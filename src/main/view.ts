@@ -55,6 +55,10 @@ export class View {
 
   private lastUrl = '';
 
+  // --- Auto-resize helpers for WebContentsView
+  private _boundUpdateBounds?: () => void;
+  private _resizeListenersAttached = false;
+
   public constructor(window: AppWindow, url: string, incognito: boolean) {
     const path = require('path');
     this.webContentsView = new WebContentsView({
@@ -74,14 +78,13 @@ export class View {
       },
     });
 
-
     // When using @electron/remote in renderers, each WebContents must be
-    // explicitly enabled. The built‑in remote module has been removed in
+    // explicitly enabled. The built-in remote module has been removed in
     // recent Electron versions, so without calling enable() the alias to
     // '@electron/remote' in the renderer will throw "@electron/remote cannot be
     // required in the browser process". Enabling the webContents makes the
     // remote APIs available in the corresponding renderer process. See
-    // https://www.npmjs.com/package/@electron/remote for details.
+    // https://www.npmjs.com/package/@electron/remote/main for details.
     try {
       // Dynamically require to avoid importing @electron/remote/main in
       // environments where it might not be available (e.g. unit tests).
@@ -300,13 +303,34 @@ export class View {
 
     this.webContents.loadURL(url);
 
- //    TODO:
- //   this.webContentsView.setAutoResize({
- //     width: true,
- //     height: true,
- //     horizontal: false,
- //     vertical: false,
- //   });
+    this._boundUpdateBounds = () => {
+      try {
+        if (!this.window?.win || this.window.win.isDestroyed()) return;
+        const { x, y, width, height } = this.window.win.getContentBounds();
+        // Fill the entire content area; ViewManager may later adjust via fixBounds().
+        // Coerce to non-negative sane values to avoid exceptions on initial layout.
+        const w = Math.max(0, width ?? 0);
+        const h = Math.max(0, height ?? 0);
+        (this.webContentsView as any).setBounds?.({ x: 0, y: 0, width: w, height: h });
+      } catch (err) {
+        // swallow layout errors; ViewManager will still correct bounds.
+      }
+    };
+
+    const winRef = this.window.win;
+    // Attach a few key window events
+    const attachResizeListeners = () => {
+      if (this._resizeListenersAttached) return;
+      this._resizeListenersAttached = true;
+      winRef.on('resize', this._boundUpdateBounds!);
+      winRef.on('enter-full-screen', this._boundUpdateBounds!);
+      winRef.on('leave-full-screen', this._boundUpdateBounds!);
+      winRef.on('maximize', this._boundUpdateBounds!);
+      winRef.on('unmaximize', this._boundUpdateBounds!);
+      // Do an initial sizing pass.
+      this._boundUpdateBounds!();
+    };
+    attachResizeListeners();
   }
 
   public get webContents() {
@@ -341,6 +365,19 @@ export class View {
   }
 
   public destroy() {
+    // Remove auto-resize bindings to avoid leaks
+    try {
+      if (this._boundUpdateBounds && this.window?.win && !this.window.win.isDestroyed()) {
+        this.window.win.removeListener('resize', this._boundUpdateBounds);
+        this.window.win.removeListener('enter-full-screen', this._boundUpdateBounds);
+        this.window.win.removeListener('leave-full-screen', this._boundUpdateBounds);
+        this.window.win.removeListener('maximize', this._boundUpdateBounds);
+        this.window.win.removeListener('unmaximize', this._boundUpdateBounds);
+      }
+    } catch {}
+    this._resizeListenersAttached = false;
+    this._boundUpdateBounds = undefined;
+
     (this.webContentsView.webContents as any).destroy();
     this.webContentsView = null;
   }
