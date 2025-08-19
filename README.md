@@ -54,15 +54,15 @@ As developers, many of us have attempted to compile Chromium from source, only t
 
 # Screenshots
 
-<img width="1919" height="1032" alt="Screenshot 2025-08-15 132049" src="https://github.com/user-attachments/assets/c955f38e-dd53-4814-9546-930d42a02960" />
+<img width="1919" height="1032" alt="Screenshot 2025-08-15 132049" src="https://github.com/user-attachments/assets/279c4f8a-5b46-4610-b696-5d61839c5f86" />
 
 UI normal variant:
 
-<img width="1919" height="78" alt="top" src="https://github.com/user-attachments/assets/f6e8063d-bd79-43f3-9b05-b707c950420f" />
+<img width="1919" height="78" alt="top" src="https://github.com/user-attachments/assets/151995d8-5d6b-4543-8657-e82a4ac36565" />
 
 UI compact variant:
-<img width="1919" height="38" alt="Screenshot 2025-08-15 131407" src="https://github.com/user-attachments/assets/8cc423e2-7f59-4242-97eb-fdafae513520" />
-<img width="1919" height="37" alt="Screenshot 2025-08-15 131424" src="https://github.com/user-attachments/assets/c470ef1a-41db-4cf3-8486-81f72221b39c" />
+<img width="1919" height="38" alt="Screenshot 2025-08-15 131407" src="https://github.com/user-attachments/assets/f8a75bb0-b288-42ce-942f-37ab55d6d556" />
+<img width="1919" height="37" alt="Screenshot 2025-08-15 131424" src="https://github.com/user-attachments/assets/821daecb-71e5-4b4b-8477-1676527754c4" />
 
 # Downloads
 - [Stable](https://github.com/VQMSoftware/Selenix-Browser/releases)
