@@ -377,7 +377,7 @@ export class Store {
 
   public async loadTopSites() {
     try {
-      this.topSites = await (window as any).getTopSites(8);
+      this.topSites = await (window as any).api.topsites.get(8);
     } catch (e) {
       console.error('loadTopSites failed:', e);
       this.topSites = [];

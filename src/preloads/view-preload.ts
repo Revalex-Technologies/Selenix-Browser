@@ -248,3 +248,14 @@ if (window.location.href.startsWith(WEBUI_BASE_URL)) {
     window.postMessage({ type: 'credentials-remove', data }, '*');
   });
 }
+
+/* ---------- Modern history API namespace ---------- */
+contextBridge.exposeInMainWorld('api', {
+  history: {
+    get: async () => ipcRenderer.invoke('history-get'),
+    remove: (ids: string[]) => ipcRenderer.send('history-remove', ids),
+  },
+  topsites: {
+    get: async (count: number) => ipcRenderer.invoke('topsites-get', count),
+  },
+});

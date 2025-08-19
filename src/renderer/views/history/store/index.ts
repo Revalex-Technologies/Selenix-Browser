@@ -169,7 +169,7 @@ export class Store {
   }
 
   public async load() {
-    this.items = await (window as any).getHistory();
+    this.items = await (window as any).api.history.get();
   }
 
   public async loadFavicons() {
@@ -185,12 +185,12 @@ export class Store {
   public async clear() {
     const itemsToRemove = [...this.items];
     this.items = [];
-    await (window as any).removeHistory(itemsToRemove.map((x) => x._id));
+    await (window as any).api.history.remove(itemsToRemove.map((x) => x._id));
   }
 
   public removeItems(id: string[]) {
     this.items = this.items.filter((x) => id.indexOf(x._id) === -1);
-    (window as any).removeHistory(id);
+    (window as any).api.history.remove(id);
   }
 
   @action
