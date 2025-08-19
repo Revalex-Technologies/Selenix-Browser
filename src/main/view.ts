@@ -74,6 +74,7 @@ export class View {
       },
     });
 
+
     // When using @electron/remote in renderers, each WebContents must be
     // explicitly enabled. The built‑in remote module has been removed in
     // recent Electron versions, so without calling enable() the alias to

@@ -173,10 +173,23 @@ export class AppWindow {
     });
 
     // Update window bounds on resize and on move when window is not maximized.
-    this.win.on('resize', () => {
+this.win.on('resize', () => {
       if (!this.win.isMaximized()) {
         windowState.bounds = this.win.getBounds();
       }
+      // Keep WebContentsView sized to the content area as the window resizes.
+      setTimeout(() => {
+        if (process.platform === 'linux') {
+          this.viewManager.select(this.viewManager.selectedId, false);
+        } else {
+          this.viewManager.fixBounds();
+        }
+      });
+      // Notify renderer layout
+      this.webContents.send('tabs-resize');
+      setTimeout(() => {
+        this.webContents.send('tabs-resize');
+      }, 500);
     });
 
     this.win.on('move', () => {
