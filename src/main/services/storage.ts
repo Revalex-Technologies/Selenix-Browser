@@ -1,6 +1,6 @@
 import { ipcMain, dialog } from 'electron';
 import * as Datastore from 'nedb';
-import { fromBuffer } from 'file-type';
+import { fileTypeFromBuffer } from 'file-type/core';
 import * as icojs from 'icojs';
 
 import { getPath } from '~/utils';
@@ -399,13 +399,13 @@ export class StorageService {
 
       let data = Buffer.from(res.data, 'binary');
 
-      const type = await fromBuffer(data);
+      const type = await fileTypeFromBuffer(data);
 
       if (type && type.ext === 'ico') {
         data = Buffer.from(new Uint8Array(await convertIcoToPng(data)));
       }
 
-      const str = `data:${(await fromBuffer(data)).ext};base64,${data.toString(
+      const str = `data:${(await fileTypeFromBuffer(data)).ext};base64,${data.toString(
         'base64',
       )}`;
 
