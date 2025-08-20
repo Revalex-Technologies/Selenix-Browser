@@ -23,7 +23,36 @@ const Versions = styled.div`
 `;
 
 export const About: React.FC = () => {
-  const versions = (process as any).versions || {};
+  const getSafeVersions = () => {
+    // Prefer versions provided by the preload (contextBridge)
+    try {
+      const wv = (typeof window !== 'undefined' && (window as any)?.versions) ? (window as any).versions : null;
+      if (wv) return wv as any;
+    } catch {}
+  // Electron's renderer may not have a global `process` (e.g., when nodeIntegration is off
+  // or when bundled with modern Webpack/Vite), so guard all access.
+  const pv = (typeof process !== 'undefined' && (process as any)?.versions) ? (process as any).versions : null;
+
+  if (pv) return pv;
+
+  // Fallback: try to infer Chromium version from the user agent
+  const ua = (typeof navigator !== 'undefined' && (navigator as any)) ? (navigator as any) : null;
+  const result: any = {};
+  try {
+    // Prefer userAgentData if available
+    const brands = (ua as any)?.userAgentData?.brands || [];
+    const chromium = brands.find((b: any) => /Chrom(e|ium)/i.test(b.brand));
+    if (chromium?.version) result.chrome = chromium.version;
+  } catch {}
+  try {
+    // Fallback to userAgent parsing
+    const m = ua?.userAgent?.match(/Chrom(e|ium)\/([\d.]+)/i);
+    if (m && m[2]) result.chrome = result.chrome || m[2];
+  } catch {}
+
+  return result;
+};
+const versions = getSafeVersions();
   return (
     <Wrapper>
       <Banner src={require('./selenix-banner.png')} alt="Selenix" />

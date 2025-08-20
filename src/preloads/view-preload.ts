@@ -150,6 +150,18 @@ contextBridge.exposeInMainWorld('electron', {
   },
 });
 
+// Expose safe readonly versions so internal pages can show Electron/Node/V8 versions
+try {
+  contextBridge.exposeInMainWorld('versions', {
+    electron: process.versions.electron,
+    chrome: process.versions.chrome,
+    node: process.versions.node,
+    v8: process.versions.v8,
+  });
+} catch {}
+
+
+
 // Back-compat: many of the internal pages referenced window.settings directly.
 contextBridge.exposeInMainWorld('settings', settings);
 
