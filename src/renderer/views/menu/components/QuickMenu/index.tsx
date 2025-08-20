@@ -1,5 +1,9 @@
 import * as React from 'react';
 import { observer } from 'mobx-react-lite';
+// Safe pre-paint effect hook that prefers React.useInsertionEffect when available
+const usePrePaintEffect: typeof React.useLayoutEffect =
+  ((React as any).useInsertionEffect ?? React.useLayoutEffect);
+
 
 import {
   Line,
