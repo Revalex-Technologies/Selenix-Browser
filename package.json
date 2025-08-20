@@ -73,6 +73,7 @@
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-prettier": "5.5.4",
     "eslint-plugin-react": "7.37.5",
+    "file-type": "^21.0.0",
     "fork-ts-checker-webpack-plugin": "^9.1.0",
     "html-webpack-plugin": "^5.1.0",
     "icojs": "^0.16.0",
