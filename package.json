@@ -1,7 +1,7 @@
 {
   "name": "selenix",
   "version": "1.0.0",
-  "packageManager": "yarn@4.9.2",
+  "packageManager": "yarn@4.9.3",
   "sideEffects": false,
   "description": "Extensible, fast and innovative web browser with material UI.",
   "keywords": [
