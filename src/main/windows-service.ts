@@ -66,8 +66,17 @@ export class WindowsService {
   }
 
   public broadcast(channel: string, ...args: unknown[]) {
-    this.list.forEach((appWindow) =>
-      appWindow.win.webContents.send(channel, ...args),
-    );
+    const alive: AppWindow[] = [];
+    this.list.forEach((appWindow) => {
+      try {
+        const win = (appWindow as any)?.win;
+        if (!win || typeof win.isDestroyed !== 'function' || win.isDestroyed()) return;
+        const wc = win.webContents;
+        if (!wc || typeof wc.isDestroyed !== 'function' || wc.isDestroyed()) return;
+        wc.send(channel, ...args);
+        alive.push(appWindow);
+      } catch {}
+    });
+    this.list = alive;
   }
 }

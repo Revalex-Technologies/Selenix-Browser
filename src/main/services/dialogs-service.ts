@@ -220,7 +220,13 @@ export class DialogsService {
             if (index !== -1) {
               Application.instance.windows.list.forEach((window) => {
                 try {
-                  window.win.contentView.removeChildView(viewToRemove);
+                  try {
+              if (window.win && !window.win.isDestroyed()) {
+                window.win.contentView.removeChildView(viewToRemove);
+              }
+            } catch (e) {
+              console.error('Error removing browser view:', e);
+            }
                 } catch (e) {
                   console.error('Error removing browser view:', e);
                 }
@@ -374,7 +380,13 @@ export class DialogsService {
       try {
         Application.instance.windows.list.forEach((window) => {
           try {
-            window.win.contentView.removeChildView(view);
+            try {
+            if (window.win && !window.win.isDestroyed()) {
+              window.win.contentView.removeChildView(view);
+            }
+          } catch (e) {
+            console.error('Error removing browser view:', e);
+          }
           } catch {}
         });
         try {

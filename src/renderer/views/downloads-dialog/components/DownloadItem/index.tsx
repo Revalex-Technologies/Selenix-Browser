@@ -12,8 +12,20 @@ import {
   SecondaryText,
 } from './style';
 import { IDownloadItem } from '~/interfaces';
-import prettyBytes = require('pretty-bytes');
 import { shell } from 'electron';
+
+// Lightweight pretty-bytes formatter to avoid ESM/CJS type issues.
+const prettyBytes = (input: number): string => {
+  if (typeof input !== 'number' || !isFinite(input)) return '0 B';
+  const neg = input < 0;
+  let num = Math.abs(input);
+  if (num < 1) return `${neg ? '-' : ''}${num} B`;
+  const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+  const exponent = Math.min(Math.floor(Math.log10(num) / 3), units.length - 1);
+  const value = Number((num / Math.pow(1000, exponent)).toFixed(2));
+  return `${neg ? '-' : ''}${value} ${units[exponent]}`;
+};
+
 
 const onClick = (item: IDownloadItem) => () => {
   if (item.completed) {
