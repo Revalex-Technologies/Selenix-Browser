@@ -130,7 +130,10 @@ const onFindInPageClick = () => {
 
 const onAlwaysClick = () => {
   store.alwaysOnTop = !store.alwaysOnTop;
-  remote.getCurrentWindow().setAlwaysOnTop(store.alwaysOnTop);
+  const current = remote.getCurrentWindow();
+  const parent = (current as any).getParentWindow ? (current as any).getParentWindow() : null;
+  const target = parent || current;
+  target.setAlwaysOnTop(store.alwaysOnTop);
 };
 
 const onNewWindowClick = () => {

@@ -1,4 +1,5 @@
 import { ipcRenderer } from 'electron';
+import * as remote from '@electron/remote';
 import { makeObservable, observable } from 'mobx';
 import { DialogStore } from '~/models/dialog-store';
 
@@ -15,14 +16,14 @@ export class Store extends DialogStore {
 
   constructor() {
     super();
-
-    // Use makeObservable (compatible with subclasses).
+// Use makeObservable (compatible with subclasses).
     makeObservable(this, {
       alwaysOnTop: observable,
       updateAvailable: observable,
       updateError: observable,
     });
 
+    try { this.alwaysOnTop = remote.getCurrentWindow().isAlwaysOnTop(); } catch (e) {}
     this.registerIpcHandlers();
   }
 
