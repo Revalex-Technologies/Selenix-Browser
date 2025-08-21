@@ -153,8 +153,32 @@ export class ViewManager extends EventEmitter {
   }
 
   public clear() {
-    this.window.win.setContentView(null);
-    Object.values(this.views).forEach((x) => x.destroy());
+    try {
+      // Safely remove all child views from the window and destroy them.
+      const contentView = this.window.win?.contentView as any;
+      if (contentView && typeof contentView.removeChildView === 'function') {
+        for (const v of this.views.values()) {
+          try {
+            // Remove the view from the contentView if it was attached.
+            contentView.removeChildView(v.webContentsView);
+          } catch {}
+          try {
+            v.destroy();
+          } catch {}
+        }
+      } else {
+        // Fallback: just destroy views if contentView isn't available
+        for (const v of this.views.values()) {
+          try { v.destroy(); } catch {}
+        }
+      }
+    } finally {
+      // Reset internal state
+      if (typeof (this.views as any).clear === 'function') {
+        (this.views as Map<number, any>).clear();
+      }
+      this.selectedId = -1 as any;
+    }
   }
 
   public select(id: number, focus = true) {
