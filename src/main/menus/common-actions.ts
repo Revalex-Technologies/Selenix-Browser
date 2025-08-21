@@ -36,8 +36,14 @@ export const viewSource = async () => {
 };
 
 export const printPage = () => {
-  const {
-    webContents,
-  } = Application.instance.windows.current.viewManager.selected;
-  webContents.print();
+  const windowsService = Application.instance.windows;
+  const currentWindow = windowsService?.current;
+  const selectedView = currentWindow?.viewManager?.selected;
+  const wc = selectedView?.webContents || currentWindow?.win?.webContents;
+
+  if (wc && typeof (wc as any).print === 'function') {
+    try { (wc as any).print(); } catch (err) { console.error('Print failed:', err); }
+  } else {
+    console.warn('[printPage] No active webContents to print.');
+  }
 };

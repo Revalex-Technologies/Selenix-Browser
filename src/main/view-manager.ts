@@ -53,7 +53,18 @@ export class ViewManager extends EventEmitter {
     });
 
     ipcMain.on('Print', (e, details) => {
-      this.views.get(this.selectedId).webContents.print();
+      // Prefer printing the currently selected view; fall back to the sender's webContents.
+      const selectedView = this.views.get(this.selectedId);
+      if (selectedView?.webContents) {
+        try { selectedView.webContents.print(); } catch (err) { console.error('Print failed (selected view):', err); }
+        return;
+      }
+      const sender = e?.sender;
+      if (sender && typeof (sender as any).print === 'function') {
+        try { (sender as any).print(); } catch (err) { console.error('Print failed (sender):', err); }
+        return;
+      }
+      console.warn('[Print] No active view/webContents available to print.');
     });
 
     ipcMain.handle(`view-select-${id}`, (e, id: number, focus: boolean) => {
