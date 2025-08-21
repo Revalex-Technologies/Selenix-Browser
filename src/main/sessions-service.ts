@@ -11,10 +11,7 @@ import { pathExists } from '~/utils/files';
 import { extractZip } from '~/utils/zip';
 import { extensions, _setFallbackSession } from 'electron-extensions';
 import { requestPermission } from './dialogs/permissions';
-import * as rimraf from 'rimraf';
-import { promisify } from 'util';
-
-const rf = promisify(rimraf);
+import { rimraf as rf } from 'rimraf';
 
 interface ExtendedExtension extends Extension {
   backgroundPage?: {
