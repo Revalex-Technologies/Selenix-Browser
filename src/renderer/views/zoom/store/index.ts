@@ -4,13 +4,14 @@ import { DialogStore } from '~/models/dialog-store';
 
 export class Store extends DialogStore {
   @observable
+
   public zoomFactor = 1;
 
   public timer: any = 0;
 
   public constructor() {
     super();
-    makeObservable(this, { zoomFactor: observable });
+    makeObservable(this);
     this.init();
   }
 

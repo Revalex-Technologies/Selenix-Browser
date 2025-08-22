@@ -19,11 +19,11 @@ import { IURLSegment } from '~/interfaces/urls';
 import { BookmarkBarStore } from './bookmark-bar';
 
 export class Store {
+  public startupTabs = new StartupTabsStore(this);
   public settings = new SettingsStore(this);
   public addTab = new AddTabStore();
   public tabs = new TabsStore();
   public extensions = new ExtensionsStore();
-  public startupTabs = new StartupTabsStore(this);
   public tabGroups = new TabGroupsStore(this);
   public autoFill = new AutoFillStore();
   public bookmarksBar = new BookmarkBarStore(this);

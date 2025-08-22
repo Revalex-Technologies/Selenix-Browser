@@ -13,15 +13,25 @@ export class Store extends DialogStore {
 
   // Observable
 
+  @observable
+
   public title = '';
+
+  @observable
 
   public url = '';
 
+  @observable
+
   public x = 0;
+
+  @observable
 
   public xTransition = false;
 
   // Computed
+
+  @computed
 
   public get domain() {
     let protocol: string | undefined;
@@ -55,13 +65,7 @@ export class Store extends DialogStore {
   constructor() {
     super({ visibilityWrapper: false, persistent: true });
 
-    makeObservable(this, {
-      title: observable,
-      url: observable,
-      x: observable,
-      xTransition: observable,
-      domain: computed,
-    });
+    makeObservable(this);
 
     ipcRenderer.on('visible', (e, visible, tab) => {
       clearTimeout(this.timeout);

@@ -8,7 +8,11 @@ import { IFormFillData } from '~/interfaces';
 import { DialogStore } from '~/models/dialog-store';
 
 export class Store extends DialogStore {
+  @observable
+
   public content: 'save' | 'update' | 'list';
+
+  @observable
 
   public list: IFormFillData[] = [];
 
@@ -21,11 +25,7 @@ export class Store extends DialogStore {
   public constructor() {
     super({ hideOnBlur: false });
 
-    makeObservable(this, {
-      content: observable,
-      list: observable,
-      remove: action,
-    });
+    makeObservable(this);
 
     ipcRenderer.on('credentials-update', (e, data) => {
       const { username, password, content, list } = data;
@@ -41,6 +41,8 @@ export class Store extends DialogStore {
       this.content = content;
     });
   }
+
+  @action
 
   public remove(data: IFormFillData) {
     this.list = this.list.filter((r) => r._id !== data._id);

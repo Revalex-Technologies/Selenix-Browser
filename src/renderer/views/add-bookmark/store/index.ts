@@ -11,9 +11,15 @@ export class Store extends DialogStore {
 
   // Observable
 
+  @observable
+
   public folders: IBookmark[] = [];
 
+  @observable
+
   public dialogTitle = '';
+
+  @observable
 
   public currentFolder: IBookmark = null;
 
@@ -25,11 +31,7 @@ export class Store extends DialogStore {
       this.currentFolder = this.folders.find((x) => x.static === 'main');
     })();
 
-    makeObservable(this, {
-      folders: observable,
-      dialogTitle: observable,
-      currentFolder: observable,
-    });
+    makeObservable(this);
 
     ipcRenderer.on('data', async (e, data) => {
       const { bookmark, title, url, favicon } = data;

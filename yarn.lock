@@ -7601,10 +7601,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mobx@npm:6.1.7":
-  version: 6.1.7
-  resolution: "mobx@npm:6.1.7"
-  checksum: 10c0/ab2c11999416f9b5e204ab00675700d7fe8c607392590ee94473572e28a228a9d49b2426b79bc49274bef0b89c6d80a8156f8b009319e84c9cc49640a2aa5ed7
+"mobx@npm:6.13.7":
+  version: 6.13.7
+  resolution: "mobx@npm:6.13.7"
+  checksum: 10c0/3ae7f8c586a48a0a2b9b4900871455bc93d3878bdff70b6820ba830c6b883d7f8a0222aa2a0fec7201d25f38a19cb340e62a18a3939182a676dc35d857f35dd6
   languageName: node
   linkType: hard
 
@@ -9111,7 +9111,7 @@ __metadata:
     html-webpack-plugin: "npm:^5.6.4"
     icojs: "npm:^0.16.0"
     jszip: "npm:^3.10.1"
-    mobx: "npm:6.1.7"
+    mobx: "npm:6.13.7"
     mobx-react-lite: "npm:3.2.0"
     nedb: "npm:1.8.0"
     node-bookmarks-parser: "npm:^2.0.0"

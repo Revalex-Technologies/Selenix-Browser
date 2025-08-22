@@ -9,19 +9,21 @@ import { DialogStore } from '~/models/dialog-store';
  * Any errors are also sent to renderer (main already shows a native popup).
  */
 export class Store extends DialogStore {
+  @observable
+
   public alwaysOnTop = false;
 
+  @observable
+
   public updateAvailable = false;
+  @observable
+
   public updateError: string | null = null;
 
   constructor() {
     super();
 // Use makeObservable (compatible with subclasses).
-    makeObservable(this, {
-      alwaysOnTop: observable,
-      updateAvailable: observable,
-      updateError: observable,
-    });
+    makeObservable(this);
 
     try { this.alwaysOnTop = remote.getCurrentWindow().isAlwaysOnTop(); } catch (e) {}
     this.registerIpcHandlers();

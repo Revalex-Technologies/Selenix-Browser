@@ -5,14 +5,18 @@ import { getDomain } from '~/utils';
 import { DialogStore } from '~/models/dialog-store';
 
 export class Store extends DialogStore {
+  @observable
+
   public permissions: string[] = [];
+
+  @observable
 
   public domain = '';
 
   public constructor() {
     super({ hideOnBlur: false });
 
-    makeObservable(this, { permissions: observable, domain: observable });
+    makeObservable(this);
 
     ipcRenderer.on('update-tab-info', (e, tabId, { url, name, details }) => {
       this.domain = getDomain(url);

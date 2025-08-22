@@ -33,43 +33,62 @@ export class ITab {
   public marginLeft = 0;
 
   // Observable
+@observable
 
   public isDragging = false;
+@observable
 
   public isPinned = false;
+@observable
 
   public isMuted = false;
+@observable
 
   public isPlaying = false;
+@observable
 
   public title = 'New tab';
+@observable
 
   public loading = true;
+@observable
 
   public favicon = '';
+@observable
 
   public tabGroupId = -1;
+@observable
 
   public addressbarValue: string = null;
+@observable
 
   public url = '';
+@observable
 
   public blockedAds = 0;
+@observable
 
   public hasCredentials = false;
 
   // Computed
+  @computed
   public get isSelected() {
     return store.tabs.selectedTabId === this.id;
   }
+
+  @computed
 
   public get isHovered() {
     return store.tabs.hoveredTabId === this.id;
   }
 
+  @computed
+
   public get isExpanded() {
     return this.isHovered || this.isSelected || !store.tabs.scrollable;
   }
+
+  @computed
 
   public get isIconSet() {
     return this.favicon !== '' || this.loading;
@@ -79,24 +98,7 @@ export class ITab {
     { active, url, pinned }: chrome.tabs.CreateProperties,
     id: number,
   ) {
-    makeObservable(this, {
-      addressbarValue: observable,
-      url: observable,
-      favicon: observable,
-      loading: observable,
-      tabGroupId: observable,
-      isDragging: observable,
-      isPinned: observable,
-      isMuted: observable,
-      isPlaying: observable,
-      title: observable,
-      blockedAds: observable,
-      hasCredentials: observable,
-      isSelected: computed,
-      isHovered: computed,
-      isExpanded: computed,
-      isIconSet: computed,
-    });
+    makeObservable(this);
 
     this.url = url;
     this.id = id;

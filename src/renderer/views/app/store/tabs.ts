@@ -22,11 +22,15 @@ import { TOOLBAR_HEIGHT } from '~/constants/design';
 import { TabEvent } from '~/interfaces/tabs';
 
 export class TabsStore {
+@observable
   public isDragging = false;
+@observable
 
   public hoveredTabId = -1;
+@observable
 
   public list: ITab[] = [];
+@observable
 
   public selectedTabId = -1;
 
@@ -50,23 +54,20 @@ export class TabsStore {
 
   public leftMargins = 0;
 
+  @computed
+
   public get selectedTab() {
     return this.getTabById(this.selectedTabId);
   }
+
+  @computed
 
   public get hoveredTab() {
     return this.getTabById(this.hoveredTabId);
   }
 
   public constructor() {
-    makeObservable(this, {
-      list: observable,
-      isDragging: observable,
-      hoveredTabId: observable,
-      selectedTabId: observable,
-      selectedTab: computed,
-      hoveredTab: computed,
-    });
+    makeObservable(this);
 
     window.addEventListener('mouseup', this.onMouseUp);
     window.addEventListener('mousemove', this.onMouseMove);

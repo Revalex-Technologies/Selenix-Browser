@@ -19,15 +19,19 @@ export class Store extends DialogStore {
   public suggestions = new SuggestionsStore(this);
 
   @observable
+
   public visitedItems: IVisitedItem[] = [];
 
   @observable
+
   public tabs: ISearchTab[] = [];
 
   @observable
+
   public inputText = '';
 
   @computed
+
   public get searchedTabs(): ISuggestion[] {
     const lastItem = this.suggestions.list[this.suggestions.list.length - 1];
 
@@ -53,6 +57,7 @@ export class Store extends DialogStore {
   }
 
   @computed
+
   public get searchEngine() {
     return this.settings.searchEngines[this.settings.searchEngine];
   }
@@ -69,13 +74,7 @@ export class Store extends DialogStore {
       persistent: true,
     });
 
-    makeObservable(this, {
-      visitedItems: observable,
-      tabs: observable,
-      inputText: observable,
-      searchedTabs: computed,
-      searchEngine: computed,
-    });
+    makeObservable(this);
 
     ipcRenderer.on('visible', (e, visible, data) => {
       this.visible = visible;
