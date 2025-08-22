@@ -1,12 +1,74 @@
 import { ipcMain } from 'electron';
 import { parse } from 'url';
-// Optional keytar import with fallbacks so the app compiles even if keytar is not installed
-let _keytar: any = null;
-try { _keytar = require('keytar'); } catch {}
-const getPassword = async (service: string, account: string) => _keytar ? _keytar.getPassword(service, account) : null;
-const setPassword = async (service: string, account: string, password: string) => _keytar ? _keytar.setPassword(service, account, password) : null;
-const deletePassword = async (service: string, account: string) => _keytar ? _keytar.deletePassword(service, account) : null;
 
+/**
+ * Password persistence via electron-store (with a no-op in-memory fallback).
+ * Set ELECTRON_STORE_KEY to enable at-rest encryption.
+ */
+type PasswordStore = {
+  get(service: string, account: string): Promise<string | null>;
+  set(service: string, account: string, password: string): Promise<void>;
+  delete(service: string, account: string): Promise<void>;
+};
+
+let passwordStore: PasswordStore;
+
+(() => {
+  try {
+    // Use require to avoid ESM/CJS friction in different build setups.
+    const Store = require('electron-store') as typeof import('electron-store');
+
+    // You can change the 'name' to customize the filename on disk (credentials.json).
+    const store = new (Store as any)({
+      name: 'credentials',
+      // If you provide ELECTRON_STORE_KEY, values will be encrypted at rest.
+      encryptionKey: process.env.ELECTRON_STORE_KEY || undefined,
+      clearInvalidConfig: true,
+    });
+
+    const makeKey = (service: string, account: string) => `${service}:${account}`;
+
+    passwordStore = {
+      async get(service, account) {
+        const v = store.get(makeKey(service, account));
+        return (v ?? null) as string | null;
+      },
+      async set(service, account, password) {
+        store.set(makeKey(service, account), password);
+      },
+      async delete(service, account) {
+        store.delete(makeKey(service, account));
+      },
+    };
+  } catch (err) {
+    // Fallback: in-memory map so the app still compiles/runs without electron-store
+    console.warn(
+      '[credentials] electron-store not found; falling back to in-memory storage (passwords will not persist).',
+    );
+    const mem = new Map<string, string>();
+    const makeKey = (service: string, account: string) => `${service}:${account}`;
+
+    passwordStore = {
+      async get(service, account) {
+        return mem.get(makeKey(service, account)) ?? null;
+      },
+      async set(service, account, password) {
+        mem.set(makeKey(service, account), password);
+      },
+      async delete(service, account) {
+        mem.delete(makeKey(service, account));
+      },
+    };
+  }
+})();
+
+// Maintain the same helper API the rest of the file expects:
+const getPassword = (service: string, account: string) =>
+  passwordStore.get(service, account);
+const setPassword = (service: string, account: string, password: string) =>
+  passwordStore.set(service, account, password);
+const deletePassword = (service: string, account: string) =>
+  passwordStore.delete(service, account);
 
 import { AppWindow } from '../windows';
 import { Application } from '../application';
@@ -125,11 +187,11 @@ export const runMessagingService = (appWindow: AppWindow) => {
     // TODO: autofill
     // ipcMain.on(`form-fill-show-${id}`, async (e, rect, name, value) => {
     //   const items = await getFormFillMenuItems(name, value);
-
+    //
     //   if (items.length) {
     //     appWindow.dialogs.formFillDialog.send(`formfill-get-items`, items);
     //     appWindow.dialogs.formFillDialog.inputRect = rect;
-
+    //
     //     appWindow.dialogs.formFillDialog.resize(
     //       items.length,
     //       items.find((r) => r.subtext) != null,
@@ -140,7 +202,7 @@ export const runMessagingService = (appWindow: AppWindow) => {
     //     appWindow.dialogs.formFillDialog.hide();
     //   }
     // });
-
+    //
     // ipcMain.on(`form-fill-hide-${id}`, () => {
     //   appWindow.dialogs.formFillDialog.hide();
     // });
@@ -178,7 +240,7 @@ export const runMessagingService = (appWindow: AppWindow) => {
     //   appWindow.dialogs.credentialsDialog.rearrange();
     //   appWindow.dialogs.credentialsDialog.show();
     // });
-
+    //
     // ipcMain.on(`credentials-hide-${id}`, () => {
     //   appWindow.dialogs.credentialsDialog.hide();
     // });
