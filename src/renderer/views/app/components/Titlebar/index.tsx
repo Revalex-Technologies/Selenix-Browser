@@ -36,7 +36,7 @@ export const Titlebar = observer(() => {
       {/* When using native OS window controls, we don't render custom controls.
           On Linux, if we're in fullscreen, show an explicit exit button since
           native controls are typically hidden in fullscreen. */}
-      {platform() === 'linux' && store.isFullscreen && (
+      {platform() !== 'darwin' && store.isFullscreen && (
         <FullscreenExitButton
           style={{
             height: store.isCompact ? '100%' : 32,

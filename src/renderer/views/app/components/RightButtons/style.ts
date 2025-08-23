@@ -1,10 +1,12 @@
-import styled, { css } from 'styled-components';
-import { ITheme } from '~/interfaces';
+import styled from 'styled-components';
 
 export const Buttons = styled.div`
   display: flex;
   align-items: center;
   margin-right: 4px;
+  padding-right: ${({ theme }: { theme?: any }) => (theme?.isCompact ? 'var(--overlay-right-inset, 0px)' : '0px')};
+  padding-left: ${({ theme }: { theme?: any }) => (theme?.isCompact ? 'var(--overlay-left-inset, 0px)' : '0px')};
+  position: relative;
 `;
 
 export const Separator = styled.div`
@@ -12,8 +14,6 @@ export const Separator = styled.div`
   width: 1px;
   margin-left: 4px;
   margin-right: 4px;
-
-  ${({ theme }: { theme?: ITheme }) => css`
-    background-color: ${theme['toolbar.separator.color']};
-  `};
+  opacity: 0.12;
+  background: currentColor;
 `;

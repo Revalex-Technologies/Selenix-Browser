@@ -12,6 +12,7 @@ import {
   ICON_MORE,
 } from '~/renderer/constants/icons';
 import { Buttons, Separator } from './style';
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
 import store from '../../store';
 import { SiteButtons } from '../SiteButtons';
 
@@ -53,8 +54,20 @@ const BrowserActions = observer(() => {
 });
 
 export const RightButtons = observer(() => {
+  const buttonsRef = React.useRef<HTMLDivElement | null>(null);
+
+  useIsomorphicLayoutEffect(() => {
+    const update = () => {
+      const w = buttonsRef.current ? buttonsRef.current.offsetWidth : 0;
+      document.documentElement.style.setProperty('--right-buttons-width', `${w}px`);
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
   return (
-    <Buttons>
+    <Buttons ref={buttonsRef}>
       <BrowserActions />
       {store.extensions.browserActions.length > 0 && <Separator />}
       {store.isCompact && (

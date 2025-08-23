@@ -11,14 +11,19 @@ import { ITheme } from '~/interfaces';
 
 export const StyledTabbar = styled.div`
   height: 100%;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   position: relative;
-  padding-right: var(--overlay-right-inset, 0px);
-  padding-left: var(--overlay-left-inset, 0px);
+  padding-right: ${({ theme }: { theme?: any }) => (
+    theme?.isCompact
+      ? 'calc(var(--overlay-right-inset, 0px) + var(--right-buttons-width, 0px) + 8px)'
+      : 'calc(var(--overlay-right-inset, 0px) + 16px)'
+  )}; /* compact reserves buttons; normal extends */
+  padding-left: ${({ theme }: { theme?: any }) => (theme?.isCompact ? '0px' : 'var(--overlay-left-inset, 0px)') };
 
   overflow: hidden;
   align-items: center;
-  margin-right: 32px;
+  margin-right: ${({ theme }: { theme?: any }) => (theme?.isCompact ? '0px' : '0px')};
   display: flex;
   margin-left: 4px;
 `;
@@ -41,10 +46,18 @@ export const StyledTabbar = styled.div`
 
 export const TabsContainer = styled.div`
   height: 100%;
-  width: calc(100% - ${TOOLBAR_BUTTON_WIDTH}px);
+  width: ${({ theme }: { theme?: any }) =>
+    (theme?.isCompact
+      ? 'calc(100% - var(--overlay-right-inset, 0px) - var(--right-buttons-width, 0px) - 8px)'
+      : `calc(100% - ${TOOLBAR_BUTTON_WIDTH}px - 16px)`)}; /* compact reserves buttons; normal extends with larger blank */
+  min-width: 0;
   position: relative;
-  padding-right: var(--overlay-right-inset, 0px);
-  padding-left: var(--overlay-left-inset, 0px);
+  padding-right: ${({ theme }: { theme?: any }) => (
+    theme?.isCompact
+      ? 'calc(var(--overlay-right-inset, 0px) + var(--right-buttons-width, 0px) + 8px)'
+      : 'calc(var(--overlay-right-inset, 0px) + 16px)'
+  )}; /* compact reserves buttons; normal extends */
+  padding-left: ${({ theme }: { theme?: any }) => (theme?.isCompact ? '0px' : 'var(--overlay-left-inset, 0px)') };
 
   overflow: hidden;
   overflow-x: overlay;
@@ -60,7 +73,7 @@ export const TabsContainer = styled.div`
 
 export const AddTab = styled(ToolbarButton)`
   position: absolute;
-  left: var(--overlay-left-inset, 0px);
+  left: ${({ theme }: { theme?: any }) => (theme?.isCompact ? '0px' : 'var(--overlay-left-inset, 0px)')};
   min-width: ${ADD_TAB_BUTTON_WIDTH}px;
   height: ${ADD_TAB_BUTTON_HEIGHT}px;
 

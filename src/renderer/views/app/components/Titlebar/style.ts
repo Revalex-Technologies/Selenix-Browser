@@ -13,8 +13,8 @@ export const StyledTitlebar = styled.div`
   flex-flow: row;
   color: rgba(0, 0, 0, 0.8);
   width: 100%;
-  padding-right: var(--overlay-right-inset, 0px);
-  padding-left: var(--overlay-left-inset, 0px);
+  
+  
 
 
   &:before {
@@ -42,7 +42,7 @@ export const StyledTitlebar = styled.div`
     padding-left: ${platform() === 'darwin' && !isFullscreen ? 78 : 4}px;
 
     /* Reserve space for native Win caption buttons */
-    padding-right: ${platform() === 'win32' && !isFullscreen ? 'calc(var(--overlay-right-inset, 120px) + 8px)' : 4}px;
+    padding-right: ${platform() === 'win32' && !isFullscreen ? `${theme.isCompact ? 'calc(var(--overlay-right-inset, 40px) + 2px)' : 'calc(min(var(--overlay-right-inset, 40px), 12px) + 2px)'}` : 4}px;
 
     &:before {
       -webkit-app-region: ${isFullscreen ? 'no-drag' : 'drag'};
