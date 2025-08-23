@@ -61,8 +61,9 @@ UI normal variant:
 <img width="1919" height="78" alt="top" src="https://github.com/user-attachments/assets/151995d8-5d6b-4543-8657-e82a4ac36565" />
 
 UI compact variant:
-<img width="1919" height="38" alt="Screenshot 2025-08-15 131407" src="https://github.com/user-attachments/assets/f8a75bb0-b288-42ce-942f-37ab55d6d556" />
-<img width="1919" height="37" alt="Screenshot 2025-08-15 131424" src="https://github.com/user-attachments/assets/821daecb-71e5-4b4b-8477-1676527754c4" />
+<img width="1919" height="38" alt="compact1" src="https://github.com/user-attachments/assets/bcb9f6d4-1264-4bde-a4ae-4fc7a4295c6f" />
+<img width="1919" height="38" alt="compact2" src="https://github.com/user-attachments/assets/8f80c3e0-73dc-44a8-b1f2-72fdd78f1340" />
+
 
 # Downloads
 - [Stable](https://github.com/VQMSoftware/Selenix-Browser/releases)
