@@ -39,7 +39,8 @@ As developers, many of us have attempted to compile Chromium from source, only t
 - **Customizable browser UI** - Choose whether Selenix should have compact or normal UI.
 - **Tab groups** - Easily group tabs, so it's hard to get lost.
 - **Scrollable tabs**
-- **chrome extensions currently do not work** - i have not updated any extension capibility of the browser yet as of writing this, i and possibly a contributer at some point may have a working extension implamentation untill then you can read the [`docs`](docs) to find out how to install extensions, old ones do work you just need to look a little harder to find them.
+- **chrome extensions support** - load your favorite extensions from any chromium browser into Selenix Browser (currently only supports MV2 extensions) instructions on setting up your extensions can be found in [`docs/extensions`](docs/extensions.md)
+
 
 ## Other basic features
 

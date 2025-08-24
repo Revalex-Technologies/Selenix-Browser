@@ -20,6 +20,7 @@ import * as remote from '@electron/remote';
 // for more details.
 import store from '../../store';
 import { ToolbarButton } from '../ToolbarButton';
+import { BrowserAction } from '../BrowserAction';
 
 const showAddBookmarkDialog = async () => {
   const star = document.getElementById('star');
@@ -137,6 +138,14 @@ export const SiteButtons = observer(() => {
         dense={dense}
         onMouseDown={onStarClick}
       />
+{store.isCompact && store.tabs.selectedTabId &&
+  store.extensions.browserActions.map((item) =>
+    item.tabId === store.tabs.selectedTabId ? (
+      <BrowserAction data={item} key={`compact-${item.extensionId}`} />
+    ) : null
+  )
+}
+
       <ToolbarButton
         size={16}
         badge={store.settings.object.shield && blockedAds > 0}

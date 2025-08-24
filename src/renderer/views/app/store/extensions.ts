@@ -71,7 +71,9 @@ export class ExtensionsStore {
         extensionId: extension.id,
         icon,
         title: default_title,
-        popup: extension.manifest?.browser_action?.default_popup,
+        popup:
+        (extension.manifest as any)?.browser_action?.default_popup ??
+        (extension.manifest as any)?.action?.default_popup,
       });
 
       this.defaultBrowserActions.push(browserAction);

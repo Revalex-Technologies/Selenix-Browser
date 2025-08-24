@@ -6,6 +6,7 @@ import { IBrowserAction } from '../../models';
 import { ipcRenderer } from 'electron';
 import * as remote from '@electron/remote';
 import store from '../../store';
+import { EXTENSIONS_PROTOCOL } from '~/constants';
 
 interface Props {
   data: IBrowserAction;
@@ -17,14 +18,27 @@ const showPopup = (
   top: number,
   devtools: boolean,
 ) => {
-  store.extensions.currentlyToggledPopup = data.extensionId;
-  ipcRenderer.send(
-    `show-extension-popup-${store.windowId}`,
-    left,
-    top,
-    data.popup,
-    devtools,
-  );
+store.extensions.currentlyToggledPopup = data.extensionId;
+
+// Use an absolute chrome-extension:// URL. Normalize if one was provided already.
+const raw = (data.popup || '').trim();
+let popupUrl: string;
+if (raw.startsWith(`${EXTENSIONS_PROTOCOL}://`)) {
+  // Fix accidental triple-slash like chrome-extension:///id/popup.html
+  popupUrl = raw.replace(`${EXTENSIONS_PROTOCOL}:///`, `${EXTENSIONS_PROTOCOL}://`);
+} else {
+  const popupRel = raw.replace(/^\/+/, '');
+  if (!popupRel) return;
+  popupUrl = `${EXTENSIONS_PROTOCOL}://${data.extensionId}/${popupRel}`;
+}
+
+ipcRenderer.send(
+  `show-extension-popup-${store.windowId}`,
+  left,
+  top,
+  popupUrl,
+  devtools,
+);
 };
 
 let canOpenPopup = true;
@@ -93,8 +107,7 @@ export const BrowserAction = observer(({ data }: Props) => {
   } = data;
 
   return (
-    <ToolbarButton
-      onClick={onClick(data)}
+    <ToolbarButton onClick={onClick(data)}
       onMouseDown={onMouseDown(data)}
       onContextMenu={onContextMenu(data)}
       opacity={1}

@@ -68,8 +68,12 @@ export const RightButtons = observer(() => {
 
   return (
     <Buttons ref={buttonsRef}>
-      <BrowserActions />
-      {store.extensions.browserActions.length > 0 && <Separator />}
+      {!store.isCompact && (
+        <>
+          <BrowserActions />
+          {store.extensions.browserActions.length > 0 && <Separator />}
+        </>
+      )}
       {store.isCompact && (
         <>
           <SiteButtons />
