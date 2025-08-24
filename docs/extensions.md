@@ -1,6 +1,6 @@
 # Extensions
 
-selenix has partial support for Chrome extensions (keep that in mind)
+while Selenix does support chroome extensions it only supports the older MV2 extensions, i am currently in the process of migrating to the new MV3.
 
 # Installing an extension
 
