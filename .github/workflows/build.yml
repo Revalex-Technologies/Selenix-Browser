@@ -21,11 +21,10 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
 
-    # Global env helps avoid IPv6 stalls & sets Yarn’s registry
+    # Prefer IPv4 & set registry (helps Linux stalls)
     env:
-      NODE_OPTIONS: --dns-result-order=ipv4first   # Prefer IPv4 to dodge IPv6 stalls on runners
-      YARN_NPM_REGISTRY_SERVER: https://registry.npmjs.org  # Yarn v4 registry env override
-      # (You can also set YARN_HTTP_TIMEOUT, YARN_NETWORK_CONCURRENCY here if you prefer env-based overrides)
+      NODE_OPTIONS: --dns-result-order=ipv4first
+      YARN_NPM_REGISTRY_SERVER: https://registry.npmjs.org
 
     steps:
       - name: Checkout
@@ -94,13 +93,15 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Enable Corepack and Yarn (from packageManager)
+      # Pin Yarn 4 explicitly to avoid CLI incompatibilities
+      - name: Enable Corepack and pin Yarn 4
         if: steps.superseded.outputs.skip_build != 'true'
         shell: bash
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
+          set -euo pipefail
           corepack enable
-          corepack install
+          corepack prepare yarn@4.9.3 --activate
           yarn -v
 
       - name: Show versions
@@ -150,14 +151,11 @@ jobs:
           sudo apt-get update -y
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libfuse2 rpm libarchive-tools
 
-      # ---- CI-friendly Yarn config (limits concurrency and raises timeout) ----
       - name: Configure Yarn for CI (registry, timeout, concurrency)
         if: steps.superseded.outputs.skip_build != 'true'
         shell: bash
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
-          # These keys are correct for Yarn 4 (Berry):
-          # - npmRegistryServer, httpTimeout, networkConcurrency
           yarn config set npmRegistryServer "${YARN_NPM_REGISTRY_SERVER}"
           yarn config set httpTimeout 600000
           yarn config set networkConcurrency 8
@@ -165,7 +163,7 @@ jobs:
           yarn config get httpTimeout
           yarn config get networkConcurrency
 
-      # --------- Install (lockfile-aware) with verbose output ----------
+      # --------- Install (lockfile-aware), no --mode flag ----------
       - name: Install dependencies (Yarn 4; lockfile-aware)
         if: steps.superseded.outputs.skip_build != 'true'
         shell: bash
@@ -177,7 +175,7 @@ jobs:
             yarn install --immutable --check-cache --inline-builds --verbose
           else
             echo "No yarn.lock found -> generating lockfile (non-immutable install)"
-            YARN_ENABLE_IMMUTABLE_INSTALLS=false yarn install --mode=update-lockfile --check-cache --inline-builds --verbose
+            YARN_ENABLE_IMMUTABLE_INSTALLS=false yarn install --check-cache --inline-builds --verbose
             echo "Generated yarn.lock:"
             ls -l yarn.lock || true
           fi
