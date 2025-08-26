@@ -11,8 +11,14 @@ try {
 
     document.documentElement.style.setProperty('--overlay-left-inset', leftInset + 'px');
     document.documentElement.style.setProperty('--overlay-right-inset', rightInset + 'px');
+    document.documentElement.style.setProperty('--overlay-reserved-left', leftInset + 'px');
+    document.documentElement.style.setProperty('--overlay-reserved-right', rightInset + 'px');
     document.documentElement.style.setProperty('--overlay-height', rect.height + 'px');
   };
+
+  // Provide reasonable defaults even if the API is missing (e.g., Win10)
+  document.documentElement.style.setProperty('--overlay-reserved-right', '120px');
+  document.documentElement.style.setProperty('--overlay-reserved-left', '0px');
 
   if (wco) {
     applyGeometry();

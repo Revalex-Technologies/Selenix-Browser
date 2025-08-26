@@ -117,19 +117,69 @@ ref: listRef,
 export const RightButtons = observer(() => {
   const buttonsRef = React.useRef<HTMLDivElement | null>(null);
   const [hasExtensionActions, setHasExtensionActions] = React.useState(false);
+  React.useEffect(() => {
+    // When the presence of extension actions changes (MV2/3), force a re-measure.
+    const el = buttonsRef.current;
+    if (!el) return;
+    const w = el.offsetWidth;
+    document.documentElement.style.setProperty('--right-buttons-width', `${w}px`);
+  }, [hasExtensionActions, store.extensions.browserActions.length, store.tabs.selectedTabId]);
+
 
   useIsomorphicLayoutEffect(() => {
     const update = () => {
       const w = buttonsRef.current ? buttonsRef.current.offsetWidth : 0;
       document.documentElement.style.setProperty('--right-buttons-width', `${w}px`);
     };
+
+    // Initial
     update();
+
+    // Recalc on window size and overlay geometry changes
     window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
-  }, []);
+    const onGeom = () => update();
+    try {
+      const wco: any = (navigator as any).windowControlsOverlay;
+      if (wco && typeof wco.addEventListener === 'function') {
+        wco.addEventListener('geometrychange', onGeom);
+      }
+    } catch {}
+
+    // Recalc on DOM changes (extension icons appearing/disappearing)
+    const mo = new MutationObserver(() => update());
+    if (buttonsRef.current) {
+      mo.observe(buttonsRef.current, { childList: true, subtree: true, attributes: true });
+      try {
+        const ro = new (window as any).ResizeObserver(() => update());
+        (ro as any).observe(buttonsRef.current);
+        // Save on ref for cleanup
+        (buttonsRef.current as any).__rb_ro = ro;
+      } catch {}
+    }
+
+    return () => {
+      window.removeEventListener('resize', update);
+      try {
+        const wco: any = (navigator as any).windowControlsOverlay;
+        if (wco && typeof wco.removeEventListener === 'function') {
+          wco.removeEventListener('geometrychange', onGeom);
+        }
+      } catch {}
+      mo.disconnect();
+      try {
+        const el: any = buttonsRef.current;
+        const ro = el && el.__rb_ro;
+        if (ro && ro.disconnect) ro.disconnect();
+      } catch {}
+    };
+  }, [store.isCompact]);
 
   return (
     <Buttons ref={buttonsRef}>
+      {/* Compact mode: show BrowserAction icons as well (no separator) */}
+      {store.isCompact && (
+        <RemovedActions onPresenceChange={setHasExtensionActions} />
+      )}
       {!store.isCompact && (
         <>
           <RemovedActions onPresenceChange={setHasExtensionActions} />

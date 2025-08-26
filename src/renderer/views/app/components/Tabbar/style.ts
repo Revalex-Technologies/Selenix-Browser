@@ -16,7 +16,7 @@ export const StyledTabbar = styled.div`
   position: relative;
   padding-right: ${({ theme }: { theme?: any }) => (
     theme?.isCompact
-      ? 'calc(var(--overlay-right-inset, 0px) + var(--right-buttons-width, 0px) + 8px)'
+      ? 'calc(max(var(--right-buttons-width, 0px), var(--overlay-reserved-right, 120px)) + 8px)'
       : 'calc(var(--overlay-right-inset, 0px) + 16px)'
   )}; /* compact reserves buttons; normal extends */
   padding-left: ${({ theme }: { theme?: any }) => (theme?.isCompact ? '0px' : 'var(--overlay-left-inset, 0px)') };
@@ -48,13 +48,13 @@ export const TabsContainer = styled.div`
   height: 100%;
   width: ${({ theme }: { theme?: any }) =>
     (theme?.isCompact
-      ? 'calc(100% - var(--overlay-right-inset, 0px) - var(--right-buttons-width, 0px) - 8px)'
+      ? 'calc(100% - max(var(--right-buttons-width, 0px), var(--overlay-reserved-right, 120px)) - 8px)'
       : `calc(100% - ${TOOLBAR_BUTTON_WIDTH}px - 16px)`)}; /* compact reserves buttons; normal extends with larger blank */
   min-width: 0;
   position: relative;
   padding-right: ${({ theme }: { theme?: any }) => (
     theme?.isCompact
-      ? 'calc(var(--overlay-right-inset, 0px) + var(--right-buttons-width, 0px) + 8px)'
+      ? 'calc(max(var(--right-buttons-width, 0px), var(--overlay-reserved-right, 120px)) + 8px)'
       : 'calc(var(--overlay-right-inset, 0px) + 16px)'
   )}; /* compact reserves buttons; normal extends */
   padding-left: ${({ theme }: { theme?: any }) => (theme?.isCompact ? '0px' : 'var(--overlay-left-inset, 0px)') };
