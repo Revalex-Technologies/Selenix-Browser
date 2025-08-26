@@ -4,14 +4,15 @@ name: Build
 on:
   push:
     branches:
-      - '**'         # run on any branch
+      - '**'
     tags-ignore:
-      - '**'         # do NOT run on tags
+      - '**'
 
 jobs:
   build:
     name: Build on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
     concurrency:
       group: build-${{ github.ref }}-${{ matrix.os }}
 
@@ -19,6 +20,12 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
+
+    # Global env helps avoid IPv6 stalls & sets Yarn’s registry
+    env:
+      NODE_OPTIONS: --dns-result-order=ipv4first   # Prefer IPv4 to dodge IPv6 stalls on runners
+      YARN_NPM_REGISTRY_SERVER: https://registry.npmjs.org  # Yarn v4 registry env override
+      # (You can also set YARN_HTTP_TIMEOUT, YARN_NETWORK_CONCURRENCY here if you prefer env-based overrides)
 
     steps:
       - name: Checkout
@@ -87,7 +94,7 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Enable Corepack and Yarn 4
+      - name: Enable Corepack and Yarn (from packageManager)
         if: steps.superseded.outputs.skip_build != 'true'
         shell: bash
         working-directory: ${{ env.PROJECT_DIR }}
@@ -143,7 +150,22 @@ jobs:
           sudo apt-get update -y
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libfuse2 rpm libarchive-tools
 
-      # --------- KEY FIX: allow install without a lockfile ----------
+      # ---- CI-friendly Yarn config (limits concurrency and raises timeout) ----
+      - name: Configure Yarn for CI (registry, timeout, concurrency)
+        if: steps.superseded.outputs.skip_build != 'true'
+        shell: bash
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          # These keys are correct for Yarn 4 (Berry):
+          # - npmRegistryServer, httpTimeout, networkConcurrency
+          yarn config set npmRegistryServer "${YARN_NPM_REGISTRY_SERVER}"
+          yarn config set httpTimeout 600000
+          yarn config set networkConcurrency 8
+          yarn config get npmRegistryServer
+          yarn config get httpTimeout
+          yarn config get networkConcurrency
+
+      # --------- Install (lockfile-aware) with verbose output ----------
       - name: Install dependencies (Yarn 4; lockfile-aware)
         if: steps.superseded.outputs.skip_build != 'true'
         shell: bash
@@ -152,11 +174,10 @@ jobs:
           set -euo pipefail
           if [ -f yarn.lock ]; then
             echo "yarn.lock found -> immutable install"
-            yarn install --immutable
+            yarn install --immutable --check-cache --inline-builds --verbose
           else
             echo "No yarn.lock found -> generating lockfile (non-immutable install)"
-            # Ensure Yarn doesn't enforce immutable installs in CI when no lockfile exists
-            YARN_ENABLE_IMMUTABLE_INSTALLS=false yarn install
+            YARN_ENABLE_IMMUTABLE_INSTALLS=false yarn install --mode=update-lockfile --check-cache --inline-builds --verbose
             echo "Generated yarn.lock:"
             ls -l yarn.lock || true
           fi
