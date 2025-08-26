@@ -1,5 +1,4 @@
-# build workflow
-
+# .github/workflows/build.yml
 name: Build
 
 on:
@@ -13,7 +12,6 @@ jobs:
   build:
     name: Build on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    # No cancel-in-progress; we self-skip older runs to avoid "canceled" notifications
     concurrency:
       group: build-${{ github.ref }}-${{ matrix.os }}
 
@@ -26,7 +24,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # needed for ls-remote compare below
+          fetch-depth: 0
 
       # ---- Superseded guard: skip gracefully if a newer commit exists on this branch ----
       - name: Determine if this run is superseded
@@ -34,23 +32,19 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # Only relevant for push events on branches
           if [ "${{ github.event_name }}" != "push" ] || [[ "${GITHUB_REF}" != refs/heads/* ]]; then
             echo "skip_build=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           BRANCH="${GITHUB_REF#refs/heads/}"
-          # Query the latest commit SHA for this branch on origin
           LATEST_SHA="$(git ls-remote origin "$BRANCH" | awk '{print $1}' | head -n1 || true)"
           echo "Latest on origin/$BRANCH: ${LATEST_SHA:-<none>}"
           echo "This run SHA: $GITHUB_SHA"
 
           if [ -n "${LATEST_SHA:-}" ] && [ "$LATEST_SHA" != "$GITHUB_SHA" ]; then
-            echo "A newer commit exists. Marking this run to be skipped (will end green)."
             echo "skip_build=true" >> "$GITHUB_OUTPUT"
           else
-            echo "This is the latest commit on the branch."
             echo "skip_build=false" >> "$GITHUB_OUTPUT"
           fi
 
@@ -149,11 +143,23 @@ jobs:
           sudo apt-get update -y
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libfuse2 rpm libarchive-tools
 
-      - name: Install dependencies (Yarn 4)
+      # --------- KEY FIX: allow install without a lockfile ----------
+      - name: Install dependencies (Yarn 4; lockfile-aware)
         if: steps.superseded.outputs.skip_build != 'true'
         shell: bash
         working-directory: ${{ env.PROJECT_DIR }}
-        run: yarn install --immutable
+        run: |
+          set -euo pipefail
+          if [ -f yarn.lock ]; then
+            echo "yarn.lock found -> immutable install"
+            yarn install --immutable
+          else
+            echo "No yarn.lock found -> generating lockfile (non-immutable install)"
+            # Ensure Yarn doesn't enforce immutable installs in CI when no lockfile exists
+            YARN_ENABLE_IMMUTABLE_INSTALLS=false yarn install
+            echo "Generated yarn.lock:"
+            ls -l yarn.lock || true
+          fi
 
       - name: Clean dist (safety)
         if: steps.superseded.outputs.skip_build != 'true'
@@ -187,7 +193,6 @@ jobs:
           compression-level: 0
           retention-days: 14
 
-      # If superseded, still end the job clearly with success.
       - name: End (skipped due to newer commit)
         if: steps.superseded.outputs.skip_build == 'true'
         run: echo "Newer commit detected on branch; this run skipped intentionally (green check)."
