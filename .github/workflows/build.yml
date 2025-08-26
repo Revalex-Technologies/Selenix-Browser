@@ -163,7 +163,7 @@ jobs:
           yarn config get httpTimeout
           yarn config get networkConcurrency
 
-      # --------- Install (lockfile-aware), no --mode flag ----------
+      # --------- Install (lockfile-aware) ----------
       - name: Install dependencies (Yarn 4; lockfile-aware)
         if: steps.superseded.outputs.skip_build != 'true'
         shell: bash
@@ -172,10 +172,10 @@ jobs:
           set -euo pipefail
           if [ -f yarn.lock ]; then
             echo "yarn.lock found -> immutable install"
-            yarn install --immutable --check-cache --inline-builds --verbose
+            yarn install --immutable --check-cache
           else
             echo "No yarn.lock found -> generating lockfile (non-immutable install)"
-            YARN_ENABLE_IMMUTABLE_INSTALLS=false yarn install --check-cache --inline-builds --verbose
+            yarn install --no-immutable --check-cache
             echo "Generated yarn.lock:"
             ls -l yarn.lock || true
           fi
