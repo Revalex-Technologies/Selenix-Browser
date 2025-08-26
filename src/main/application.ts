@@ -3,7 +3,7 @@ import { isAbsolute, extname } from 'path';
 import { existsSync } from 'fs';
 import { SessionsService } from './sessions-service';
 // Import the electron-chrome-extensions library. This package provides
-// full Chrome extension API support (currently MV2 and MV3) for Electron. We'll
+// modern Chrome extension support (currently MV2 and MV3) for Electron. We'll
 // instantiate it when the application is ready and store the instance
 // on the Application class. See setupExtensions() below for details.
 import type { ElectronChromeExtensions } from 'electron-chrome-extensions';
