@@ -1,5 +1,16 @@
 # Development
 
+## electron remote package
+
+We install `@electron/remote` because the built in remote was removed from electron a long time ago, then we hook it like this
+
+```ts
+import { enable } from '@electron/remote/main';
+
+// we enable remote within the webContents
+enable(this.win.webContents);
+```
+
 ## IPC
 
 Now, the preferred way to communicate between processes is to use [`@wexond/rpc-electron`](https://github.com/wexond/rpc) package.
@@ -23,8 +34,7 @@ Common RPC interface
 
 ## Node integration
 
-We are going to turn off `nodeIntegration`, enable `contextIsolation` and `sandbox` in the UI webContents,
-therefore we prefer not having requires to node.js built-in modules in renderers.
+We turn of `nodeIntegration` in the view and enable `contextIsolation`for security, this also fixes websites from not properly loading because theres no fallback for them (in wexond 5.2.0 this was not enabled).
 
 ## Project structure
 
