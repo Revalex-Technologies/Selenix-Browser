@@ -17,3 +17,11 @@ export const Separator = styled.div`
   opacity: 0.12;
   background: currentColor;
 `;
+
+
+export const ExtensionsWrapper = styled.div<{present?: boolean}>`
+  display: flex;
+  align-items: center;
+  /* Add a tiny bit of breathing room between the address bar and first extension icon */
+  margin-left: ${p => (p.present ? '6px' : '0')};
+`;

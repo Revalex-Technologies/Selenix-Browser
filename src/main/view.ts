@@ -171,7 +171,31 @@ export class View {
       this.updateURL(this.webContents.getURL());
     });
 
-    this.webContents.addListener('did-start-navigation', async (e, ...args) => {
+    
+    // Ensure all window.open/_blank/new-window requests open as tabs, not new BrowserWindows.
+    try {
+      (this.webContents as any).setWindowOpenHandler?.((details: any) => {
+        const url = details?.url || '';
+        const frameName = (details as any)?.frameName || '';
+        const disposition = (details as any)?.disposition || 'foreground-tab';
+        try {
+          if (disposition === 'background-tab') {
+            this.window.viewManager.create({ url, active: false }, true);
+          } else if (disposition === 'foreground-tab' || disposition === 'new-window') {
+            this.window.viewManager.create({ url, active: true }, true);
+          } else if (frameName === '_self') {
+            this.window.viewManager.selected.webContents.loadURL(url);
+          } else {
+            // Default to opening in a new foreground tab.
+            this.window.viewManager.create({ url, active: true }, true);
+          }
+        } catch (err) {
+          // swallow errors and deny default
+        }
+        return { action: 'deny' };
+      });
+    } catch {}
+this.webContents.addListener('did-start-navigation', async (e, ...args) => {
       this.updateNavigationState();
 
       this.favicon = '';
@@ -378,8 +402,17 @@ export class View {
     this._resizeListenersAttached = false;
     this._boundUpdateBounds = undefined;
 
-    (this.webContentsView.webContents as any).destroy();
-    this.webContentsView = null;
+    try {
+      if (this.webContentsView && (this.webContentsView as any).webContents) {
+        const wc: any = (this.webContentsView as any).webContents;
+        if (typeof wc.isDestroyed === 'function') {
+          if (!wc.isDestroyed()) wc.destroy();
+        } else if (typeof wc.destroy === 'function') {
+          wc.destroy();
+        }
+      }
+    } catch {}
+    this.webContentsView = null as any;
   }
 
   public async updateCredentials() {

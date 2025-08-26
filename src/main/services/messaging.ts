@@ -81,7 +81,7 @@ import * as bookmarkMenu from '../menus/bookmarks';
 import { showFindDialog } from '../dialogs/find';
 import { getFormFillMenuItems } from '../utils';
 import { showAddBookmarkDialog } from '../dialogs/add-bookmark';
-import { showExtensionDialog } from '../dialogs/extension-popup';
+// removed extension-popup import
 import { showDownloadsDialog } from '../dialogs/downloads';
 import { showZoomDialog } from '../dialogs/zoom';
 import { showTabGroupDialog } from '../dialogs/tabgroup';
@@ -158,9 +158,7 @@ export const runMessagingService = (appWindow: AppWindow) => {
   });
 
   if (process.env.ENABLE_EXTENSIONS) {
-    ipcMain.on(`show-extension-popup-${id}`, (e, left, top, url, inspect) => {
-      showExtensionDialog(appWindow.win, left, top, url, inspect);
-    });
+
   }
 
   ipcMain.on(`show-downloads-dialog-${id}`, (e, left, top) => {

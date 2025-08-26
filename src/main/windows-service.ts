@@ -1,5 +1,8 @@
 import { AppWindow } from './windows/app';
-import { extensions } from 'electron-extensions';
+// The legacy electron-extensions package has been replaced by
+// electron-chrome-extensions. All event hooks are now implemented
+// via callbacks passed to the ElectronChromeExtensions constructor in
+// Application.setupExtensions().
 import { BrowserWindow, ipcMain } from 'electron';
 
 export class WindowsService {
@@ -10,31 +13,10 @@ export class WindowsService {
   public lastFocused: AppWindow;
 
   constructor() {
-    if (process.env.ENABLE_EXTENSIONS) {
-      extensions.tabs.on('activated', (tabId, windowId, focus) => {
-        const win = this.list.find((x) => x.id === windowId);
-        win.viewManager.select(tabId, focus === undefined ? true : focus);
-      });
-
-      extensions.tabs.onCreateDetails = (tab, details) => {
-        const win = this.findByContentsView(tab.id);
-        details.windowId = win.id;
-      };
-
-      extensions.windows.onCreate = async (details) => {
-        return this.open(details.incognito).id;
-      };
-
-      extensions.tabs.onCreate = async (details) => {
-        const win =
-          this.list.find((x) => x.id === details.windowId) || this.lastFocused;
-
-        if (!win) return -1;
-
-        const view = win.viewManager.create(details);
-        return view.id;
-      };
-    }
+    // When extensions are enabled, tab and window creation events are
+    // handled by the ElectronChromeExtensions instance created in
+    // Application.setupExtensions(). There are no event listeners to
+    // register here.
 
     ipcMain.handle('get-tab-zoom', (e, tabId) => {
       return this.findByContentsView(tabId).viewManager.views.get(tabId)
@@ -45,10 +27,8 @@ export class WindowsService {
   public open(incognito = false) {
     const window = new AppWindow(incognito);
     this.list.push(window);
-
-    if (process.env.ENABLE_EXTENSIONS) {
-      extensions.windows.observe(window.win);
-    }
+    // Electron-chrome-extensions automatically tracks windows when tabs are
+    // created. There is no need to call extensions.windows.observe().
 
     window.win.on('focus', () => {
       this.lastFocused = window;

@@ -243,6 +243,10 @@ if (window.location.href.startsWith(WEBUI_BASE_URL)) {
     }
   });
 
+// Note: injection of browser actions has been moved to the renderer entry
+// (see src/renderer/pre-entry.ts) because it is required in the WebUI
+// context rather than the tab view. Do not inject browser actions here.
+
   // Push updates to pages in the main world via postMessage (keeps code unchanged)
   ipcRenderer.on('update-settings', (_e, data) => {
     window.postMessage({ type: 'update-settings', data }, '*');

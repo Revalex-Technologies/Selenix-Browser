@@ -20,7 +20,7 @@ import * as remote from '@electron/remote';
 // for more details.
 import store from '../../store';
 import { ToolbarButton } from '../ToolbarButton';
-import { BrowserAction } from '../BrowserAction';
+// REMOVED (renderer browseraction/popup): import {null} from '..//* RemovedAction removed */';
 
 const showAddBookmarkDialog = async () => {
   const star = document.getElementById('star');
@@ -81,21 +81,36 @@ ipcRenderer.on('zoom-factor-updated', (e, zoomFactor, showDialog) => {
   }
 });
 
+
+const onShieldMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+  // Left-click should open the same context menu as right-click (do not toggle directly).
+  if (e.button === 0) {
+    e.preventDefault();
+    return onShieldContextMenu(e);
+  }
+};
+
 const onShieldContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+  e.preventDefault();
   const menu = remote.Menu.buildFromTemplate([
     {
-      checked: store.settings.object.shield,
-      label: 'Enabled',
+      label: 'Enable',
       type: 'checkbox',
+      checked: !!store.settings.object.shield,
       click: () => {
-        store.settings.object.shield = !store.settings.object.shield;
+        const next = !store.settings.object.shield;
+        store.settings.object.shield = next;
         store.settings.save();
-      },
+        try { ipcRenderer.send('shield:set-enabled', next); } catch {}
+        try { window.dispatchEvent(new CustomEvent('shield:enabled-updated', { detail: next })); } catch {}
+      
+    try { window.dispatchEvent(new CustomEvent('shield:enabled-updated', { detail: next })); } catch {}},
     },
   ]);
-
-  menu.popup();
+  try { menu.popup({ window: remote.getCurrentWindow() }); } catch {}
 };
+
+
 
 export const SiteButtons = observer(() => {
   const { selectedTab } = store.tabs;
@@ -138,13 +153,6 @@ export const SiteButtons = observer(() => {
         dense={dense}
         onMouseDown={onStarClick}
       />
-{store.isCompact && store.tabs.selectedTabId &&
-  store.extensions.browserActions.map((item) =>
-    item.tabId === store.tabs.selectedTabId ? (
-      <BrowserAction data={item} key={`compact-${item.extensionId}`} />
-    ) : null
-  )
-}
 
       <ToolbarButton
         size={16}
@@ -153,6 +161,7 @@ export const SiteButtons = observer(() => {
         icon={ICON_SHIELD}
         opacity={store.settings.object.shield ? 0.87 : 0.54}
         onContextMenu={onShieldContextMenu}
+        onMouseDown={onShieldMouseDown}
       ></ToolbarButton>
     </>
   );

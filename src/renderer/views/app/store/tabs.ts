@@ -132,6 +132,19 @@ export class TabsStore {
       this.getTabById(id)?.close();
     });
 
+    ipcRenderer.on('select-tab', (e, id: number) => {
+      // Avoid feedback loop / jitter: main already selected & focused the view.
+      // We only mark it active in the UI without calling Tab.select(),
+      // which would invoke main again.
+      const tab = this.getTabById(id);
+      if (!tab) return;
+      this.selectedTabId = id;
+      // Do not move focus or change address bar here.
+      // Bounds/layout may not need an update, but it's cheap and safe.
+      this.updateTabsBounds(false);
+    });
+
+
     ipcRenderer.on('tab-event', (e, event: TabEvent, tabId, args) => {
       const tab = this.getTabById(tabId);
 

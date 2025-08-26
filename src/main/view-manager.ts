@@ -3,15 +3,17 @@ import { VIEW_Y_OFFSET } from '~/constants/design';
 import { View } from './view';
 import { AppWindow } from './windows';
 import { WEBUI_BASE_URL } from '~/constants/files';
+import { Application } from './application';
 
 import {
   ZOOM_FACTOR_MIN,
   ZOOM_FACTOR_MAX,
   ZOOM_FACTOR_INCREMENT,
 } from '~/constants/web-contents';
-import { extensions } from 'electron-extensions';
+// The legacy electron-extensions API has been removed. Instead we rely on
+// electron-chrome-extensions which is initialized on the Application
+// instance. Where necessary we reference Application.instance.extensions.
 import { EventEmitter } from 'events';
-import { Application } from './application';
 
 export class ViewManager extends EventEmitter {
   public views = new Map<number, View>();
@@ -67,11 +69,20 @@ export class ViewManager extends EventEmitter {
       console.warn('[Print] No active view/webContents available to print.');
     });
 
-    ipcMain.handle(`view-select-${id}`, (e, id: number, focus: boolean) => {
-      if (process.env.ENABLE_EXTENSIONS) {
-        extensions.tabs.activate(id, focus);
+    ipcMain.handle(`view-select-${id}`, (e, tabId: number, focus: boolean) => {
+      // When extensions are enabled, notify electron-chrome-extensions
+      // which tab has been activated. Otherwise fallback to selecting
+      // the view directly.
+      if (process.env.ENABLE_EXTENSIONS && Application.instance.extensions) {
+        const view = this.views.get(tabId)
+        if (view) {
+          try {
+            Application.instance.extensions.selectTab(view.webContentsView.webContents)
+          } catch {}
+        }
+        this.select(tabId, focus)
       } else {
-        this.select(id, focus);
+        this.select(tabId, focus)
       }
     });
 
@@ -150,10 +161,29 @@ export class ViewManager extends EventEmitter {
     this.views.set(id, view);
 
     if (process.env.ENABLE_EXTENSIONS) {
-      extensions.tabs.observe(webContents);
+      // Register the tab with electron-chrome-extensions so that
+      // chrome.tabs APIs can target it. The addTab call associates
+      // the webContents with its owning BrowserWindow. We wrap in
+      // try/catch because the extensions instance might not be ready
+      // during early startup.
+      try {
+        Application.instance.extensions?.addTab(
+          webContents,
+          this.window.win,
+        )
+      } catch {}
     }
 
     webContents.once('destroyed', () => {
+      // Clean up our internal mapping when a tab's webContents is
+      // destroyed. Also notify electron-chrome-extensions so it can
+      // remove the tab from its store. Without this call the
+      // extensions API may retain references to closed tabs.
+      if (process.env.ENABLE_EXTENSIONS) {
+        try {
+          Application.instance.extensions?.removeTab(webContents)
+        } catch {}
+      }
       this.views.delete(id);
     });
 
@@ -201,6 +231,9 @@ export class ViewManager extends EventEmitter {
     }
 
     this.selectedId = id;
+
+    // Notify the renderer (WebUI) which tab was selected so the tabstrip can update.
+    this.window.webContents.send('select-tab', id);
 
     if (selected) {
       this.window.win.contentView.removeChildView(selected.webContentsView);
@@ -273,6 +306,13 @@ export class ViewManager extends EventEmitter {
 
   public destroy(id: number) {
     const view = this.views.get(id);
+
+    // Notify electron-chrome-extensions that this tab is being removed.
+    if (process.env.ENABLE_EXTENSIONS && view && Application.instance.extensions) {
+      try {
+        Application.instance.extensions.removeTab(view.webContentsView.webContents)
+      } catch {}
+    }
 
     this.views.delete(id);
 

@@ -73,9 +73,52 @@ export const getViewMenu = (
         },
       },
       {
+        
         label: 'Save image as...',
-        click: () => {
-          appWindow.webContents.downloadURL(params.srcURL);
+        click: async () => {
+          try {
+            const { dialog } = require('electron');
+            const url = params.srcURL;
+            const guessedName = (() => {
+              try {
+                const u = new URL(url);
+                const last = (u.pathname.split('/').pop() || '').split('?')[0] || 'image';
+                return last || 'image';
+              } catch (_err) { return 'image'; }
+            })();
+
+            const res = await dialog.showSaveDialog({
+              defaultPath: guessedName,
+              filters: [
+                { name: 'Images', extensions: ['png','jpg','jpeg','gif','webp','bmp','svg'] },
+                { name: 'All Files', extensions: ['*'] },
+              ],
+            });
+            if (res.canceled || !res.filePath) return;
+
+            const ses = appWindow.win.webContents.session;
+            const handler = (event: any, item: any) => {
+              try {
+                if ((item.getURL && item.getURL()) === url) {
+                  try { item.setSavePath(res.filePath); } catch {}
+                  ses.removeListener('will-download', handler);
+                }
+              } catch {}
+            };
+            // One-shot path assignment for this download only
+            ses.on('will-download', handler);
+
+            // Kick off the download
+            try {
+              // Prefer session.downloadURL with saveAs flag when available
+              if (typeof (ses as any).downloadURL === 'function') {
+                try { (ses as any).downloadURL(url, { saveAs: true }); }
+                catch { appWindow.webContents.downloadURL(url); }
+              } else {
+                appWindow.webContents.downloadURL(url);
+              }
+            } catch {}
+          } catch (err) { console.error('Save image as failed:', err); }
         },
       },
       {

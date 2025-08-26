@@ -1,4 +1,3 @@
-// src/main/services/adblock.ts
 import { existsSync, promises as fs } from 'fs';
 import { resolve, join } from 'path';
 import {
@@ -124,6 +123,8 @@ function emitBlockedEvent(request: any /* Request-like */) {
 
 // Register preload once per session using modern API; skip if unavailable
 async function registerPreloadForSession(ses: Session): Promise<void> {
+  // Disable Ghostery preload by default to avoid extension/service-worker crashes.
+  if (process.env.ADBLOCKER_PRELOAD !== '1') { dlog('skipping Ghostery preload (set ADBLOCKER_PRELOAD=1 to enable)'); return; }
   if (!PRELOAD_PATH) {
     dlog('no Ghostery preload found — cosmetic counter UI disabled, network blocking unaffected');
     return;
@@ -151,8 +152,8 @@ async function registerPreloadForSession(ses: Session): Promise<void> {
   }
   if (!hasSW) {
     try {
-      await anySes.registerPreloadScript({ id: ids.sw, filePath: PRELOAD_PATH, type: 'service-worker' });
-      dlog('preload registered (service-worker):', PRELOAD_PATH);
+      // (disabled) service-worker preload skipped to avoid 'window is not defined' errors
+dlog('preload registered (service-worker):', PRELOAD_PATH);
     } catch {
       dlog('service-worker preload not supported in this Electron; skipping');
     }

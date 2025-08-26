@@ -106,9 +106,9 @@ export class Settings extends EventEmitter {
 
     contexts.forEach((e) => {
       if (this.object.shield) {
-        runAdblockService(e);
+        runAdblockService();
       } else {
-        stopAdblockService(e);
+        stopAdblockService();
       }
     });
   };

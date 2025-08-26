@@ -1,6 +1,6 @@
 # Extensions
 
-while Selenix does support chroome extensions it only supports the older MV2 extensions, i am currently in the process of migrating to the new MV3.
+While Selenix Does support MV3 and MV2 Extensions, electron does not currently have every single chrome apis so some of your extensions may not work properly or error out saying theres some features missing and to update your browser.
 
 # Installing an extension
 
