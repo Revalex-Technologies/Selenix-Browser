@@ -46,7 +46,7 @@
     "@types/chrome": "0.1.4",
     "@types/crypto-js": "^4.2.2",
     "@types/jszip": "^3.4.1",
-    "@types/nedb": "1.8.11",
+    "@types/nedb": "1.8.16",
     "@types/node": "^24.0.0",
     "@types/node-fetch": "^2.5.8",
     "@types/react": "17.0.2",
