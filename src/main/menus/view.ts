@@ -22,13 +22,17 @@ export const getViewMenu = (
       {
         label: 'Open link in new tab',
         click: () => {
-          appWindow.viewManager.create(
+          // Open and immediately activate the new tab so both the content view
+          // and the renderer tabstrip stay in sync.
+          const v = appWindow.viewManager.create(
             {
               url: params.linkURL,
-              active: false,
+              active: true,
             },
             true,
           );
+          // Ensure renderer receives 'select-tab' and the new view is focused.
+          try { appWindow.viewManager.select(v.id, true); } catch {}
         },
       },
       {
@@ -52,13 +56,16 @@ export const getViewMenu = (
       {
         label: 'Open image in new tab',
         click: () => {
-          appWindow.viewManager.create(
+          // Open and immediately activate the new tab so both the content view
+          // and the renderer tabstrip stay in sync.
+          const v = appWindow.viewManager.create(
             {
               url: params.srcURL,
-              active: false,
+              active: true,
             },
             true,
           );
+          try { appWindow.viewManager.select(v.id, true); } catch {}
         },
       },
       {
