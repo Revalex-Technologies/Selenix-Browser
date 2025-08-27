@@ -306,21 +306,33 @@ export class ViewManager extends EventEmitter {
 
   public destroy(id: number) {
     const view = this.views.get(id);
-
-    // Notify electron-chrome-extensions that this tab is being removed.
-    if (process.env.ENABLE_EXTENSIONS && view && Application.instance.extensions) {
-      try {
-        Application.instance.extensions.removeTab(view.webContentsView.webContents)
-      } catch {}
-    }
+    if (!view) return;
 
     this.views.delete(id);
 
-    if (view && !view.webContentsView.webContents.isDestroyed()) {
-      this.window.win.contentView.removeChildView(view.webContentsView);
-      view.destroy();
-      this.emit('removed', id);
-    }
+    try {
+      const wc: any = (view as any)?.webContentsView?.webContents;
+      if (process.env.ENABLE_EXTENSIONS && wc && Application.instance.extensions) {
+        try {
+          const alive = typeof wc.isDestroyed === 'function' ? !wc.isDestroyed() : true;
+          if (alive) Application.instance.extensions.removeTab(wc);
+        } catch {}
+      }
+    } catch {}
+
+    // Detach child view if present
+    try {
+      const child: any = (view as any)?.webContentsView;
+      const win = this.window?.win;
+      if (child && win && !win.isDestroyed()) {
+        try { win.contentView.removeChildView(child); } catch {}
+      }
+    } catch {}
+
+    // Destroy wrapper (handles its own null checks)
+    try { view.destroy(); } catch {}
+
+    try { this.emit('removed', id); } catch {}
   }
 
   public emitZoomUpdate(showDialog = true) {
