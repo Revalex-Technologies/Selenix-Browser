@@ -4,7 +4,7 @@ While Selenix Does support MV3 and MV2 Extensions, electron does not currently h
 
 # Installing an extension
 
-To install an extension, you will need to extract the `crx` file of the extension and put the extracted folder to `extensions` directory.
+To install an extension, you can use the chrome web store, and if you dont want to do that, you will need to extract the `crx` file of the extension and put the extracted folder to `extensions` directory.
 
 The `extensions` directory paths:
 - On Linux and macOS: `~/.selenix/extensions`
