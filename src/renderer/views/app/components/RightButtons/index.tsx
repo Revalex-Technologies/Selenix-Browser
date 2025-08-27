@@ -46,26 +46,28 @@ const onMenuClick = async () => {
 // RemovedActions component which relies on store-managed state.
 const RemovedActions = observer(({ onPresenceChange }: { onPresenceChange?: (present: boolean) => void }) => {
   const listRef = React.useRef<any>(null);
-  const [present, setPresent] = React.useState(false);
 
-  // When MV3 extensions are enabled, use the <browser-action-list> custom element
-  // provided by electron-chrome-extensions. This element manages its own state
-  // internally and will update whenever the active tab changes. Note that the
-  // element requires a partition corresponding to the session where extensions
-  // are loaded ("persist:view" in Selenix) and the current tab ID to map actions
-  // to the correct webContents. Without these attributes, the element will
-  // attempt to query actions from the session of the WebUI, which has none.
+  // Short-circuit in incognito: report not present and render nothing.
+  if (store.isIncognito) {
+    try { onPresenceChange?.(false); } catch {}
+    return null;
+  }
+
+  // MV3 path: render the native <browser-action-list> element.
   if (process.env.ENABLE_EXTENSIONS) {
-    const { selectedTabId } = store.tabs
+    const { selectedTabId } = store.tabs;
+    const [present, setPresent] = React.useState(false);
+
     React.useEffect(() => {
       const el = listRef.current as HTMLElement | null;
       const RO = (window as any).ResizeObserver;
       const handle = () => {
-        const isPresent = (el && el.offsetWidth ? el.offsetWidth : 0) > 0;
+        const isPresent = !!el && el.offsetWidth > 0;
         setPresent(isPresent);
-        onPresenceChange?.(isPresent);
+        try { onPresenceChange?.(isPresent); } catch {}
       };
       let cleanup: (() => void) | undefined;
+
       if (el) {
         handle();
         if (RO) {
@@ -76,42 +78,30 @@ const RemovedActions = observer(({ onPresenceChange }: { onPresenceChange?: (pre
           const id = window.setInterval(handle, 300);
           cleanup = () => window.clearInterval(id);
         }
-      } else {
-        handle();
       }
+
       return cleanup;
     }, [onPresenceChange, store.tabs.selectedTabId]);
-    // Use React.createElement to avoid JSX complaining about unknown intrinsic element.
+
     return (
       <ExtensionsWrapper present={present}>
         {React.createElement('browser-action-list', {
-id: 'actions',
-        alignment: 'bottom right',
-        // Specify the session partition where MV3 extensions are loaded. In Selenix
-        // this corresponds to the view session named "persist:view". Without
-        // explicitly setting this, the list will default to the WebUI session and
-        // will not display any icons.
-        partition: 'persist:view',
-        // Pass the current tab's webContents ID. This ensures the list reflects
-        // the browser actions for the selected tab. When the selected tab
-        // changes, MobX will re-render this component and update the attribute.
-        tab: selectedTabId ?? undefined,
-ref: listRef,
-} as any)}
+          id: 'actions',
+          alignment: 'bottom right',
+          partition: 'persist:view',
+          tab: selectedTabId ?? undefined,
+          ref: listRef,
+        } as any)}
       </ExtensionsWrapper>
-    )
+    );
   }
 
-  // Fallback to MV2-style icons for legacy extensions. These are stored in
-  // store.extensions.browserActions and keyed by tab ID.
-  const { selectedTabId } = store.tabs
+  // MV2 fallback: no native element; just report presence if we have actions.
+  const { selectedTabId } = store.tabs;
   const hasMv2 = !!selectedTabId && store.extensions.browserActions.some((x) => x.tabId === selectedTabId);
-  React.useEffect(() => { onPresenceChange?.(hasMv2); }, [hasMv2, onPresenceChange]);
-  return (
-    <ExtensionsWrapper present={hasMv2}>
-      {null}
-    </ExtensionsWrapper>
-  )
+  React.useEffect(() => { try { onPresenceChange?.(hasMv2); } catch {} }, [hasMv2, onPresenceChange]);
+
+  return <ExtensionsWrapper present={hasMv2}>{null}</ExtensionsWrapper>;
 })
 
 export const RightButtons = observer(() => {
@@ -180,7 +170,7 @@ export const RightButtons = observer(() => {
       {store.isCompact && (
         <RemovedActions onPresenceChange={setHasExtensionActions} />
       )}
-      {!store.isCompact && (
+      {!store.isIncognito && !store.isCompact && (
         <>
           <RemovedActions onPresenceChange={setHasExtensionActions} />
           {/*

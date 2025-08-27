@@ -169,7 +169,19 @@ export class AppWindow {
     // Show once ready to avoid flicker.
     this.win.once('ready-to-show', () => {
       this.win.show();
-      emitPlatformAndState();
+      
+if (this.incognito) {
+  try {
+    dialog.showMessageBox(this.win, {
+      type: 'info',
+      buttons: ['OK'],
+      defaultId: 0,
+      title: 'Incognito mode',
+      message: 'Since incognito is not persistant, extensions are disabled',
+    });
+  } catch {}
+}
+emitPlatformAndState();
     });
 
     // Update window bounds on resize and on move when window is not maximized.
