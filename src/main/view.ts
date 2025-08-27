@@ -109,7 +109,7 @@ export class View {
     this.homeUrl = url;
 
     this.webContents.session.webRequest.onBeforeSendHeaders(
-      (details, callback) => {
+      (details: any, callback: any) => {
         const { object: settings } = Application.instance.settings;
         if (settings.doNotTrack) details.requestHeaders['DNT'] = '1';
         callback({ requestHeaders: details.requestHeaders });
@@ -120,18 +120,18 @@ export class View {
       return this.errorURL;
     });
 
-    this.webContents.on('context-menu', (e, params) => {
+    this.webContents.on('context-menu', (e: any, params: any) => {
       const menu = getViewMenu(this.window, params, this.webContents);
       menu.popup();
     });
 
-    this.webContents.addListener('found-in-page', (e, result) => {
+    this.webContents.addListener('found-in-page', (e: any, result: any) => {
       Application.instance.dialogs
         .getDynamic('find')
         .webContentsView.webContents.send('found-in-page', result);
     });
 
-    this.webContents.addListener('page-title-updated', (e, title) => {
+    this.webContents.addListener('page-title-updated', (e: any, title: any) => {
       this.window.updateTitle();
       this.updateData();
 
@@ -139,7 +139,7 @@ export class View {
       this.updateURL(this.webContents.getURL());
     });
 
-    this.webContents.addListener('did-navigate', async (e, url) => {
+    this.webContents.addListener('did-navigate', async (e: any, url: any) => {
       this.emitEvent('did-navigate', url);
 
       await this.addHistoryItem(url);
@@ -148,7 +148,7 @@ export class View {
 
     this.webContents.addListener(
       'did-navigate-in-page',
-      async (e, url, isMainFrame) => {
+      async (e: any, url: any, isMainFrame: any) => {
         if (isMainFrame) {
           this.emitEvent('did-navigate', url);
 
@@ -195,7 +195,7 @@ export class View {
         return { action: 'deny' };
       });
     } catch {}
-this.webContents.addListener('did-start-navigation', async (e, ...args) => {
+this.webContents.addListener('did-start-navigation', async (e: any, ...args: any[]) => {
       this.updateNavigationState();
 
       this.favicon = '';
@@ -206,7 +206,7 @@ this.webContents.addListener('did-start-navigation', async (e, ...args) => {
 
     this.webContents.on(
       'did-start-navigation',
-      (e, url, isInPlace, isMainFrame) => {
+      (e: any, url: any, isInPlace: any, isMainFrame: any) => {
         if (!isMainFrame) return;
         const newUA = getUserAgentForURL(this.webContents.userAgent, url);
         if (this.webContents.userAgent !== newUA) {
@@ -244,7 +244,7 @@ this.webContents.addListener('did-start-navigation', async (e, ...args) => {
 
     this.webContents.addListener(
       'did-fail-load',
-      (e, errorCode, errorDescription, validatedURL, isMainFrame) => {
+      (e: any, errorCode: any, errorDescription: any, validatedURL: any, isMainFrame: any) => {
         // ignore -3 (ABORTED) - An operation was aborted (due to user action).
         if (isMainFrame && errorCode !== -3) {
           this.errorURL = validatedURL;
@@ -260,7 +260,7 @@ this.webContents.addListener('did-start-navigation', async (e, ...args) => {
 
     this.webContents.addListener(
       'page-favicon-updated',
-      async (e, favicons) => {
+      async (e: any, favicons: any) => {
         this.favicon = favicons[0];
 
         this.updateData();
@@ -280,7 +280,7 @@ this.webContents.addListener('did-start-navigation', async (e, ...args) => {
       },
     );
 
-    this.webContents.addListener('zoom-changed', (e, zoomDirection) => {
+    this.webContents.addListener('zoom-changed', (e: any, zoomDirection: any) => {
       const newZoomFactor =
         this.webContents.zoomFactor +
         (zoomDirection === 'in'
@@ -358,7 +358,9 @@ this.webContents.addListener('did-start-navigation', async (e, ...args) => {
   }
 
   public get webContents() {
-    return this.webContentsView.webContents;
+    const wc = (this as any)?.webContentsView?.webContents;
+    if (!wc) { throw new Error('WebContents is unavailable (view destroyed)'); }
+    return wc;
   }
 
   public get url() {
@@ -389,7 +391,12 @@ this.webContents.addListener('did-start-navigation', async (e, ...args) => {
   }
 
   public destroy() {
-    // Remove auto-resize bindings to avoid leaks
+    // Guard: prevent double-destroy
+    try {
+      if ((this as any)._isDestroyed) return;
+    } catch {}
+
+    // Drop all resize observers/listeners
     try {
       if (this._boundUpdateBounds && this.window?.win && !this.window.win.isDestroyed()) {
         this.window.win.removeListener('resize', this._boundUpdateBounds);
@@ -403,16 +410,33 @@ this.webContents.addListener('did-start-navigation', async (e, ...args) => {
     this._boundUpdateBounds = undefined;
 
     try {
-      if (this.webContentsView && (this.webContentsView as any).webContents) {
-        const wc: any = (this.webContentsView as any).webContents;
-        if (typeof wc.isDestroyed === 'function') {
-          if (!wc.isDestroyed()) wc.destroy();
-        } else if (typeof wc.destroy === 'function') {
-          wc.destroy();
-        }
+      const child: any = (this as any)?.webContentsView;
+      const win = this.window?.win;
+      if (child && win && !win.isDestroyed()) {
+        try { win.contentView.removeChildView(child); } catch {}
       }
     } catch {}
-    this.webContentsView = null as any;
+
+    // Destroy underlying webContents if present
+    try {
+      const wc: any = (this as any)?.webContentsView?.webContents;
+      if (wc) {
+        try { wc.removeAllListeners?.(); } catch {}
+        const isDestroyed = typeof wc.isDestroyed === 'function' ? wc.isDestroyed() : false;
+        if (!isDestroyed) { try { wc.destroy?.(); } catch {} }
+      }
+    } catch {}
+
+    try {
+      const wcId = (this as any)?.webContentsView?.webContents?.id;
+      if (wcId != null) {
+        try { ipcMain.removeHandler(`get-error-url-${wcId}`); } catch {}
+      }
+    } catch {}
+
+    // Null out reference and mark destroyed
+    try { (this as any).webContentsView = null as any; } catch {}
+    try { (this as any)._isDestroyed = true; } catch {}
   }
 
   public async updateCredentials() {
