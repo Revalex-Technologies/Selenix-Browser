@@ -9,7 +9,7 @@ import { SessionsService } from './sessions-service';
 import type { ElectronChromeExtensions } from 'electron-chrome-extensions';
 import { checkFiles } from '~/utils/files';
 import { Settings } from './models/settings';
-import { isURL, prefixHttp } from '~/utils';
+import { getPath, isURL, prefixHttp } from '~/utils';
 import { WindowsService } from './windows-service';
 import { StorageService } from './services/storage';
 import { getMainMenu } from './menus/main';
@@ -123,6 +123,9 @@ export class Application {
     // method will safely return if ENABLE_EXTENSIONS is not set. See
     // implementation below.
     await this.setupExtensions()
+
+    // Enable installing directly from the Chrome Web Store.
+    await this.setupChromeWebStore()
 
     // Only open a new window after sessions and extensions have been
     // initialised, so that new tabs inherit the correct session and
@@ -473,4 +476,35 @@ export class Application {
       console.error('Failed to initialize electron-chrome-extensions:', error)
     }
   }
+
+  /**
+   * Enable Chrome Web Store integration using the electron-chrome-web-store package.
+   * This registers the proper preload and IPC on the **persist:view** session so
+   * visiting the Chrome Web Store can install extensions directly.
+   */
+  private async setupChromeWebStore(): Promise<void> {
+    // Respect the same ENABLE_EXTENSIONS gate as the core extensions setup.
+    if (!process.env.ENABLE_EXTENSIONS) return;
+
+    try {
+      // Dynamically require to avoid bundling/runtime issues if the package isn't present.
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { installChromeWebStore } = require('electron-chrome-web-store') as typeof import('electron-chrome-web-store');
+
+      // Use the same extensions directory Selenix already uses elsewhere.
+      const extPath = getPath('extensions') || undefined;
+
+      await installChromeWebStore({
+        session: this.sessions.view,          // persist:view
+        extensionsPath: extPath,              // keep extension files with the rest of the app data
+        loadExtensions: true,                 // load any previously installed extensions on startup
+        allowUnpackedExtensions: false,       // match default
+        autoUpdate: true,                     // keep extensions updated
+        minimumManifestVersion: 3,            // prefer MV3; MV2 is EOL
+      });
+    } catch (err) {
+      console.error('Failed to initialize Chrome Web Store integration:', err);
+    }
+  }
+
 }

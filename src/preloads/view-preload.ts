@@ -2,7 +2,6 @@ import { contextBridge, ipcRenderer, webFrame } from 'electron';
 
 import AutoComplete from './models/auto-complete';
 import { ERROR_PROTOCOL, WEBUI_BASE_URL } from '~/constants/files';
-import { injectChromeWebstoreInstallButton } from './chrome-webstore';
 
 // IMPORTANT: do NOT expose ipcRenderer directly to the page. We wrap only what we need.
 
@@ -115,12 +114,6 @@ const postMsg = (data: any, res: any) => {
 };
 
 const hostname = window.location.href.substr(WEBUI_BASE_URL.length);
-
-/* ---------- Chrome Web Store button injection ---------- */
-
-if (process.env.ENABLE_EXTENSIONS && window.location.host === 'chrome.google.com') {
-  injectChromeWebstoreInstallButton();
-}
 
 /* ---------- Settings bootstrap ---------- */
 
