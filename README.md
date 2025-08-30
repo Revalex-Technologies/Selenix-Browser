@@ -55,7 +55,8 @@ As developers, many of us have attempted to compile Chromium from source, only t
 
 # Screenshot
 
-<img width="900" height="709" alt="Screenshot From 2025-08-30 02-38-23" src="https://github.com/user-attachments/assets/0f299fbc-7ba7-4d8c-9c88-a8ed3f46f743" />
+<img width="1125" height="896" alt="Screenshot from 2025-08-30 03-13-34" src="https://github.com/user-attachments/assets/9d782dc4-b117-48dd-8959-1ed7480e619e" />
+
 
 # Downloads
 - [Stable](https://github.com/VQMSoftware/Selenix-Browser/releases)
