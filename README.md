@@ -16,7 +16,7 @@ Selenix is a web browser built from wexond base (the version used was prior to t
 # Table of Contents:
 - [Motivation](#motivation)
 - [Features](#features)
-- [Screenshots](#screenshots)
+- [Screenshot](#screenshot)
 - [Downloads](#downloads)
 - [Contributing](#contributing)
 - [Development](#development)
@@ -70,9 +70,15 @@ Make sure you have the latest version of node.js which you can find * [`here`](h
 to switch between node versions you will need nvm (node version mamager) which you can find [`here`](https://github.com/nvm-sh/nvm/releases).
 
 
-### Windows
+### Type These commands for installing deps, building, running, or compiling.
 
-Make sure you have corepack enabled. You can do so by running this command as **administrator**:
+Make sure you have corepack enabled. You can do so by running these commands
+
+```bash
+$ sudo corepack enable # enables corepack for node.js + linux
+```
+
+for windows run the command below as **administrator**:
 
 ```bash
 $ corepack enable # enables corepack for node.js
@@ -101,6 +107,11 @@ More commands can be found in [`package.json`](package.json).
 # Documentation
 
 Guides and the API reference are located in [`docs`](docs) directory.
+
+# Contributing
+
+if you wish to contribute in any way, shape or form please give the [`Contributing License Agreement a Read`](CONTRIBUTING.md)
+
 
 # License
 
