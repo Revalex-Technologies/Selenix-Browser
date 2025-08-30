@@ -1,3 +1,4 @@
+
 import { AppWindow } from '../windows';
 import {
   clipboard,
@@ -9,6 +10,9 @@ import {
 } from 'electron';
 import { isURL, prefixHttp } from '~/utils';
 import { saveAs, viewSource, printPage } from './common-actions';
+
+// Store last DevTools mode in memory for the session (default to 'bottom')
+let lastDevToolsMode: 'right' | 'bottom' | 'undocked' | 'detach' = 'bottom';
 
 export const getViewMenu = (
   appWindow: AppWindow,
@@ -271,14 +275,26 @@ export const getViewMenu = (
     ]);
   }
 
+
   menuItems.push({
     label: 'Inspect',
     accelerator: 'CmdOrCtrl+Shift+I',
     click: () => {
       webContents.inspectElement(params.x, params.y);
-
-      if (webContents.isDevToolsOpened()) {
+      // Always open DevTools in the last used mode (default to 'bottom')
+      if (!webContents.isDevToolsOpened()) {
+        webContents.openDevTools({ mode: lastDevToolsMode });
+      } else {
         webContents.devToolsWebContents.focus();
+      }
+      // Listen for user changing the dock state and remember it for this session only
+      const devTools = webContents.devToolsWebContents;
+      if (devTools && !devTools.listenerCount('devtools-dock-state-changed')) {
+        devTools.on('devtools-dock-state-changed', (_event, dockState) => {
+          if (dockState === 'right' || dockState === 'bottom' || dockState === 'undocked' || dockState === 'detach') {
+            lastDevToolsMode = dockState;
+          }
+        });
       }
     },
   });
