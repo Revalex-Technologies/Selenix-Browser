@@ -5,8 +5,8 @@
 <div align="center">
   <h1>Selenix Browser</h1>
 
-[![Build Status](https://github.com/s3nix-sys/selenix-Browser/actions/workflows/build.yml/badge.svg)](https://github.com/s3nix-sy/selenix-Browser/actions)
-[![Downloads](https://img.shields.io/github/downloads/s3nix-sy/selenix-Browser/total.svg?style=flat-square)](https://s3nix-sy.github.io)
+[![Build Status](https://github.com/s3nix-sys/selenix-Browser/actions/workflows/build.yml/badge.svg)](https://github.com/s3nix-sys/selenix-Browser/actions)
+[![Downloads](https://img.shields.io/github/downloads/s3nix-sys/selenix-Browser/total.svg?style=flat-square)](https://s3nix-sy.github.io)
 [![Discord](https://discordapp.com/api/guilds/1402495455077732422/widget.png?style=shield)](https://discord.gg/x6BKcWM4pf)
 
 Selenix is a web browser built from wexond base (the version used was prior to them closing the code), on top of modern web technologies such as `Electron` and `React`, that can also be used as a framework to create a custom web browser (see the [License](#license) section).
