@@ -90,7 +90,7 @@ const restoreOriginalsIfAny = async () => {
         name: 'selenix-nightly',
         repository: {
           type: 'git',
-          url: 'git+https://github.com/vqmsoftware/Selenix-Browser-Nightly.git',
+          url: 'git+https://github.com/Revalex-Technologies/Selenix-Browser-Nightly.git',
         },
       };
 

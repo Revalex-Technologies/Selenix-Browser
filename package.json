@@ -12,15 +12,15 @@
     "mobx",
     "styled-components"
   ],
-  "homepage": "https://github.com/s3nix-sys/Selenix-Browser#readme",
+  "homepage": "https://github.com/Revalex-Technologies/Selenix-Browser#readme",
   "main": "build/main.bundle.js",
-  "author": "VQMSoftware <vqmsoftware@gmail.com>",
+  "author": "Revalex Technologies <revalextechnologies@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/s3nix-sys/Selenix-Browser.git"
+    "url": "git+https://github.com/Revalex-Technologies/Selenix-Browser.git"
   },
   "bugs": {
-    "url": "https://github.com/s3nix-sys/Selenix-Browser/issues"
+    "url": "https://github.com/Revalex-Technologies/Selenix-Browser/issues"
   },
   "scripts": {
     "dev-renderer": "cross-env DEV=1 webpack serve --config webpack.config.renderer.js",

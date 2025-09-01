@@ -10,7 +10,7 @@ By submitting any code, documentation, designs, or other materials (collectively
 
 ## 1. License Grant (Inbound License)
 
-You retain ownership of your Contribution(s), but you hereby grant to the Project maintainer (VQMSoftware) and all recipients of the Project a perpetual, worldwide, non-exclusive, royalty-free, irrevocable license to use, reproduce, modify, sublicense, and distribute your Contribution(s) under the same license terms as the Project (GPL-3.0).
+You retain ownership of your Contribution(s), but you hereby grant to the Project maintainer (Revalex Technologies) and all recipients of the Project a perpetual, worldwide, non-exclusive, royalty-free, irrevocable license to use, reproduce, modify, sublicense, and distribute your Contribution(s) under the same license terms as the Project (GPL-3.0).
 
 ---
 
