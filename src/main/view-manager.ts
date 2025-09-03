@@ -277,7 +277,11 @@ export class ViewManager extends EventEmitter {
     };
 
     if (newBounds !== view.bounds) {
-      view.webContentsView.setBounds(newBounds);
+      try {
+        if (view.webContentsView && typeof view.webContentsView.setBounds === 'function') {
+          view.webContentsView.setBounds(newBounds);
+        }
+      } catch {}
       view.bounds = newBounds;
     }
   }

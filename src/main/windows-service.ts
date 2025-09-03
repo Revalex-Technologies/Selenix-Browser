@@ -1,6 +1,7 @@
 import { AppWindow } from './windows/app';
 
 import { BrowserWindow, ipcMain } from 'electron';
+import { NEWTAB_URL } from '~/constants/tabs';
 
 export class WindowsService {
   public list: AppWindow[] = [];
@@ -19,98 +20,106 @@ export class WindowsService {
     ipcMain.handle('tear-off-tab', async (_e, payload: { tabId: number; screenX?: number; screenY?: number }) => {
       try {
         const { tabId, screenX = 0, screenY = 0 } = payload || ({} as any);
+        
         const from = this.findByContentsView(tabId);
         if (!from) return false;
-
         const view: any = from.viewManager.views.get(tabId);
         if (!view) return false;
 
-        // Open a new window preserving incognito state
+        
         const to = this.open(!!from.incognito);
 
-        // Position the new window near the cursor if possible
+        
         try {
           const x = Math.max(0, Math.floor(screenX - 80));
           const y = Math.max(0, Math.floor(screenY - 40));
           to.win.setPosition(x, y, false);
         } catch {}
 
-        // Remove mapping from the old window without destroying the view
+        
         try {
           from.viewManager.views.delete(tabId);
+          
+          const remaining = from.viewManager.views.size;
+          if (remaining === 0) {
+            try {
+              from.viewManager.create({ url: NEWTAB_URL, active: true }, false, false);
+            } catch {}
+          }
         } catch {}
 
-        // Reparent the existing view to the new window
+        
         try {
           view.reparent(to);
         } catch {}
 
-        // Wire up into the new manager map
+        
         try {
           to.viewManager.views.set(tabId, view);
         } catch {}
 
-        // Notify UIs
+        
         try {
+          
           from.send('remove-tab', tabId);
         } catch {}
-        try {
-          const url = typeof view.url === 'string' ? view.url : view.webContents?.getURL?.() ?? '';
-          to.send('create-tab', { url, active: true } as any, false, tabId);
-          to.send('select-tab', tabId);
         
-      
-      // Push current loading + navigation state to ensure toolbar/icons are correct immediately.
-      try {
-        const moved = to.viewManager.views.get(tabId);
-        if (moved) {
-          const isLoading = typeof (moved.webContents as any)?.isLoading === 'function'
-            ? (moved.webContents as any).isLoading()
-            : false;
-          moved.emitEvent('loading', isLoading);
-          moved.updateNavigationState();
-        }
-      } catch {}
-// After reparenting, force the renderer to receive up-to-date title/URL,
-      // since the page won't necessarily re-fire 'page-title-updated'.
-      try {
-        const moved = to.viewManager.views.get(tabId);
-        if (moved) {
-          moved.emitEvent('title-updated', moved.webContents.getTitle());
-          moved.emitEvent('url-updated', moved.webContents.getURL());
-        }
-      } catch {}
-
-      
-      // Also force-stop loading indicator and refresh icon, since renderer may not get a navigation event after reparent.
-      try {
-        const moved = to.viewManager.views.get(tabId);
-        if (moved && moved.webContents) {
-          moved.emitEvent('loading', false);
-        }
-      } catch {}
-      // Some startup settings spawn a blank tab on new windows; we don't want duplicates.
-      setTimeout(() => {
+        const _createTearOffTab = () => {
+          try {
+            const url = view.url || (view.webContents?.getURL?.() || '');
+            to.send('create-tab', { url, active: true } as any, false, tabId);
+            to.send('select-tab', tabId);
+            try {
+              to.viewManager.select(tabId, true);
+            } catch {}
+            try {
+              const moved = to.viewManager.views.get(tabId);
+              if (moved) {
+                const wc: any = moved.webContents;
+                const isLoading = typeof wc?.isLoading === 'function' ? wc.isLoading() : false;
+                moved.emitEvent('loading', isLoading);
+                moved.updateNavigationState();
+                try {
+                  moved.emitEvent('title-updated', wc.getTitle());
+                  moved.emitEvent('url-updated', wc.getURL());
+                } catch {}
+                moved.emitEvent('loading', false);
+              }
+            } catch {}
+            
+            setTimeout(() => {
+              try {
+                const keep = new Set([tabId]);
+                const ids = Array.from(to.viewManager.views.keys());
+                for (const id of ids) {
+                  if (!keep.has(id)) {
+                    try {
+                      const unwanted = to.viewManager.views.get(id);
+                      unwanted?.destroy();
+                    } catch {}
+                    try { to.viewManager.views.delete(id); } catch {}
+                    try { to.send('remove-tab', id); } catch {}
+                  }
+                }
+                try { to.viewManager.select(tabId, true); } catch {}
+                try { to.send('select-tab', tabId); } catch {}
+              } catch {}
+            }, 200);
+          } catch {}
+        };
         try {
-          const keep = new Set([tabId]);
-          const ids = Array.from(to.viewManager.views.keys());
-          for (const id of ids) {
-            if (!keep.has(id)) {
-              try { to.viewManager.views.get(id)?.destroy(); } catch {}
-              try { to.viewManager.views.delete(id); } catch {}
-              try { to.send('remove-tab', id); } catch {}
-            }
+          if (to.win.webContents?.isLoading?.()) {
+            to.win.webContents.once('did-finish-load', _createTearOffTab);
+          } else {
+            _createTearOffTab();
           }
         } catch {}
-      }, 250);
-} catch {}
-
-        // Focus the moved tab
-        try { to.viewManager.select(tabId, true); } catch {}
 
         return true;
       } catch (err) {
-        try { console.error('[tear-off-tab] failed:', err); } catch {}
+        try {
+          console.error('[tear-off-tab] failed:', err);
+        } catch {}
         return false;
       }
     });

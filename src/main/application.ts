@@ -291,28 +291,56 @@ export class Application {
             const bw = popup?.browserWindow
             if (!bw || bw.isDestroyed()) return
 
-            const parentWin = (popup as any).parent ?? this.windows.current.win
+            let parentWin: Electron.BrowserWindow | null = null
+            let anchor: { x: number; y: number; width: number; height: number } | null = null
+
+            const candidates: Electron.BrowserWindow[] = []
+            try {
+              const providedParent = (popup as any)?.parent
+              if (providedParent && !providedParent.isDestroyed()) {
+                candidates.push(providedParent)
+              }
+            } catch {}
+            for (const appWin of this.windows.list) {
+              const win = appWin?.win
+              if (!win || win.isDestroyed()) continue
+              if (!candidates.includes(win)) {
+                candidates.push(win)
+              }
+            }
+            if (candidates.length === 0 && this.windows.current?.win) {
+              candidates.push(this.windows.current.win)
+            }
+
+            for (const testWin of candidates) {
+              try {
+                anchor = await getDomAnchorFromWebUI(popup, testWin)
+                if (anchor) {
+                  parentWin = testWin
+                  break
+                }
+              } catch {}
+            }
+
+            if (!parentWin) {
+              parentWin = this.windows.current?.win || null
+            }
             if (!parentWin || parentWin.isDestroyed()) return
-
-            const viewBounds = bw.getBounds()
-            const winBounds = parentWin.getBounds()
-            const margin = 12
-
-            let anchor = await getDomAnchorFromWebUI(popup, parentWin)
 
             if (!anchor) {
               const rawAnchor = getAnchorRect(popup)
               anchor = rawAnchor ? toScreenRect(rawAnchor, parentWin) : null
             }
 
+            const viewBounds = bw.getBounds()
+            const winBounds = parentWin.getBounds()
+            const margin = 12
+
             let targetX = viewBounds.x
             let targetY = viewBounds.y
-
             if (anchor) {
-
               targetX = Math.round(anchor.x + anchor.width - viewBounds.width)
-
-              const belowY = Math.round(anchor.y + anchor.height + 8 )
+              const belowY = Math.round(anchor.y + anchor.height + 8)
               const aboveY = Math.round(anchor.y - viewBounds.height - 8)
               const windowBottom = winBounds.y + winBounds.height
               targetY = (belowY + viewBounds.height <= windowBottom) ? belowY : aboveY
@@ -322,7 +350,6 @@ export class Application {
             const minX = winBounds.x + margin
             const maxY = winBounds.y + winBounds.height - margin - viewBounds.height
             const minY = winBounds.y + margin
-
             if (targetX > maxX) targetX = maxX
             if (targetX < minX) targetX = minX
             if (targetY > maxY) targetY = maxY
@@ -332,7 +359,6 @@ export class Application {
               bw.setBounds({ ...viewBounds, x: targetX, y: targetY })
             }
           } catch (err) {
-
             console.error('Failed to reposition extension popup:', err)
           }
         }
