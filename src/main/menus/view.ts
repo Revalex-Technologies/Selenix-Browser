@@ -22,8 +22,7 @@ export const getViewMenu = (
       {
         label: 'Open link in new tab',
         click: () => {
-          // Open and immediately activate the new tab so both the content view
-          // and the renderer tabstrip stay in sync.
+
           const v = appWindow.viewManager.create(
             {
               url: params.linkURL,
@@ -31,7 +30,7 @@ export const getViewMenu = (
             },
             true,
           );
-          // Ensure renderer receives 'select-tab' and the new view is focused.
+
           try { appWindow.viewManager.select(v.id, true); } catch {}
         },
       },
@@ -56,8 +55,7 @@ export const getViewMenu = (
       {
         label: 'Open image in new tab',
         click: () => {
-          // Open and immediately activate the new tab so both the content view
-          // and the renderer tabstrip stay in sync.
+
           const v = appWindow.viewManager.create(
             {
               url: params.srcURL,
@@ -80,7 +78,7 @@ export const getViewMenu = (
         },
       },
       {
-        
+
         label: 'Save image as...',
         click: async () => {
           try {
@@ -112,12 +110,11 @@ export const getViewMenu = (
                 }
               } catch {}
             };
-            // One-shot path assignment for this download only
+
             ses.on('will-download', handler);
 
-            // Kick off the download
             try {
-              // Prefer session.downloadURL with saveAs flag when available
+
               if (typeof (ses as any).downloadURL === 'function') {
                 try { (ses as any).downloadURL(url, { saveAs: true }); }
                 catch { appWindow.webContents.downloadURL(url); }

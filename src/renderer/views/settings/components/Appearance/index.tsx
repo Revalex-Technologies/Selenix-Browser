@@ -104,7 +104,7 @@ export const Appearance = observer(() => {
   return (
     <>
       <Header>Appearance</Header>
-      {/* <MenuAnimations /> */}
+      {}
       <BookmarksBar />
       <WarnQuit />
       <ThemeVariant />

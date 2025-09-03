@@ -1,7 +1,6 @@
 // @ts-nocheck
 
 /* eslint-disable @typescript-eslint/ban-ts-ignore */
-// https://stackoverflow.com/a/13542669
 
 export const getColorBrightness = (color: string) => {
   let r: number;
@@ -44,7 +43,7 @@ export const rgbToHex = (rgba: number[]) => {
 };
 
 export const hexToRgb = (hex) => {
-  // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+
   const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
   hex = hex.replace(shorthandRegex, function (m, r, g, b) {
     return r + r + g + g + b + b;

@@ -598,4 +598,5 @@ this.webContents.addListener('did-start-navigation', async (e: any, ...args: any
 
     try { this.webContents.focus(); } catch {}
   }
+
 }

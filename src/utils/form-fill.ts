@@ -51,9 +51,9 @@ export const getFormFillValue = (
 
   try {
     switch (name) {
-      case 'fname': // first name
+      case 'fname':
         return fullName[0];
-      case 'mname': // middle name
+      case 'mname':
         return fullName.length >= 3 && fullName[fullName.length - 2];
       default:
         return fields[getKey(name)];

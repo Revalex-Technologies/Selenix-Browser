@@ -68,7 +68,7 @@ export const Preferences = observer(() => {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
     try {
-      // read as data URL to persist
+
       const reader = new FileReader();
       reader.onload = () => {
         const dataUrl = String(reader.result || '');
@@ -76,9 +76,9 @@ export const Preferences = observer(() => {
           localStorage.setItem('imageURL', dataUrl);
           localStorage.setItem('imageDate', new Date().toString());
         } catch (err) {
-          // ignore quota errors
+
         }
-        // immediately apply without waiting for reload
+
         store.image = dataUrl;
         store.preset = 'custom';
       };
@@ -86,7 +86,7 @@ export const Preferences = observer(() => {
     } catch (err) {
       console.error(err);
     } finally {
-      // reset input so the same file can be chosen again
+
       e.currentTarget.value = '';
     }
   };
@@ -144,15 +144,7 @@ export const Preferences = observer(() => {
           >
             Inspirational
           </ContextMenuItem>
-          {/* <ContextMenuItem
-            bigger
-            onClick={onPresetClick('informational')}
-            selected={store.preset === 'informational'}
-            iconSize={28}
-            icon={ICON_WINDOW}
-          >
-            Informational
-          </ContextMenuItem> */}
+          {}
           <ContextMenuItem
             bigger
             selected={store.preset === 'custom'}
@@ -171,7 +163,7 @@ export const Preferences = observer(() => {
             pointerEvents:
               store.preferencesContent === 'custom' ? 'inherit' : 'none',
             transition: '0.3s max-height, 0.3s transform, 0.3s opacity',
-            // maxHeight: store.preferencesContent === 'custom' ? 390 : 200,
+
             maxHeight: store.preferencesContent === 'custom' ? 300 : 150,
             transform:
               store.preferencesContent === 'custom'
@@ -194,29 +186,8 @@ export const Preferences = observer(() => {
             onClick={onPickCustomImage}
           >
             Choose custom image
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={onCustomFileChange}
-            />
+            <input ref={fileInputRef} type="file" accept="image/*" onChange={onCustomFileChange} />
           </ContextMenuItem>
-          <ContextMenuSeparator bigger></ContextMenuSeparator>
-          <SwitchItem name="topSitesVisible">Show top sites</SwitchItem>
-          <SwitchItem name="quickMenuVisible">Show quick menu</SwitchItem>
-          {/* <ContextMenuSeparator bigger></ContextMenuSeparator>
-          <SubTitle>News visibility:</SubTitle>
-          <Dropdown
-            defaultValue={store.newsBehavior}
-            onMouseDown={() => (store.overflowVisible = true)}
-            style={{ margin: '0 20px 8px' }}
-            onChange={onNewsVisibilityChange}
-          >
-            <Dropdown.Item value="always-visible">Always visible</Dropdown.Item>
-            <Dropdown.Item value="hidden">Hidden</Dropdown.Item>
-            <Dropdown.Item value="on-scroll">Visible on scroll</Dropdown.Item>
-          </Dropdown> */}
         </div>
       </div>
     </ContextMenu>

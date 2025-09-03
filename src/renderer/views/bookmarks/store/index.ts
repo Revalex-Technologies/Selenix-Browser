@@ -68,8 +68,6 @@ export class Store {
   @observable
   public currentBookmark: IBookmark = null;
 
-  // Computed
-
   @computed
   public get visibleItems() {
     return this.list

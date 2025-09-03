@@ -3,14 +3,8 @@ import { contextBridge, ipcRenderer, webFrame } from 'electron';
 import AutoComplete from './models/auto-complete';
 import { ERROR_PROTOCOL, WEBUI_BASE_URL } from '~/constants/files';
 
-// IMPORTANT: do NOT expose ipcRenderer directly to the page. We wrap only what we need.
-
-/* ---------- IDs ---------- */
-
 const tabId: number = ipcRenderer.sendSync('get-webcontents-id');
 export const windowId: number = ipcRenderer.sendSync('get-window-id');
-
-/* ---------- Navigation helpers ---------- */
 
 const goBack = () => {
   ipcRenderer.invoke('web-contents-call', { webContentsId: tabId, method: 'goBack' });
@@ -19,8 +13,6 @@ const goBack = () => {
 const goForward = () => {
   ipcRenderer.invoke('web-contents-call', { webContentsId: tabId, method: 'goForward' });
 };
-
-/* ---------- Mouse buttons: X1/X2 back/forward ---------- */
 
 window.addEventListener('mouseup', (e) => {
   if (e.button === 3) {
@@ -31,8 +23,6 @@ window.addEventListener('mouseup', (e) => {
     goForward();
   }
 });
-
-/* ---------- Horizontal swipe back/forward (trackpads, etc.) ---------- */
 
 let beginningScrollLeft: number = null;
 let beginningScrollRight: number = null;
@@ -93,14 +83,10 @@ ipcRenderer.on('scroll-touch-end', () => {
   resetCounters();
 });
 
-/* ---------- Autofill hooks (kept as-is) ---------- */
-
 if (process.env.ENABLE_AUTOFILL) {
   window.addEventListener('load', AutoComplete.loadForms);
   window.addEventListener('mousedown', AutoComplete.onWindowMouseDown);
 }
-
-/* ---------- WebUI helpers & messaging ---------- */
 
 const postMsg = (data: any, res: any) => {
   window.postMessage(
@@ -115,22 +101,10 @@ const postMsg = (data: any, res: any) => {
 
 const hostname = window.location.href.substr(WEBUI_BASE_URL.length);
 
-/* ---------- Settings bootstrap ---------- */
-
 const settings = ipcRenderer.sendSync('get-settings-sync');
 
-/**
- * IMPORTANT:
- * With contextIsolation on, do not try to give the page raw ipcRenderer.
- * Instead we expose exactly what internal pages need via contextBridge.
- *
- * We still keep postMessage-based RPC for storage/credentials like you had.
- */
-
-/* ---------- Expose safe API to the main world ---------- */
-
 contextBridge.exposeInMainWorld('electron', {
-  // Expose only IPC methods you actually need on the page side
+
   ipc: {
     invoke: (channel: string, ...args: any[]) => ipcRenderer.invoke(channel, ...args),
     send: (channel: string, ...args: any[]) => ipcRenderer.send(channel, ...args),
@@ -143,7 +117,6 @@ contextBridge.exposeInMainWorld('electron', {
   },
 });
 
-// Expose safe readonly versions so internal pages can show Electron/Node/V8 versions
 try {
   contextBridge.exposeInMainWorld('versions', {
     electron: process.versions.electron,
@@ -153,12 +126,8 @@ try {
   });
 } catch {}
 
-
-
-// Back-compat: many of the internal pages referenced window.settings directly.
 contextBridge.exposeInMainWorld('settings', settings);
 
-// Basic window info + navigation
 contextBridge.exposeInMainWorld('viewControls', {
   windowId,
   tabId,
@@ -166,7 +135,6 @@ contextBridge.exposeInMainWorld('viewControls', {
   goForward,
 });
 
-// WebUI utilities that internal pages previously got via executeJavaScript
 contextBridge.exposeInMainWorld('webui', {
   isInternal: window.location.href.startsWith(WEBUI_BASE_URL),
   isErrorPage: window.location.protocol === `${ERROR_PROTOCOL}:`,
@@ -176,8 +144,6 @@ contextBridge.exposeInMainWorld('webui', {
   getTopSites: async (count: number) => ipcRenderer.invoke('topsites-get', count),
 });
 
-// If you still have code that expects window.require('electron') for a tiny subset,
-// you can expose a minimal shim. This avoids exposing the real ipcRenderer.
 contextBridge.exposeInMainWorld('require', (id: string) => {
   if (id === 'electron') {
     return {
@@ -196,8 +162,6 @@ contextBridge.exposeInMainWorld('require', (id: string) => {
   return undefined;
 });
 
-/* ---------- Do Not Track injection on non-internal pages ---------- */
-
 if (!window.location.href.startsWith(WEBUI_BASE_URL)) {
   (async function () {
     if (settings.doNotTrack) {
@@ -206,8 +170,6 @@ if (!window.location.href.startsWith(WEBUI_BASE_URL)) {
     }
   })();
 }
-
-/* ---------- Internal page title & message handlers ---------- */
 
 if (window.location.href.startsWith(WEBUI_BASE_URL)) {
   window.addEventListener('DOMContentLoaded', () => {
@@ -218,7 +180,6 @@ if (window.location.href.startsWith(WEBUI_BASE_URL)) {
     else if (hostname.startsWith('newtab')) document.title = 'New tab';
   });
 
-  // Same postMessage API you had; pages send messages, we fulfill via IPC.
   window.addEventListener('message', async ({ data }) => {
     if (!data) return;
 
@@ -236,11 +197,6 @@ if (window.location.href.startsWith(WEBUI_BASE_URL)) {
     }
   });
 
-// Note: injection of browser actions has been moved to the renderer entry
-// (see src/renderer/pre-entry.ts) because it is required in the WebUI
-// context rather than the tab view. Do not inject browser actions here.
-
-  // Push updates to pages in the main world via postMessage (keeps code unchanged)
   ipcRenderer.on('update-settings', (_e, data) => {
     window.postMessage({ type: 'update-settings', data }, '*');
   });
@@ -258,7 +214,6 @@ if (window.location.href.startsWith(WEBUI_BASE_URL)) {
   });
 }
 
-/* ---------- Modern history API namespace ---------- */
 contextBridge.exposeInMainWorld('api', {
   history: {
     get: async () => ipcRenderer.invoke('history-get'),

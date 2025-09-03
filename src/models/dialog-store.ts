@@ -1,5 +1,5 @@
 import { ipcRenderer } from 'electron';
-// Switch to the @electron/remote package for remote functionality【720843281807270†L52-L62】.
+
 import * as remote from '@electron/remote';
 import { observable, computed, makeObservable } from 'mobx';
 import { getTheme } from '~/utils/themes';

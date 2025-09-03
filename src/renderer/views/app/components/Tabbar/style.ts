@@ -18,7 +18,7 @@ export const StyledTabbar = styled.div`
     theme?.isCompact
       ? 'calc(max(var(--right-buttons-width, 0px), var(--overlay-reserved-right, 120px)) + 8px)'
       : 'calc(var(--overlay-right-inset, 0px) + 16px)'
-  )}; /* compact reserves buttons; normal extends */
+  )};
   padding-left: ${({ theme }: { theme?: any }) => (theme?.isCompact ? '0px' : 'var(--overlay-left-inset, 0px)') };
 
   overflow: hidden;
@@ -28,35 +28,19 @@ export const StyledTabbar = styled.div`
   margin-left: 4px;
 `;
 
-/* &:hover {
-    ${({ theme }: { theme?: ITheme }) => css`
-      &::-webkit-scrollbar-thumb {
-        background-color: ${theme['toolbar.lightForeground']
-          ? 'rgba(255, 255, 255, 0.2)'
-          : 'rgba(0, 0, 0, 0.2)'};
-
-        &:hover {
-          background-color: ${theme['toolbar.lightForeground']
-            ? 'rgba(255, 255, 255, 0.3)'
-            : 'rgba(0, 0, 0, 0.3)'};
-        }
-      }
-    `};
-  } */
-
 export const TabsContainer = styled.div`
   height: 100%;
   width: ${({ theme }: { theme?: any }) =>
     (theme?.isCompact
       ? 'calc(100% - max(var(--right-buttons-width, 0px), var(--overlay-reserved-right, 120px)) - 8px)'
-      : `calc(100% - ${TOOLBAR_BUTTON_WIDTH}px - 16px)`)}; /* compact reserves buttons; normal extends with larger blank */
+      : `calc(100% - ${TOOLBAR_BUTTON_WIDTH}px - 16px)`)};
   min-width: 0;
   position: relative;
   padding-right: ${({ theme }: { theme?: any }) => (
     theme?.isCompact
       ? 'calc(max(var(--right-buttons-width, 0px), var(--overlay-reserved-right, 120px)) + 8px)'
       : 'calc(var(--overlay-right-inset, 0px) + 16px)'
-  )}; /* compact reserves buttons; normal extends */
+  )};
   padding-left: ${({ theme }: { theme?: any }) => (theme?.isCompact ? '0px' : 'var(--overlay-left-inset, 0px)') };
 
   overflow: hidden;

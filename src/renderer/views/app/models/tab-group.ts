@@ -21,7 +21,6 @@ export class ITabGroup {
   public placeholderRef = React.createRef<HTMLDivElement>();
   public lineRef = React.createRef<HTMLDivElement>();
 
-  // Observable
   public id: number = id++;
 
   public name = '';

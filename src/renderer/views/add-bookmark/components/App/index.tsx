@@ -6,9 +6,7 @@ import { StyledApp, Title, Row, Label, Buttons } from './style';
 import store from '../../store';
 import { Input, Dropdown } from '~/renderer/components/Input';
 import { Button } from '~/renderer/components/Button';
-// Pull in ipcRenderer from electron and remote from the standalone package. The built‑in
-// remote module was removed from Electron beginning in v14. See
-// https://github.com/electron/remote for migration details.
+
 import { ipcRenderer } from 'electron';
 import * as remote from '@electron/remote';
 import { getBookmarkTitle } from '~/renderer/views/bookmarks/utils';

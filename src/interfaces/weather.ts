@@ -27,7 +27,6 @@ export type IWeatherCondition =
   | 'snow'
   | 'storm';
 
-/* tslint:disable */
 export interface IOpenWeatherItem {
   clouds: {
     all: number;
@@ -58,7 +57,6 @@ export interface IOpenWeatherItem {
     speed: number;
   };
 }
-/* tslint:enable */
 
 export type forecastLangCode =
   | 'ar'

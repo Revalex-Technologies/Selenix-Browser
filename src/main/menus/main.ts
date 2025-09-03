@@ -124,16 +124,12 @@ export const getMainMenu = () => {
           'Print',
         ),
 
-        // Hidden items
-
-        // Focus address bar
         ...createMenuItem(['Ctrl+Space', 'CmdOrCtrl+L', 'Alt+D', 'F6'], () => {
           Application.instance.dialogs
             .getPersistent('search')
             .show(Application.instance.windows.current.win);
         }),
 
-        // Toggle menu
         ...createMenuItem(['Alt+F', 'Alt+E'], () => {
           Application.instance.windows.current.send('show-menu-dialog');
         }),
@@ -192,7 +188,17 @@ export const getMainMenu = () => {
     {
       label: 'History',
       submenu: [
-        // TODO: Homepage - Ctrl+Shift+H
+        ...createMenuItem(
+          ['CmdOrCtrl+Shift+H'],
+          () => {
+            const { selected } = Application.instance.windows.current.viewManager;
+            if (selected) {
+              const home = (selected as any).homeUrl || 'about:blank';
+              selected.webContents.loadURL(home);
+            }
+          },
+          'Homepage',
+        ),
         ...createMenuItem(
           isMac ? ['Cmd+[', 'Cmd+Left'] : ['Alt+Left'],
           () => {
@@ -217,10 +223,37 @@ export const getMainMenu = () => {
           },
           'Go forward',
         ),
-        // { type: 'separator' }
-        // TODO: list last closed tabs
-        // { type: 'separator' }
-        // TODO: list last visited
+
+        { type: 'separator' },
+        {
+          label: 'Recently closed',
+          submenu:
+            Application.instance.windows.current.viewManager.recentlyClosed
+              .slice(0, 10)
+              .map((item) => ({
+                label: (item.title || item.url || 'Closed Tab'),
+                click: () => {
+                  const { selected } = Application.instance.windows.current.viewManager;
+                  if (selected && item.url) selected.webContents.loadURL(item.url);
+                },
+              })),
+        },
+
+        { type: 'separator' },
+        {
+          label: 'Recently visited',
+          submenu:
+            (Application.instance.storage?.history || [])
+              .slice(-15)
+              .reverse()
+              .map((item: any) => ({
+                label: (item.title || item.url),
+                click: () => {
+                  const { selected } = Application.instance.windows.current.viewManager;
+                  if (selected && item?.url) selected.webContents.loadURL(item.url);
+                },
+              })),
+        },
         { type: 'separator' },
         ...createMenuItem(
           isMac ? ['Cmd+Y'] : ['Ctrl+H'],
@@ -266,8 +299,20 @@ export const getMainMenu = () => {
           },
           'Add this website to bookmarks',
         ),
-        // { type: 'separator' }
-        // TODO: list bookmarks
+
+        {
+              label: 'Bookmarks',
+              submenu: (Application.instance.storage?.bookmarks || [])
+                .filter((b: any) => !b.isFolder && b.url)
+                .slice(0, 15)
+                .map((b: any) => ({
+                  label: b.title || b.url,
+                  click: () => {
+                    const { selected } = Application.instance.windows.current.viewManager;
+                    if (selected) selected.webContents.loadURL(b.url);
+                  },
+                })),
+            }
       ],
     },
     {
@@ -293,7 +338,6 @@ export const getMainMenu = () => {
               'Developer tools...',
             ),
 
-            // Developer tools (current webContents) (dev)
             ...createMenuItem(['CmdOrCtrl+Shift+F12'], () => {
               setTimeout(() => {
                 webContents
@@ -356,7 +400,6 @@ export const getMainMenu = () => {
     },
   ];
 
-  // Ctrl+1 - Ctrl+8
   template[0].submenu = template[0].submenu.concat(
     createMenuItem(
       Array.from({ length: 8 }, (v, k) => k + 1).map((i) => `CmdOrCtrl+${i}`),
@@ -369,7 +412,6 @@ export const getMainMenu = () => {
     ),
   );
 
-  // Ctrl+9
   template[0].submenu = template[0].submenu.concat(
     createMenuItem(['CmdOrCtrl+9'], () => {
       Application.instance.windows.current.webContents.send('select-last-tab');

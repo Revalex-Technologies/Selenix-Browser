@@ -10,14 +10,13 @@ import {
   ZOOM_FACTOR_MAX,
   ZOOM_FACTOR_INCREMENT,
 } from '~/constants/web-contents';
-// The legacy electron-extensions API has been removed. Instead we rely on
-// electron-chrome-extensions which is initialized on the Application
-// instance. Where necessary we reference Application.instance.extensions.
+
 import { EventEmitter } from 'events';
 
 export class ViewManager extends EventEmitter {
   public views = new Map<number, View>();
   public selectedId = 0;
+  public recentlyClosed: { title: string; url: string }[] = [];
   public _fullscreen = false;
 
   public incognito: boolean;
@@ -55,7 +54,7 @@ export class ViewManager extends EventEmitter {
     });
 
     ipcMain.on('Print', (e, details) => {
-      // Prefer printing the currently selected view; fall back to the sender's webContents.
+
       const selectedView = this.views.get(this.selectedId);
       if (selectedView?.webContents) {
         try { selectedView.webContents.print(); } catch (err) { console.error('Print failed (selected view):', err); }
@@ -70,9 +69,7 @@ export class ViewManager extends EventEmitter {
     });
 
     ipcMain.handle(`view-select-${id}`, (e, tabId: number, focus: boolean) => {
-      // When extensions are enabled, notify electron-chrome-extensions
-      // which tab has been activated. Otherwise fallback to selecting
-      // the view directly.
+
       if (process.env.ENABLE_EXTENSIONS && Application.instance.extensions) {
         const view = this.views.get(tabId)
         if (view) {
@@ -161,11 +158,7 @@ export class ViewManager extends EventEmitter {
     this.views.set(id, view);
 
     if (process.env.ENABLE_EXTENSIONS) {
-      // Register the tab with electron-chrome-extensions so that
-      // chrome.tabs APIs can target it. The addTab call associates
-      // the webContents with its owning BrowserWindow. We wrap in
-      // try/catch because the extensions instance might not be ready
-      // during early startup.
+
       try {
         Application.instance.extensions?.addTab(
           webContents,
@@ -175,16 +168,21 @@ export class ViewManager extends EventEmitter {
     }
 
     webContents.once('destroyed', () => {
-      // Clean up our internal mapping when a tab's webContents is
-      // destroyed. Also notify electron-chrome-extensions so it can
-      // remove the tab from its store. Without this call the
-      // extensions API may retain references to closed tabs.
+
       if (process.env.ENABLE_EXTENSIONS) {
         try {
           Application.instance.extensions?.removeTab(webContents)
         } catch {}
       }
       this.views.delete(id);
+
+    try {
+      const wc: any = (view as any)?.webContentsView?.webContents ?? view?.webContents;
+      const title = wc && typeof wc.getTitle === 'function' ? wc.getTitle() : 'Closed Tab';
+      const url = wc && typeof wc.getURL === 'function' ? wc.getURL() : '';
+      this.recentlyClosed.unshift({ title, url });
+      if (this.recentlyClosed.length > 25) this.recentlyClosed.pop();
+    } catch {}
     });
 
     if (sendMessage) {
@@ -195,12 +193,12 @@ export class ViewManager extends EventEmitter {
 
   public clear() {
     try {
-      // Safely remove all child views from the window and destroy them.
+
       const contentView = this.window.win?.contentView as any;
       if (contentView && typeof contentView.removeChildView === 'function') {
         for (const v of this.views.values()) {
           try {
-            // Remove the view from the contentView if it was attached.
+
             contentView.removeChildView(v.webContentsView);
           } catch {}
           try {
@@ -208,13 +206,13 @@ export class ViewManager extends EventEmitter {
           } catch {}
         }
       } else {
-        // Fallback: just destroy views if contentView isn't available
+
         for (const v of this.views.values()) {
           try { v.destroy(); } catch {}
         }
       }
     } finally {
-      // Reset internal state
+
       if (typeof (this.views as any).clear === 'function') {
         (this.views as Map<number, any>).clear();
       }
@@ -232,7 +230,6 @@ export class ViewManager extends EventEmitter {
 
     this.selectedId = id;
 
-    // Notify the renderer (WebUI) which tab was selected so the tabstrip can update.
     this.window.webContents.send('select-tab', id);
 
     if (selected) {
@@ -242,7 +239,7 @@ export class ViewManager extends EventEmitter {
     this.window.win.contentView.addChildView(view.webContentsView);
 
     if (focus) {
-      // Also fixes switching tabs with Ctrl + Tab
+
       view.webContents.focus();
     } else {
       this.window.webContents.focus();
@@ -257,7 +254,7 @@ export class ViewManager extends EventEmitter {
 
     this.emit('activated', id);
 
-    // TODO: this.emitZoomUpdate(false);
+    this.emitZoomUpdate(false);
   }
 
   public async fixBounds() {
@@ -286,8 +283,7 @@ export class ViewManager extends EventEmitter {
   }
 
   private setBoundsListener() {
-    // resize the WebContentsView's height when the toolbar height changes
-    // ex: when the bookmarks bar appears
+
     this.window.webContents.executeJavaScript(`
         const {ipcRenderer} = require('electron');
         const resizeObserver = new ResizeObserver(([{ contentRect }]) => {
@@ -311,6 +307,13 @@ export class ViewManager extends EventEmitter {
     this.views.delete(id);
 
     try {
+      const wc: any = (view as any)?.webContentsView?.webContents ?? view?.webContents;
+      const title = wc && typeof wc.getTitle === 'function' ? wc.getTitle() : 'Closed Tab';
+      const url = wc && typeof wc.getURL === 'function' ? wc.getURL() : '';
+      this.recentlyClosed.unshift({ title, url });
+      if (this.recentlyClosed.length > 25) this.recentlyClosed.pop();
+    } catch {}
+    try {
       const wc: any = (view as any)?.webContentsView?.webContents;
       if (process.env.ENABLE_EXTENSIONS && wc && Application.instance.extensions) {
         try {
@@ -320,7 +323,6 @@ export class ViewManager extends EventEmitter {
       }
     } catch {}
 
-    // Detach child view if present
     try {
       const child: any = (view as any)?.webContentsView;
       const win = this.window?.win;
@@ -329,7 +331,6 @@ export class ViewManager extends EventEmitter {
       }
     } catch {}
 
-    // Destroy wrapper (handles its own null checks)
     try { view.destroy(); } catch {}
 
     try { this.emit('removed', id); } catch {}

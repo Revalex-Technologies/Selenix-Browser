@@ -21,8 +21,8 @@ export const Separator = styled.div`
 export const ExtensionsWrapper = styled.div<{present?: boolean}>`
   display: flex;
   align-items: center;
-  /* Ensure actions remain clickable in the draggable titlebar area */
+
   -webkit-app-region: no-drag;
-  /* In compact mode there should be no leading space; in default keep a small gap when actions are present */
+
   margin-left: ${({present, theme}: {present?: boolean; theme?: any}) => (theme?.isCompact ? '0' : (present ? '6px' : '0'))};
 `;

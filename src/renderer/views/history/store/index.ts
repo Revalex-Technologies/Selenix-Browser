@@ -21,8 +21,6 @@ export type QuickRange =
 export class Store {
   public faviconsDb = new PreloadDatabase<IFavicon>('favicons');
 
-  // Observable
-
   @observable
   public settings: ISettings = { ...(window as any).settings };
 

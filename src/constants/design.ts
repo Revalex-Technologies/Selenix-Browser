@@ -4,7 +4,6 @@ export const COMPACT_TAB_MARGIN_TOP = 3;
 export const DEFAULT_TAB_HEIGHT = 32;
 export const COMPACT_TAB_HEIGHT = 32;
 
-// Toolbar
 export const TOOLBAR_HEIGHT = 42;
 
 export const TOOLBAR_BUTTON_WIDTH = 36;
@@ -20,11 +19,9 @@ export const COMPACT_TITLEBAR_HEIGHT =
 
 export const VIEW_Y_OFFSET = TOOLBAR_HEIGHT + DEFAULT_TITLEBAR_HEIGHT;
 
-// Widths
 export const WINDOWS_BUTTON_WIDTH = 45;
 export const MENU_WIDTH = 330;
 
-// Dialogs
 export const DIALOG_MIN_HEIGHT = 130;
 export const DIALOG_MARGIN = 16;
 export const DIALOG_TOP = 34;

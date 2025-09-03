@@ -1,6 +1,3 @@
-
-// Safe IPC shim for contextIsolation: true and nodeIntegration: false.
-// Expects preload to expose window.__electronApi = { ipcRenderer, remote? }
 export type IpcRendererLike = {
   send: (...args: any[]) => void;
   sendSync?: (...args: any[]) => any;
@@ -26,7 +23,7 @@ function pickIpc(): IpcRendererLike {
     ?? window.electron?.ipcRenderer
     ?? (window as any).ipcRenderer;
   if (!api) {
-    // Provide a no-op stub to prevent crashes if preload isn't ready yet.
+
     const no = () => {};
     const noop: any = new Proxy(no, { get: () => noop, apply: () => undefined });
     return Object.assign(noop, { on: no, once: no, removeListener: no, removeAllListeners: no });

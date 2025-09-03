@@ -12,11 +12,10 @@ const COMPONENTS_TO_REMOVE = [
 ];
 
 const getChromeVersion = () => {
-  // Electron's process.versions.chrome contains the Chromium version
+
   const chromeVersion = process.versions.chrome;
   const versionParts = chromeVersion.split('.');
-  
-  // Format as Chrome/X.Y.Z.W
+
   return ` Chrome/${versionParts[0]}.${versionParts[1]}.${versionParts[2]}.${versionParts[3]}`;
 };
 
@@ -38,16 +37,12 @@ const shouldRemoveChromeString = (url: string) =>
 export const getUserAgentForURL = (userAgent: string, url: string) => {
   let componentsToRemove = [...COMPONENTS_TO_REMOVE];
 
-  // For accounts.google.com, we remove Chrome/*.* component
-  // from the user agent, to fix compatibility issues on Google Sign In.
-  // WATCH: https://developers.googleblog.com/2020/08/guidance-for-our-effort-to-block-less-secure-browser-and-apps.html
   if (shouldRemoveChromeString(url)) {
     componentsToRemove = [...componentsToRemove, CHROME_COMPONENT_PATTERN];
   }
 
-  // Replace the components.
   [
-    // Convert components to remove to pairs.
+
     ...componentsToRemove.map((x): [string | RegExp, string] => [x, '']),
     ...COMPONENTS_TO_REPLACE,
   ].forEach((x) => (userAgent = userAgent.replace(x[0], x[1])));

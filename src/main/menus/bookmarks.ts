@@ -34,9 +34,7 @@ function getIcon(
   if (favicon) {
     let dataURL = Application.instance.storage.favicons.get(favicon);
     if (dataURL) {
-      // some favicon data urls have a corrupted base 64 file type descriptor
-      // prefixed with data:png;base64, instead of data:image/png;base64,
-      // see: https://github.com/electron/electron/issues/23369
+
       if (!dataURL.split(',')[0].includes('image')) {
         const split = dataURL.split(':');
         dataURL = split.join(':image/');

@@ -113,7 +113,6 @@ export const getSearchSuggestions = (filter: string) =>
         }
       }
 
-      // Sort suggestions array by length.
       suggestions = suggestions.sort((a, b) => a.length - b.length).slice(0, 6);
 
       resolve(suggestions);

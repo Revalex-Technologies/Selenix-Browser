@@ -26,12 +26,10 @@ const Item = observer(({ data }: { data: IFormFillData }) => {
     setRealPassword(pass);
   };
 
-  // TODO(xnerhu): favicons
-
   return (
     <>
       <Wrapper>
-        {/* <Icon icon={store.favicons.favicons.get(favicon)} /> */}
+        {}
         <Label style={{ marginLeft: 12 }}>{url}</Label>
       </Wrapper>
       <Wrapper>

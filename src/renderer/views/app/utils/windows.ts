@@ -1,4 +1,3 @@
-// Use the @electron/remote package to access remote functions.
 import * as remote from '@electron/remote';
 
 export const getCurrentWindow = () => remote.getCurrentWindow();

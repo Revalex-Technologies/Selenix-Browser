@@ -81,7 +81,6 @@ const onInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
 const onClearClick = () => {
   store.clear();
 
-  // TODO: ipcRenderer.send('clear-browsing-data');
 };
 
 export default observer(() => {

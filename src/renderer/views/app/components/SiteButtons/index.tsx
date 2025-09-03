@@ -9,18 +9,12 @@ import {
   ICON_MAGNIFY_MINUS,
   ICON_SHIELD,
 } from '~/renderer/constants/icons';
-// Import ipcRenderer from 'electron' and remote from '@electron/remote'.
+
 import { ipcRenderer } from 'electron';
 import * as remote from '@electron/remote';
-// The Node.js `url` module was removed as a default polyfill in Webpack 5 and is
-// unavailable in modern browsers. Since our renderer process runs in a
-// browser-like environment, we can use the WHATWG `URL` API instead of
-// `url.parse`. The new API is widely supported and avoids the need for
-// additional polyfills. See https://developer.mozilla.org/en-US/docs/Web/API/URL
-// for more details.
+
 import store from '../../store';
 import { ToolbarButton } from '../ToolbarButton';
-// REMOVED (renderer browseraction/popup): import {null} from '..//* RemovedAction removed */';
 
 const showAddBookmarkDialog = async () => {
   const star = document.getElementById('star');
@@ -47,13 +41,11 @@ const onZoomClick = (e: React.MouseEvent<HTMLDivElement>) => {
 const onKeyClick = () => {
   let hostname = '';
   try {
-    // Use the WHATWG URL API to extract the hostname from the tab URL. This
-    // replaces the deprecated `url.parse` call from Node's `url` module.
+
     const parsed = new URL(store.tabs.selectedTab.url);
     hostname = parsed.hostname;
   } catch (err) {
-    // In case the URL constructor throws (e.g. invalid URL), leave hostname
-    // empty so no credentials are matched.
+
     hostname = '';
   }
   const list = store.autoFill.credentials.filter(
@@ -81,9 +73,8 @@ ipcRenderer.on('zoom-factor-updated', (e, zoomFactor, showDialog) => {
   }
 });
 
-
 const onShieldMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-  // Left-click should open the same context menu as right-click (do not toggle directly).
+
   if (e.button === 0) {
     e.preventDefault();
     return onShieldContextMenu(e);
@@ -103,14 +94,12 @@ const onShieldContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
         store.settings.save();
         try { ipcRenderer.send('shield:set-enabled', next); } catch {}
         try { window.dispatchEvent(new CustomEvent('shield:enabled-updated', { detail: next })); } catch {}
-      
+
     try { window.dispatchEvent(new CustomEvent('shield:enabled-updated', { detail: next })); } catch {}},
     },
   ]);
   try { menu.popup({ window: remote.getCurrentWindow() }); } catch {}
 };
-
-
 
 export const SiteButtons = observer(() => {
   const { selectedTab } = store.tabs;

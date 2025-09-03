@@ -1,10 +1,10 @@
 import { observer } from 'mobx-react-lite';
 import * as React from 'react';
-// Bring in ipcRenderer from electron and remote from @electron/remote.
+
 import { ipcRenderer } from 'electron';
 
 import { ToolbarButton } from '../ToolbarButton';
-// REMOVED (renderer browseraction/popup): import {null} from '..//* RemovedAction removed */';
+
 import {
   ICON_SHIELD,
   ICON_DOWNLOAD,
@@ -38,22 +38,14 @@ const onMenuClick = async () => {
   showMenuDialog();
 };
 
-// Display extension browser action icons using one of two mechanisms:
-// When Electron Chrome Extensions (MV3) support is enabled, render the
-// native <browser-action-list> element provided by the library. This
-// custom element manages its own layout and updates in response to
-// extension state changes. Otherwise fall back to the legacy
-// RemovedActions component which relies on store-managed state.
 const RemovedActions = observer(({ onPresenceChange }: { onPresenceChange?: (present: boolean) => void }) => {
   const listRef = React.useRef<any>(null);
 
-  // Short-circuit in incognito: report not present and render nothing.
   if (store.isIncognito) {
     try { onPresenceChange?.(false); } catch {}
     return null;
   }
 
-  // MV3 path: render the native <browser-action-list> element.
   if (process.env.ENABLE_EXTENSIONS) {
     const { selectedTabId } = store.tabs;
     const [present, setPresent] = React.useState(false);
@@ -96,7 +88,6 @@ const RemovedActions = observer(({ onPresenceChange }: { onPresenceChange?: (pre
     );
   }
 
-  // MV2 fallback: no native element; just report presence if we have actions.
   const { selectedTabId } = store.tabs;
   const hasMv2 = !!selectedTabId && store.extensions.browserActions.some((x) => x.tabId === selectedTabId);
   React.useEffect(() => { try { onPresenceChange?.(hasMv2); } catch {} }, [hasMv2, onPresenceChange]);
@@ -108,13 +99,12 @@ export const RightButtons = observer(() => {
   const buttonsRef = React.useRef<HTMLDivElement | null>(null);
   const [hasExtensionActions, setHasExtensionActions] = React.useState(false);
   React.useEffect(() => {
-    // When the presence of extension actions changes (MV2/3), force a re-measure.
+
     const el = buttonsRef.current;
     if (!el) return;
     const w = el.offsetWidth;
     document.documentElement.style.setProperty('--right-buttons-width', `${w}px`);
   }, [hasExtensionActions, store.extensions.browserActions.length, store.tabs.selectedTabId]);
-
 
   useIsomorphicLayoutEffect(() => {
     const update = () => {
@@ -122,10 +112,8 @@ export const RightButtons = observer(() => {
       document.documentElement.style.setProperty('--right-buttons-width', `${w}px`);
     };
 
-    // Initial
     update();
 
-    // Recalc on window size and overlay geometry changes
     window.addEventListener('resize', update);
     const onGeom = () => update();
     try {
@@ -135,14 +123,13 @@ export const RightButtons = observer(() => {
       }
     } catch {}
 
-    // Recalc on DOM changes (extension icons appearing/disappearing)
     const mo = new MutationObserver(() => update());
     if (buttonsRef.current) {
       mo.observe(buttonsRef.current, { childList: true, subtree: true, attributes: true });
       try {
         const ro = new (window as any).ResizeObserver(() => update());
         (ro as any).observe(buttonsRef.current);
-        // Save on ref for cleanup
+
         (buttonsRef.current as any).__rb_ro = ro;
       } catch {}
     }
@@ -166,19 +153,14 @@ export const RightButtons = observer(() => {
 
   return (
     <Buttons ref={buttonsRef}>
-      {/* Compact mode: show BrowserAction icons as well (no separator) */}
+      {}
       {store.isCompact && (
         <RemovedActions onPresenceChange={setHasExtensionActions} />
       )}
       {!store.isIncognito && !store.isCompact && (
         <>
           <RemovedActions onPresenceChange={setHasExtensionActions} />
-          {/*
-            Display a separator whenever extensions are enabled. For MV2 extensions,
-            we previously checked browserActions.length. For MV3 extensions, there
-            is no easy way to detect whether any actions are currently shown, so
-            we optimistically render a separator whenever the feature is enabled.
-          */}
+          {}
           {hasExtensionActions || store.extensions.browserActions.length > 0 ? (
             <Separator />
           ) : null}

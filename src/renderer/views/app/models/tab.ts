@@ -32,7 +32,6 @@ export class ITab {
 
   public marginLeft = 0;
 
-  // Observable
 @observable
 
   public isDragging = false;
@@ -70,7 +69,6 @@ export class ITab {
 
   public hasCredentials = false;
 
-  // Computed
   @computed
   public get isSelected() {
     return store.tabs.selectedTabId === this.id;

@@ -1,7 +1,7 @@
 import { makeObservable, observable } from 'mobx';
 
 import { Store } from '.';
-// Use the separate @electron/remote package instead of the removed built‑in remote module.
+
 import * as remote from '@electron/remote';
 import { prefixHttp, isURL } from '~/utils';
 import { Database } from '~/models/database';
@@ -52,7 +52,7 @@ export class StartupTabsStore {
 
     const args = remote.process.argv;
     let needsNewTabPage = false;
-    // If we have tabs saved, load them
+
     if (tabsToLoad && tabsToLoad.length > 0) {
       this.clearStartupTabs(true, false);
 
@@ -76,16 +76,13 @@ export class StartupTabsStore {
           })),
       );
 
-      // If we only load up pinned tabs, add a new tab page
       if (tabsToLoad.filter((x) => !x.pinned).length == 0) {
         needsNewTabPage = true;
       }
     } else {
-      // No tabs saved. Just load a new tab page.
+
       needsNewTabPage = true;
     }
-
-    // load up command line args. If there are any, we don't need a new tab page.
 
     if (args.length > 1 && this.store.windowId === 1) {
       const path = remote.process.argv[1];

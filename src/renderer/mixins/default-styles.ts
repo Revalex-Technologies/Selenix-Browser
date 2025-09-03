@@ -28,7 +28,7 @@ export const UIStyle = createGlobalStyle`
 
 export const WebUIStyle = createGlobalStyle`
   ${baseStyle};
-  
+
   body {
     overflow-y: auto;
     ${body2()};

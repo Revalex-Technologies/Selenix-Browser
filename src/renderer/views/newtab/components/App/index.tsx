@@ -79,26 +79,11 @@ export default observer(() => {
                 icon={ICON_BOOKMARKS}
                 onClick={onIconClick('bookmarks')}
               ></IconItem>
-              {/* <IconItem
-                imageSet={store.imageVisible}
-                title="Downloads"
-                icon={ICON_DOWNLOAD}
-                onClick={onIconClick('downloads')}
-              ></IconItem>
-              <IconItem
-                imageSet={store.imageVisible}
-                title="Extensions"
-                icon={ICON_EXTENSIONS}
-                onClick={onIconClick('extensions')}
-              ></IconItem> */}
+              {}
             </Menu>
           )}
         </Wrapper>
-        {/* {store.newsBehavior !== 'hidden' && (
-          <Content>
-            <News></News>
-          </Content>
-        )} */}
+        {}
       </div>
     </ThemeProvider>
   );

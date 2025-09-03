@@ -71,11 +71,9 @@ export class DialogsService {
 
     enable(view.webContents);
 
-    // Ensure the view and its renderer are both transparent BEFORE load.
     (view as any).setBackgroundColor?.('#00000000');
     (view.webContents as any).setBackgroundColor?.('#00000000');
 
-    // Transparent boot page to avoid any black until the real HTML is loaded.
     const transparentBoot = `data:text/html;charset=utf-8,
       <meta charset="utf-8">
       <style>
@@ -136,7 +134,7 @@ export class DialogsService {
     this.contentViewDetails.set(webContentsView.webContents.id, true);
 
     if (foundDialog) {
-      // Only attach if it’s already loaded; otherwise wait to avoid black flash.
+
       if ((foundDialog.webContentsView.webContents as any).isLoading?.()) {
         foundDialog.webContentsView.webContents.once('dom-ready', () => {
           browserWindow.contentView.addChildView(webContentsView!);
@@ -149,7 +147,6 @@ export class DialogsService {
       return null as any;
     }
 
-    // Pre-position with a 1×1 rect while hidden; real sizing happens at dom-ready.
     webContentsView.setBounds({ x: 0, y: 0, width: 1, height: 1 });
 
     if (devtools) {
@@ -235,7 +232,7 @@ export class DialogsService {
               this.childViews.splice(index, 1);
 
               try {
-                // Blank it first to avoid one last composite on some GPUs.
+
                 if (!viewToRemove.webContents.isDestroyed()) {
                   viewToRemove.webContents.loadURL('about:blank');
                 }
@@ -246,7 +243,7 @@ export class DialogsService {
             }
           }
         } else {
-          // Keep the sole reusable view transparent & blank.
+
           webContentsView.webContents.loadURL('about:blank');
           (webContentsView as any).setBackgroundColor?.('#00000000');
           (webContentsView.webContents as any).setBackgroundColor?.(
@@ -332,7 +329,7 @@ export class DialogsService {
 
     webContentsView.webContents.once('dom-ready', () => {
       dialog.rearrange();
-      // Attach only now to avoid any opaque paint.
+
       try {
         browserWindow.contentView.addChildView(webContentsView);
       } catch {}
@@ -371,7 +368,7 @@ export class DialogsService {
     return this.childViews.concat(
       Array.from(this.persistentDialogs).map((x) => x.webContentsView),
     );
-    // Note: PersistentDialog already applies the same transparency fixes.
+
   };
 
   public destroy = () => {

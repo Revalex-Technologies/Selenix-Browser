@@ -67,23 +67,23 @@ export class Store {
     } catch {}
 
     if (value) {
-      // === Turning daily ON ===
+
       const todayKey = this.getTodayKey();
       const currentImg = this.image || '';
       const custom = this.getStoredCustomImage();
       const isUsingCustomNow = !!custom && currentImg === custom;
 
       if (isUsingCustomNow) {
-        // If a custom image is currently shown, switch to a fresh daily image immediately.
+
         try {
           localStorage.removeItem('imageURL');
           localStorage.removeItem('imageData');
           localStorage.removeItem('imageDate');
         } catch {}
         this.image = '';
-        if (this.imageVisible) this.loadImage(); // will fetch & cache today's daily
+        if (this.imageVisible) this.loadImage();
       } else {
-        // Not using custom right now: keep whatever is on-screen for the rest of today.
+
         try {
           if (currentImg) {
             if (currentImg.startsWith('data:')) {
@@ -94,15 +94,15 @@ export class Store {
             }
             localStorage.setItem('imageDate', todayKey);
           } else if (this.imageVisible) {
-            // No image yet -> fetch one now
+
             this.loadImage();
           }
         } catch {
-          // ignore quota errors
+
         }
       }
     } else {
-      // === Turning daily OFF ===
+
       if (this._preset === 'custom') {
         const custom = this.getStoredCustomImage();
         if (custom) this.image = custom;
@@ -182,11 +182,10 @@ export class Store {
 
     localStorage.setItem('preset', value);
 
-    // If leaving custom -> non-custom, let daily take over next load.
     if (value !== 'custom') {
       if (this.imageVisible && this.image === '') this.loadImage();
     } else {
-      // If entering custom with daily OFF and a custom exists, show it.
+
       if (!this._changeImageDaily) {
         const custom = this.getStoredCustomImage();
         if (custom) this.image = custom;
@@ -228,7 +227,6 @@ export class Store {
     const nb = localStorage.getItem('newsBehavior') as NewsBehavior | null;
     if (nb) this.newsBehavior = nb;
 
-    // Initial image selection
     if (!this._changeImageDaily && this._preset === 'custom') {
       const custom = this.getStoredCustomImage();
       if (custom) this.image = custom;
@@ -240,7 +238,6 @@ export class Store {
 
     this.loadTopSites().catch(console.error);
 
-    // Persist new custom image automatically ONLY when daily is OFF and preset is custom.
     autorun(() => {
       if (this._preset !== 'custom' || this._changeImageDaily) return;
       const img = this.image;
@@ -250,12 +247,11 @@ export class Store {
         localStorage.setItem('customImageData', img);
         localStorage.setItem('imageDate', this.getTodayKey());
       } catch {
-        // ignore quota errors
+
       }
     });
   }
 
-  /** YYYY-MM-DD string for "today". */
   private getTodayKey(): string {
     const now = new Date();
     const y = now.getFullYear();
@@ -264,9 +260,6 @@ export class Store {
     return `${y}-${m}-${d}`;
   }
 
-  /**
-   * Custom image helper: read ONLY the custom key.
-   */
   private getStoredCustomImage(): string | null {
     try {
       const custom = localStorage.getItem('customImageData');
@@ -290,9 +283,8 @@ export class Store {
       return `${yy}-${mm}-${dd}`;
     };
 
-    // === Priority 1: DAILY FLOW when changeImageDaily is ON (ignore custom) ===
     if (this._changeImageDaily) {
-      // Read ONLY daily keys (and reuse if it's today's).
+
       let storedData: string | null = null;
       let storedDate: string | null = null;
       try {
@@ -301,12 +293,11 @@ export class Store {
       } catch {}
 
       if (storedDate === todayKey && storedData) {
-        // Already have today's exact pixels -> reuse so reload doesn't change the image.
+
         this.image = storedData;
         return;
       }
 
-      // Fetch a fresh daily image and persist it as a DATA URL (pixels), not a hot link.
       const url = 'https://picsum.photos/1920/1080';
 
       try {
@@ -323,20 +314,19 @@ export class Store {
         this.image = dataUrl;
 
         try {
-          // Persist exact pixels so reloads show the same image until the date changes.
+
           localStorage.setItem('imageURL', dataUrl);
           localStorage.setItem('imageData', dataUrl);
           localStorage.setItem('imageDate', todayKey);
         } catch {}
       } catch (e) {
         console.error(e);
-        // Fallback to any stored pixels
+
         if (storedData) this.image = storedData;
       }
       return;
     }
 
-    // === Priority 2: CUSTOM FLOW when daily is OFF ===
     if (this._preset === 'custom') {
       const custom = this.getStoredCustomImage();
       if (custom) {
@@ -347,7 +337,6 @@ export class Store {
       return;
     }
 
-    // === Fallback: daily OFF, non-custom preset => use last daily if any ===
     let storedData: string | null = null;
     try {
       storedData = localStorage.getItem('imageData') || localStorage.getItem('imageURL');
@@ -355,7 +344,7 @@ export class Store {
     if (storedData) {
       this.image = storedData;
     } else {
-      // nothing stored; fetch once as pixels
+
       const url = 'https://picsum.photos/1920/1080';
       try {
         const resp = await fetch(url);
@@ -372,8 +361,6 @@ export class Store {
       }
     }
   }
-
-  // === Methods required elsewhere ===
 
   public async loadTopSites() {
     try {

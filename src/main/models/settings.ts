@@ -119,7 +119,7 @@ export class Settings extends EventEmitter {
       const json = JSON.parse(file);
 
       if (typeof json.version === 'string') {
-        // Migrate from 3.1.0
+
         Application.instance.storage.remove({
           scope: 'startupTabs',
           query: {},

@@ -17,7 +17,7 @@ import {
 
 const onKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
   if (e.which === 13) {
-    // Enter.
+
     e.preventDefault();
 
     const text = e.currentTarget.value;
@@ -80,9 +80,8 @@ const onInput = (e: any) => {
     store.hide({ focus: true });
   }
 
-  // TODO: if (store.settings.object.suggestions) {
   store.suggest();
-  // }
+
 };
 
 export const App = observer(() => {

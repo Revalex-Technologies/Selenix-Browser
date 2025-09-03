@@ -1,7 +1,5 @@
 import { BrowserWindow, app, dialog, nativeTheme, Menu, ipcMain } from 'electron';
-// Pull in the enable function from @electron/remote/main so we can allow
-// remote access to this window's webContents. The remote API has been
-// extracted from Electron and must be explicitly enabled per WebContents.
+
 import { enable } from '@electron/remote/main';
 import { writeFileSync, promises } from 'fs';
 import { resolve, join } from 'path';
@@ -24,21 +22,17 @@ export class AppWindow {
     const isWin = process.platform === 'win32';
     const isLinux = process.platform === 'linux';
 
-    // Linux: we go frameless so the OS bar isn't drawn; we rely on overlay if supported,
-    // or our own renderer buttons via IPC as a fallback (see handlers below).
-    // Windows/macOS: keep custom chrome with hidden/overlay styles.
     this.win = new BrowserWindow({
       frame: isLinux ? false : true,
       minWidth: 400,
       minHeight: 450,
       width: 900,
       height: 700,
-      // macOS uses hiddenInset. Windows & Linux use hidden with overlay enabled below.
+
       titleBarStyle: isMac ? 'hiddenInset' : ((isWin || isLinux) ? 'hidden' : undefined),
       backgroundColor: nativeTheme.shouldUseDarkColors ? '#939090ff' : '#ffffff',
       trafficLightPosition: isMac ? { x: 12, y: 12 } : undefined,
-      // Enable overlay on Win/Linux to surface native-style window controls inside our bar.
-      // (Linux support depends on Electron/WM; we also provide an IPC fallback.)
+
       titleBarOverlay: (isWin || isLinux)
         ? {
             color: nativeTheme.shouldUseDarkColors ? '#1f1f1f' : '#ffffff',
@@ -48,40 +42,33 @@ export class AppWindow {
         : undefined,
       webPreferences: {
         plugins: true,
-        // TODO: enable sandbox, contextIsolation and disable nodeIntegration to improve security
         nodeIntegration: true,
         contextIsolation: false,
         javascript: true,
-        // enableRemoteModule has been removed. The remote API must be enabled
-        // programmatically using @electron/remote/main.enable(this.win.webContents).
+
       },
       icon: resolve(
         app.getAppPath(),
         `static/${isNightly ? 'nightly-icons' : 'icons'}/icon.png`,
       ),
       show: false,
-      // Hide the menubar chrome so it doesn’t add extra UI on Linux.
+
       autoHideMenuBar: true,
       useContentSize: true,
     });
 
-    // Ensure the standard menubar is hidden (covers DE quirks on Linux).
     try {
       this.win.setMenuBarVisibility(false);
       this.win.setMenu(null);
       Menu.setApplicationMenu(null);
     } catch {}
 
-    // Enable the remote module for this window's WebContents. Without this call
-    // the remote API will not be available in renderers.
     enable(this.win.webContents);
 
     this.incognito = incognito;
 
     this.viewManager = new ViewManager(this, incognito);
 
-    // Keep Windows caption buttons & background in sync with app theme
-    // Apply overlay colors on Win/Linux and keep background in sync
     const applyOverlayColors = () => {
       if (isWin || isLinux) {
         const dark = nativeTheme.shouldUseDarkColors;
@@ -100,13 +87,10 @@ export class AppWindow {
     };
     applyOverlayColors();
 
-    // React to OS / app theme changes (system or in-app setting)
     nativeTheme.on('updated', () => {
       applyOverlayColors();
     });
 
-    // ---- IPC fallback for Linux when overlays aren’t available ----
-    // Your renderer can call these if you decide to render your own buttons.
     try { ipcMain.removeHandler('window-control'); } catch {}
     ipcMain.handle('window-control', (_evt, action: string) => {
       switch (action) {
@@ -118,7 +102,6 @@ export class AppWindow {
       }
     });
 
-    // Emit platform + state so the renderer can adjust spacing/icons
     const emitPlatformAndState = () => {
       try {
         this.send('platform', process.platform);
@@ -126,7 +109,7 @@ export class AppWindow {
           maximized: this.win.isMaximized(),
           fullScreen: this.win.isFullScreen(),
           focused: this.win.isFocused(),
-          // Simple feature flag the renderer can read to know overlays exist
+
           overlaySupported: !!this.win.setTitleBarOverlay && (isWin || isLinux),
         });
       } catch {}
@@ -143,7 +126,7 @@ export class AppWindow {
 
     (async () => {
       try {
-        // Read the last window state from file.
+
         windowState = JSON.parse(
           await promises.readFile(windowDataPath, 'utf8'),
         );
@@ -151,7 +134,6 @@ export class AppWindow {
         await promises.writeFile(windowDataPath, JSON.stringify({}));
       }
 
-      // Merge bounds from the last window state to the current window options.
       if (windowState) {
         this.win.setBounds({ ...windowState.bounds });
       }
@@ -166,10 +148,9 @@ export class AppWindow {
       }
     })();
 
-    // Show once ready to avoid flicker.
     this.win.once('ready-to-show', () => {
       this.win.show();
-      
+
 if (this.incognito) {
   try {
     dialog.showMessageBox(this.win, {
@@ -184,12 +165,11 @@ if (this.incognito) {
 emitPlatformAndState();
     });
 
-    // Update window bounds on resize and on move when window is not maximized.
 this.win.on('resize', () => {
       if (!this.win.isMaximized()) {
         windowState.bounds = this.win.getBounds();
       }
-      // Keep WebContentsView sized to the content area as the window resizes.
+
       setTimeout(() => {
         if (process.platform === 'linux') {
           this.viewManager.select(this.viewManager.selectedId, false);
@@ -197,7 +177,7 @@ this.win.on('resize', () => {
           this.viewManager.fixBounds();
         }
       });
-      // Notify renderer layout
+
       this.webContents.send('tabs-resize');
       setTimeout(() => {
         this.webContents.send('tabs-resize');
@@ -248,12 +228,9 @@ this.win.on('resize', () => {
         }
       }
 
-      // Save current window state to a file.
       windowState.maximized = this.win.isMaximized();
       windowState.fullscreen = this.win.isFullScreen();
       writeFileSync(windowDataPath, JSON.stringify(windowState));
-
-      // Removed unsafe call: this.win.setContentView(null);
 
       this.viewManager.clear();
 
@@ -275,16 +252,11 @@ this.win.on('resize', () => {
       );
     });
 
-    // this.webContents.openDevTools({ mode: 'detach' });
-
     if (process.env.NODE_ENV === 'development') {
       this.webContents.openDevTools({ mode: 'detach' });
       this.win.loadURL('http://localhost:4444/app.html');
     } else {
-      // When loading the compiled renderer in production, use loadFile instead
-      // of constructing a file:// URL manually. This avoids issues with
-      // incorrectly joined paths (e.g. extra slashes or backslashes) which
-      // can result in a blank window. See https://www.electronjs.org/docs/latest/api/browser-window#winloadfilefilepath-options
+
       const filePath = join(app.getAppPath(), 'build', 'app.html');
       this.win.loadFile(filePath);
     }
@@ -328,7 +300,7 @@ this.win.on('resize', () => {
   }
 
   public get webContents() {
-    // Guard against destroyed window/webContents to avoid runtime errors
+
     try {
       if (!this.win || this.win.isDestroyed()) return null as any;
       const wc = this.win.webContents as any;
@@ -350,7 +322,7 @@ this.win.on('resize', () => {
   public send(channel: string, ...args: any[]) {
     const wc = this.webContents as any;
     if (!wc) { return; }
-    try { wc.send(channel, ...args); } catch { /* swallow if window is gone */ }
+    try { wc.send(channel, ...args); } catch {  }
   }
 
   public updateTitle() {

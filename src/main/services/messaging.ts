@@ -1,10 +1,6 @@
 import { ipcMain } from 'electron';
 import { parse } from 'url';
 
-/**
- * Password persistence via electron-store (with a no-op in-memory fallback).
- * Set ELECTRON_STORE_KEY to enable at-rest encryption.
- */
 type PasswordStore = {
   get(service: string, account: string): Promise<string | null>;
   set(service: string, account: string, password: string): Promise<void>;
@@ -15,13 +11,12 @@ let passwordStore: PasswordStore;
 
 (() => {
   try {
-    // Use require to avoid ESM/CJS friction in different build setups.
+
     const Store = require('electron-store') as typeof import('electron-store');
 
-    // You can change the 'name' to customize the filename on disk (credentials.json).
     const store = new (Store as any)({
       name: 'credentials',
-      // If you provide ELECTRON_STORE_KEY, values will be encrypted at rest.
+
       encryptionKey: process.env.ELECTRON_STORE_KEY || undefined,
       clearInvalidConfig: true,
     });
@@ -41,7 +36,7 @@ let passwordStore: PasswordStore;
       },
     };
   } catch (err) {
-    // Fallback: in-memory map so the app still compiles/runs without electron-store
+
     console.warn(
       '[credentials] electron-store not found; falling back to in-memory storage (passwords will not persist).',
     );
@@ -62,7 +57,6 @@ let passwordStore: PasswordStore;
   }
 })();
 
-// Maintain the same helper API the rest of the file expects:
 const getPassword = (service: string, account: string) =>
   passwordStore.get(service, account);
 const setPassword = (service: string, account: string, password: string) =>
@@ -81,7 +75,7 @@ import * as bookmarkMenu from '../menus/bookmarks';
 import { showFindDialog } from '../dialogs/find';
 import { getFormFillMenuItems } from '../utils';
 import { showAddBookmarkDialog } from '../dialogs/add-bookmark';
-// removed extension-popup import
+
 import { showDownloadsDialog } from '../dialogs/downloads';
 import { showZoomDialog } from '../dialogs/zoom';
 import { showTabGroupDialog } from '../dialogs/tabgroup';
@@ -182,28 +176,6 @@ export const runMessagingService = (appWindow: AppWindow) => {
   });
 
   if (process.env.ENABLE_AUTOFILL) {
-    // TODO: autofill
-    // ipcMain.on(`form-fill-show-${id}`, async (e, rect, name, value) => {
-    //   const items = await getFormFillMenuItems(name, value);
-    //
-    //   if (items.length) {
-    //     appWindow.dialogs.formFillDialog.send(`formfill-get-items`, items);
-    //     appWindow.dialogs.formFillDialog.inputRect = rect;
-    //
-    //     appWindow.dialogs.formFillDialog.resize(
-    //       items.length,
-    //       items.find((r) => r.subtext) != null,
-    //     );
-    //     appWindow.dialogs.formFillDialog.rearrange();
-    //     appWindow.dialogs.formFillDialog.show(false);
-    //   } else {
-    //     appWindow.dialogs.formFillDialog.hide();
-    //   }
-    // });
-    //
-    // ipcMain.on(`form-fill-hide-${id}`, () => {
-    //   appWindow.dialogs.formFillDialog.hide();
-    // });
 
     ipcMain.on(
       `form-fill-update-${id}`,
@@ -232,16 +204,6 @@ export const runMessagingService = (appWindow: AppWindow) => {
         );
       },
     );
-
-    // ipcMain.on(`credentials-show-${id}`, (e, data) => {
-    //   appWindow.dialogs.credentialsDialog.send('credentials-update', data);
-    //   appWindow.dialogs.credentialsDialog.rearrange();
-    //   appWindow.dialogs.credentialsDialog.show();
-    // });
-    //
-    // ipcMain.on(`credentials-hide-${id}`, () => {
-    //   appWindow.dialogs.credentialsDialog.hide();
-    // });
 
     ipcMain.on(`credentials-save-${id}`, async (e, data) => {
       const { username, password, update, oldUsername } = data;

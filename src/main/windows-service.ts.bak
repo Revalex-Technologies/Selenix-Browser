@@ -58,52 +58,7 @@ export class WindowsService {
           const url = typeof view.url === 'string' ? view.url : view.webContents?.getURL?.() ?? '';
           to.send('create-tab', { url, active: true } as any, false, tabId);
           to.send('select-tab', tabId);
-        
-      
-      // Push current loading + navigation state to ensure toolbar/icons are correct immediately.
-      try {
-        const moved = to.viewManager.views.get(tabId);
-        if (moved) {
-          const isLoading = typeof (moved.webContents as any)?.isLoading === 'function'
-            ? (moved.webContents as any).isLoading()
-            : false;
-          moved.emitEvent('loading', isLoading);
-          moved.updateNavigationState();
-        }
-      } catch {}
-// After reparenting, force the renderer to receive up-to-date title/URL,
-      // since the page won't necessarily re-fire 'page-title-updated'.
-      try {
-        const moved = to.viewManager.views.get(tabId);
-        if (moved) {
-          moved.emitEvent('title-updated', moved.webContents.getTitle());
-          moved.emitEvent('url-updated', moved.webContents.getURL());
-        }
-      } catch {}
-
-      
-      // Also force-stop loading indicator and refresh icon, since renderer may not get a navigation event after reparent.
-      try {
-        const moved = to.viewManager.views.get(tabId);
-        if (moved && moved.webContents) {
-          moved.emitEvent('loading', false);
-        }
-      } catch {}
-      // Some startup settings spawn a blank tab on new windows; we don't want duplicates.
-      setTimeout(() => {
-        try {
-          const keep = new Set([tabId]);
-          const ids = Array.from(to.viewManager.views.keys());
-          for (const id of ids) {
-            if (!keep.has(id)) {
-              try { to.viewManager.views.get(id)?.destroy(); } catch {}
-              try { to.viewManager.views.delete(id); } catch {}
-              try { to.send('remove-tab', id); } catch {}
-            }
-          }
         } catch {}
-      }, 250);
-} catch {}
 
         // Focus the moved tab
         try { to.viewManager.select(tabId, true); } catch {}

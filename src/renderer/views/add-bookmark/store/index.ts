@@ -9,8 +9,6 @@ export class Store extends DialogStore {
 
   public bookmark: IBookmark;
 
-  // Observable
-
   @observable
 
   public folders: IBookmark[] = [];

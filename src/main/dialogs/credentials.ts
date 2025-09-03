@@ -1,13 +1,13 @@
 import { VIEW_Y_OFFSET } from '~/constants/design';
 import { AppWindow } from '../windows';
-import { PersistentDialog } from './dialog'; // Changed from Dialog to PersistentDialog
+import { PersistentDialog } from './dialog';
 
 const WIDTH = 350;
 const HEIGHT = 271;
 
 export class CredentialsDialog extends PersistentDialog {
   public appWindow: AppWindow;
-  public declare browserWindow: Electron.BrowserWindow; // Add this declaration
+  public declare browserWindow: Electron.BrowserWindow;
 
   public constructor(appWindow: AppWindow) {
     super({

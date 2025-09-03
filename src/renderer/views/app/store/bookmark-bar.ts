@@ -39,7 +39,7 @@ export class BookmarkBarStore {
   }
 
   public setBookmarkBarItems(): void {
-    // handle calculating how many and which bookmarks we can fit in the bar and which ones need to go in the overflow menu
+
     if (!this.staticMainID) return;
     const barItems: IBookmark[] = [];
     const overflowItems: IBookmark[] = [];

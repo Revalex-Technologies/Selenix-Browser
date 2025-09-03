@@ -1,13 +1,6 @@
 import { ISettings } from '~/interfaces';
-// The built‑in `remote` module was removed in recent Electron versions. Use
-// the standalone `@electron/remote` package instead【720843281807270†L52-L62】.
+
 import { app } from 'electron';
-// Do not import '@electron/remote' at module scope in shared code. Loading
-// '@electron/remote' in the main process throws an error: "@electron/remote"
-// cannot be required in the browser process. Instead, we will require
-// '@electron/remote' conditionally when running in a renderer context. See
-// https://github.com/electron/remote for details.
-// Note: we intentionally avoid a top‑level import here.
 
 export const DEFAULT_SEARCH_ENGINES = [
   {
@@ -77,33 +70,20 @@ export const DEFAULT_SETTINGS: ISettings = {
   warnOnQuit: false,
   version: 2,
   downloadsDialog: false,
-  // Determine the default downloads path. In the main process we can call
-  // app.getPath('downloads') directly. In a renderer process we cannot import
-  // `app` from 'electron', so we fall back to requiring '@electron/remote'
-  // dynamically at runtime. Wrapping the require in a try/catch prevents
-  // errors in the main process. See issue reported by the user: requiring
-  // '@electron/remote' in the main process causes an exception.
+
   downloadsPath: (() => {
     try {
-      // Detect renderer context: process.type is 'renderer' in renderers. In
-      // preload scripts or web pages with nodeIntegration disabled, this
-      // branch may still be false, but remote is only useful in those
-      // environments. We also guard against require throwing in the main
-      // process.
+
       if (typeof process !== 'undefined' && process.type === 'renderer') {
-        // Dynamically require remote in the renderer. If remote is not
-        // available for some reason, this call will throw and fall through to
-        // the catch block.
+
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const remote = require('@electron/remote');
         return remote.app.getPath('downloads');
       }
     } catch (e) {
-      // Ignore; we will use the main process app below.
+
     }
-    // Fallback: use the main process's app module if available. In the
-    // renderer process where process.type === 'renderer', `app` imported
-    // above is undefined, so we return an empty string.
+
     return app ? app.getPath('downloads') : '';
   })(),
   doNotTrack: true,

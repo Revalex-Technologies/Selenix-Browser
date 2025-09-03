@@ -4,8 +4,6 @@ import { platform } from 'os';
 import { ICON_FULLSCREEN_EXIT } from '~/renderer/constants/icons'
 import { centerIcon } from '~/renderer/mixins';
 
-// margin-top: ${isHTMLFullscreen ? -TOOLBAR_HEIGHT : 0}px;
-
 export const StyledTitlebar = styled.div`
   position: relative;
   z-index: 100;
@@ -13,9 +11,6 @@ export const StyledTitlebar = styled.div`
   flex-flow: row;
   color: rgba(0, 0, 0, 0.8);
   width: 100%;
-  
-  
-
 
   &:before {
     position: absolute;
@@ -41,7 +36,6 @@ export const StyledTitlebar = styled.div`
     align-items: ${theme.isCompact ? 'center' : 'initial'};
     padding-left: ${platform() === 'darwin' && !isFullscreen ? 78 : 4}px;
 
-    /* Reserve space for native Win caption buttons */
     padding-right: ${platform() === 'win32' && !isFullscreen ? `${theme.isCompact ? 'calc(var(--overlay-right-inset, 40px) + 2px)' : 'calc(min(var(--overlay-right-inset, 40px), 12px) + 2px)'}` : 4}px;
 
     &:before {

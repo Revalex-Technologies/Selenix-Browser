@@ -24,6 +24,7 @@ import { TabEvent } from '~/interfaces/tabs';
 export class TabsStore {
 @observable
   public isDragging = false;
+  public tearOffInProgress = false;
 @observable
 
   public hoveredTabId = -1;
@@ -133,17 +134,13 @@ export class TabsStore {
     });
 
     ipcRenderer.on('select-tab', (e, id: number) => {
-      // Avoid feedback loop / jitter: main already selected & focused the view.
-      // We only mark it active in the UI without calling Tab.select(),
-      // which would invoke main again.
+
       const tab = this.getTabById(id);
       if (!tab) return;
       this.selectedTabId = id;
-      // Do not move focus or change address bar here.
-      // Bounds/layout may not need an update, but it's cheap and safe.
+
       this.updateTabsBounds(false);
     });
-
 
     ipcRenderer.on('tab-event', (e, event: TabEvent, tabId, args) => {
       const tab = this.getTabById(tabId);
@@ -625,10 +622,20 @@ export class TabsStore {
         e.pageX < boundingRect.left ||
         e.pageX - boundingRect.left > store.addTab.left
       ) {
-        // TODO: Create a new window
-      }
-
-      this.getTabsToReplace(
+        if (!this.tearOffInProgress && selectedTab) {
+          this.tearOffInProgress = true;
+          try {
+            const sx = (e as any)?.screenX ?? 0;
+            const sy = (e as any)?.screenY ?? 0;
+            // Stop dragging in the current window UI
+            selectedTab.isDragging = false;
+            this.isDragging = false;
+            ipcRenderer.invoke('tear-off-tab', { tabId: selectedTab.id, screenX: sx, screenY: sy });
+          } finally {
+            setTimeout(() => (this.tearOffInProgress = false), 150);
+          }
+        }
+      }this.getTabsToReplace(
         selectedTab,
         lastMouseX - e.pageX >= 1 ? 'left' : 'right',
       );

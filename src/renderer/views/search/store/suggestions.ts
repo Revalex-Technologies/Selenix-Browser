@@ -16,14 +16,12 @@ const MAX_SUGGESTIONS_COUNT = 8;
 export class SuggestionsStore {
   private store: Store;
 
-  // Observable
   public list: ISuggestion[] = [];
 
   public selected = 0;
 
   public height = 0;
 
-  // Computed
   public get selectedSuggestion() {
     return this.list.find((x) => x.id === this.selected);
   }

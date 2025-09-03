@@ -257,11 +257,11 @@ export default observer(() => {
           <MenuItem icon={ICON_SHIELD} section="privacy">
             Privacy
           </MenuItem>
-          {/* <MenuItem section="permissions">Site permissions</MenuItem> */}
+          {}
 
-          {/* <MenuItem section="language">Languages</MenuItem> */}
-          {/* <MenuItem section="shortcuts">Keyboard shortcuts</MenuItem> */}
-          {/* <MenuItem section="system">System</MenuItem> */}
+          {}
+          {}
+          {}
           <MenuItem icon={ICON_EDIT} section="about">
             About
           </MenuItem>

@@ -17,8 +17,7 @@ export class DownloadsStore {
       });
 
       not.onclick = () => {
-        // TODO(sentialx): downloads notification
-        // store.overlay.visible = true;
+
       };
     });
 

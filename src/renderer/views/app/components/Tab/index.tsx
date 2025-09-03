@@ -15,8 +15,7 @@ import {
 import { ICON_VOLUME_HIGH, ICON_VOLUME_OFF } from '~/renderer/constants';
 import { ITab } from '../../models';
 import store from '../../store';
-// Import ipcRenderer from electron and remote from @electron/remote. The
-// built-in remote module is no longer bundled with Electron.
+
 import { ipcRenderer } from 'electron';
 import * as remote from '@electron/remote';
 import { COMPACT_TAB_MARGIN_TOP } from '~/constants/design';

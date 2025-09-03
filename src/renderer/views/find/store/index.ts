@@ -18,7 +18,6 @@ const defaultFindInfo = {
 export class Store extends DialogStore {
   public findInputRef = React.createRef<HTMLInputElement>();
 
-  // Observable
   @observable
 
   public tabId = -1;

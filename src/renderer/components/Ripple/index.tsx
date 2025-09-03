@@ -34,7 +34,6 @@ const getSize = (x: number, y: number, width: number, height: number) => {
     return 0;
   }
 
-  // Calculate points relative to the center of a component.
   const newX = x - width / 2;
   const newY = y - height / 2;
 

@@ -14,7 +14,6 @@ import {
 import { IDownloadItem } from '~/interfaces';
 import { shell } from 'electron';
 
-// Lightweight pretty-bytes formatter to avoid ESM/CJS type issues.
 const prettyBytes = (input: number): string => {
   if (typeof input !== 'number' || !isFinite(input)) return '0 B';
   const neg = input < 0;
@@ -25,7 +24,6 @@ const prettyBytes = (input: number): string => {
   const value = Number((num / Math.pow(1000, exponent)).toFixed(2));
   return `${neg ? '-' : ''}${value} ${units[exponent]}`;
 };
-
 
 const onClick = (item: IDownloadItem) => () => {
   if (item.completed) {

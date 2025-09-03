@@ -9,9 +9,7 @@ import { IDownloadItem, BrowserActionChangeType } from '~/interfaces';
 import { parseCrx } from '~/utils/crx';
 import { pathExists } from '~/utils/files';
 import { extractZip } from '~/utils/zip';
-// The legacy 'electron-extensions' package is no longer used. Chrome
-// extension support is now provided by electron-chrome-extensions which
-// is initialized in Application.setupExtensions().
+
 import { requestPermission } from './dialogs/permissions';
 import { rimraf as rf } from 'rimraf';
 
@@ -38,10 +36,7 @@ export class SessionsService {
     this.clearCache('incognito');
 
     if (process.env.ENABLE_EXTENSIONS) {
-      // When extensions are enabled, expose IPC handlers to load and
-      // retrieve installed extensions. The legacy extensions.initializeSession
-      // call has been removed; electron-chrome-extensions handles session
-      // initialization internally when constructed in Application.
+
       ipcMain.on('load-extensions', () => {
         this.loadExtensions();
       });
@@ -131,10 +126,9 @@ export class SessionsService {
 
     const setupDownloadListeners = (ses: Session) => {
       ses.on('will-download', (event: Electron.Event, item: DownloadItem, webContents: WebContents) => {
-        // If a save path was already assigned (e.g., via a per-download 'Save As' dialog),
-        // don't override it here—just proceed to standard progress/complete hooks.
+
         const preChosenPath = typeof item.getSavePath === 'function' ? item.getSavePath() : '';
-    
+
         const fileName = item.getFilename();
         const id = makeId(32);
         const window = webContents ? Application.instance.windows.findByContentsView(webContents.id) : undefined;
@@ -261,9 +255,7 @@ export class SessionsService {
   public unloadIncognitoExtensions() {
     this.extensionsIncognito.forEach((extension) => {
       try {
-        // Use the extensions API on the incognito session to remove
-        // extensions. Fall back to removeExtension on the session
-        // directly if needed.
+
         const extModule: any = (this.viewIncognito as any).extensions || this.viewIncognito
         extModule.removeExtension(extension.id)
       } catch (e) {
@@ -279,7 +271,7 @@ export class SessionsService {
 
     const context = sessionType === 'incognito' ? this.viewIncognito : this.view;
 
-    if ((sessionType === 'normal' && this.extensionsLoaded) || 
+    if ((sessionType === 'normal' && this.extensionsLoaded) ||
         (sessionType === 'incognito' && this.incognitoExtensionsLoaded)) {
       return;
     }
@@ -290,17 +282,10 @@ export class SessionsService {
     for (const dir of dirs) {
       try {
         const path = resolve(extensionsPath, dir);
-        // Use the electron-chrome-extensions API to load the extension. The
-        // extensions API is exposed on the session via the `extensions`
-        // property. Falling back to the legacy `loadExtension` (which
-        // would load MV2) is not appropriate here.
+
         const extModule: any = (context as any).extensions || context
         const extension = (await extModule.loadExtension(path)) as ExtendedExtension
 
-        // Only load Manifest V3 extensions. Manifest V2 support has been
-        // removed in recent Chromium versions and is not available via
-        // electron-chrome-extensions. Skip any extension whose
-        // manifest_version is not 3.
         if (extension?.manifest?.manifest_version !== 3) {
           continue
         }
@@ -311,10 +296,6 @@ export class SessionsService {
           this.extensions.push(extension)
         }
 
-        // For Manifest V3 extensions with a background service_worker, explicitly
-        // start the service worker. Without this call, some MV3 extensions
-        // may not initialise their background scripts properly. Use the
-        // `serviceWorkers` API available on the session (Electron >= 12).
         try {
           const manifest: any = (extension as any).manifest
           if (manifest?.background?.service_worker) {
@@ -327,8 +308,6 @@ export class SessionsService {
           console.warn('Could not start service worker for extension', extension.id, err)
         }
 
-        // Notify all existing windows about the new extension so that
-        // browser action icons can be displayed in the toolbar.
         for (const window of Application.instance.windows.list) {
           window?.send('load-browserAction', extension)
         }
@@ -347,15 +326,13 @@ export class SessionsService {
   async uninstallExtension(id: string) {
     if (!process.env.ENABLE_EXTENSIONS) return;
 
-    // Remove from both normal and incognito sessions
-    // Use the extensions API on the session to remove extensions.
     const extModuleNorm: any = (this.view as any).extensions || this.view
     const incogModule: any = (this.viewIncognito as any).extensions || this.viewIncognito
 
     const extension = extModuleNorm.getExtension(id)
     if (extension) {
       await extModuleNorm.removeExtension(id)
-      // Remove files on disk.
+
       await rf(extension.path)
     }
 
@@ -364,7 +341,6 @@ export class SessionsService {
       await incogModule.removeExtension(id)
     }
 
-    // Update extensions arrays
     this.extensions = this.extensions.filter(ext => ext.id !== id);
     this.extensionsIncognito = this.extensionsIncognito.filter(ext => ext.id !== id);
   }
@@ -372,9 +348,9 @@ export class SessionsService {
   public onCreateTab = async (details: chrome.tabs.CreateProperties) => {
     const window = Application.instance.windows.list
       .find((x) => x.win.id === details.windowId);
-    
+
     if (!window) throw new Error('Window not found');
-    
+
     const view = window.viewManager.create(details, false, true);
     return view.id;
   };

@@ -47,7 +47,7 @@ export class PersistentDialog {
     hideTimeout,
     webPreferences,
   }: IOptions) {
-    // Create a view with renderer opts but DO NOT show it until dom-ready
+
     this.webContentsView = new WebContentsView({
       webPreferences: {
         nodeIntegration: true,
@@ -57,17 +57,12 @@ export class PersistentDialog {
       },
     });
 
-    // Enable @electron/remote for this renderer
     enable(this.webContentsView.webContents);
 
-    // --- CRITICAL TRANSPARENCY SETTINGS (done before any load) ---
-    // Newer Electron exposes setBackgroundColor on the view itself.
     (this.webContentsView as any).setBackgroundColor?.('#00000000');
-    // Older versions: do it on webContents too.
+
     (this.webContents as any).setBackgroundColor?.('#00000000');
 
-    // Load a transparent boot page immediately so there is NEVER a black frame
-    // while the real HTML is being resolved.
     const transparentBoot = `data:text/html;charset=utf-8,
       <meta charset="utf-8">
       <style>
@@ -77,7 +72,7 @@ export class PersistentDialog {
     this.webContents.loadURL(transparentBoot);
 
     this.webContents.on('dom-ready', () => {
-      // Ensure renderer stays transparent even if app CSS changes
+
       try {
         this.webContents.insertCSS(`
           html, body, #app { background: transparent !important; }
@@ -105,7 +100,7 @@ export class PersistentDialog {
     });
 
     if (process.env.NODE_ENV === 'development') {
-      // Only navigate to the real page now; boot page already transparent
+
       this.webContents.loadURL(`http://localhost:4444/${this.name}.html`);
     } else {
       const filePath = join(app.getAppPath(), 'build', `${this.name}.html`);
@@ -158,7 +153,6 @@ export class PersistentDialog {
 
         this.visible = true;
 
-        // Attach only after dom-ready to avoid an initial black flash.
         browserWindow.contentView.addChildView(this.webContentsView);
         this.rearrange();
 
@@ -233,8 +227,7 @@ export class PersistentDialog {
     } catch {}
 
     try {
-      // Make sure the renderer is inactive & blank before destroy to avoid
-      // one last black composite on some drivers.
+
       if (!this.webContents.isDestroyed()) {
         this.webContents.loadURL('about:blank');
       }

@@ -13,7 +13,7 @@ import {
 } from './style';
 import store from '../../store';
 import { ipcRenderer } from 'electron';
-// Use @electron/remote instead of the deprecated remote module.
+
 import * as remote from '@electron/remote';
 import { WEBUI_BASE_URL, WEBUI_URL_SUFFIX } from '~/constants/files';
 import { Switch } from '~/renderer/components/Switch';
@@ -33,10 +33,8 @@ import {
 } from '~/renderer/constants/icons';
 import { getWebUIURL } from '~/common/webui';
 
-
-// === StrictMode + stable-layout first-open fade ===
 const __useInsertion: typeof React.useLayoutEffect =
-  // Prefer useInsertionEffect (pre-paint), fall back to layout effect if not available
+
   (React as any).useInsertionEffect || React.useLayoutEffect;
 
 function __primeHidden(el: HTMLElement) {
@@ -48,7 +46,7 @@ function __primeHidden(el: HTMLElement) {
 
 function __animateIn(el: HTMLElement) {
   el.style.transition = 'opacity 160ms ease, transform 200ms ease';
-  // force a reflow to commit initial styles
+
   void el.offsetWidth;
   requestAnimationFrame(() => {
     el.style.visibility = 'visible';
@@ -89,7 +87,7 @@ function __waitStableLayout(el: HTMLElement, timeoutMs = 350): Promise<void> {
 }
 
 async function __readyThenAnimate(el: HTMLElement, didRef: { current: boolean }) {
-  if (didRef.current) return; // guard StrictMode double-call
+  if (didRef.current) return;
   didRef.current = true;
   try {
     if ('fonts' in document && (document as any).fonts?.ready) {
@@ -99,21 +97,13 @@ async function __readyThenAnimate(el: HTMLElement, didRef: { current: boolean })
   await __waitStableLayout(el, 400);
   __animateIn(el);
 }
-// === /fix ===
-
 
 const onFindClick = () => {
-  /*
-  // TODO(sentialx): get selected tab
-  ipcRenderer.send(
-    `find-show-${store.windowId}`,
-    store.tabs.selectedTab.id,
-    store.tabs.selectedTab.findInfo,
-  );*/
+
 };
 
 const onDarkClick = () => {
-  // Toggle dark contents and persist via store.save() (now a no-op shim if not implemented).
+
   store.settings.darkContents = !store.settings.darkContents;
   store.save();
 };
@@ -160,11 +150,6 @@ const goToURL = (url: string) => () => {
   addNewTab(url);
 };
 
-/**
- * Handle the click on the update entry.
- * Single-click → download + restart (wired in store.triggerUpdate()).
- * No progress UI, no text changes.
- */
 const onUpdateClick = () => {
   store.triggerUpdate();
 };
@@ -173,14 +158,12 @@ export const QuickMenu = observer(() => {
   const __qmRef = React.useRef<HTMLDivElement | null>(null);
   const __didOnce = React.useRef(false);
 
-  // Pre-paint hide to avoid flicker even in StrictMode
   __useInsertion(() => {
     const el = __qmRef.current;
     if (!el) return;
     __primeHidden(el);
   }, []);
 
-  // After mount, wait for layout to settle, then animate exactly once
   React.useLayoutEffect(() => {
     const el = __qmRef.current;
     if (!el || __didOnce.current) return;
@@ -196,7 +179,7 @@ export const QuickMenu = observer(() => {
     >
       <Content>
         <MenuItems>
-          {/* Update entry. Show only when an update is available. */}
+          {}
           {store.updateAvailable && (
             <>
               <MenuItem onClick={onUpdateClick}>
@@ -250,7 +233,7 @@ export const QuickMenu = observer(() => {
             <Icon icon={ICON_SETTINGS} />
             <MenuItemTitle>Settings</MenuItemTitle>
           </MenuItem>
-          {/* TODO: <MenuItem onClick={goToWebUIPage('extensions')}> */}
+          {}
           <MenuItem
             onClick={goToURL(
               'https://chrome.google.com/webstore/category/extensions',

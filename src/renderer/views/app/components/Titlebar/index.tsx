@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import * as React from 'react';
-// Import ipcRenderer from electron and remote from the external package since
-// the built-in remote was removed from recent Electron versions.
+
 import { ipcRenderer } from 'electron';
 import * as remote from '@electron/remote';
 
@@ -33,9 +32,7 @@ export const Titlebar = observer(() => {
       <Tabbar />
       {store.isCompact && <RightButtons />}
 
-      {/* When using native OS window controls, we don't render custom controls.
-          On Linux, if we're in fullscreen, show an explicit exit button since
-          native controls are typically hidden in fullscreen. */}
+      {}
       {platform() !== 'darwin' && store.isFullscreen && (
         <FullscreenExitButton
           style={{

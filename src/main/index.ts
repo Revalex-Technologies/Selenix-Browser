@@ -2,10 +2,6 @@ import { ipcMain, app, webContents } from 'electron';
 import { setIpcMain } from '@wexond/rpc-electron';
 setIpcMain(ipcMain);
 
-// Initialize the remote module. The remote API has been removed from core
-// Electron and is now provided by the @electron/remote package. Calling
-// initialize() here ensures it hooks into the IPC internals before any
-// BrowserWindows are created.
 import { initialize } from '@electron/remote/main';
 
 initialize();
@@ -19,8 +15,6 @@ import { Application } from './application';
 
 export const isNightly = app.name === 'selenix-nightly';
 
-// The allowRendererProcessReuse property has been removed in recent Electron
-// versions. Electron now always reuses renderer processes when it is safe to do so.
 app.name = isNightly ? 'Selenix Nightly' : 'Selenix';
 
 (process.env as any)['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
@@ -71,7 +65,6 @@ ipcMain.handle(
         throw new Error(`WebContents with id ${webContentsId} not found or destroyed`);
       }
 
-      // Handle both direct methods and webContents.method calls
       let actualMethod = method;
       if (method.startsWith('webContents.')) {
         actualMethod = method.split('.')[1];

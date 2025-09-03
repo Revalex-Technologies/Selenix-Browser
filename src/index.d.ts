@@ -2,7 +2,6 @@ declare module '*.svg';
 declare module '*.png';
 declare module '*.woff2';
 
-
 declare global {
   interface Window {
     versions?: {

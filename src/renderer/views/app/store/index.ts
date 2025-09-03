@@ -3,7 +3,7 @@ import { observable, computed, makeObservable, makeAutoObservable } from 'mobx';
 import { TabsStore } from './tabs';
 import { TabGroupsStore } from './tab-groups';
 import { AddTabStore } from './add-tab';
-// Import ipcRenderer from electron and remote from the standalone package.
+
 import { ipcRenderer } from 'electron';
 import * as remote from '@electron/remote';
 import { ExtensionsStore } from './extensions';
@@ -43,7 +43,6 @@ export class Store {
 
   public isIncognito = ipcRenderer.sendSync(`is-incognito-${this.windowId}`);
 
-  // Observable
   public addressbarTextVisible = true;
 
   public addressbarFocused = false;
@@ -82,8 +81,6 @@ export class Store {
     'extension-popup': false,
     'downloads-dialog': false,
   };
-
-  // Computed
 
   public get downloadProgress() {
     const downloading = this.downloads.filter((x) => !x.completed);
@@ -211,9 +208,6 @@ export class Store {
       this.updateAvailable = true;
     });
 
-    // When the update has finished downloading the main process emits
-    // `update-ready`.  Treat this the same as `update-available` so that
-    // any UI listening to this flag will still show an update prompt.
     ipcRenderer.on('update-ready', () => {
       this.updateAvailable = true;
     });
