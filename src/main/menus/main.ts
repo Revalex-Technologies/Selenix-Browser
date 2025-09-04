@@ -22,14 +22,26 @@ const createMenuItem = (
     accelerator: shortcut,
     visible: label != null && key === 0,
     label: label != null && key === 0 ? label : '',
-    click: (menuItem: MenuItem, browserWindow: BrowserWindow) =>
-      action(
-        Application.instance.windows.list.find(
-          (x) => x.win.id === browserWindow.id,
-        ),
-        menuItem,
-        key,
-      ),
+    click: (menuItem: MenuItem, browserWindow: BrowserWindow) => {
+      let win: AppWindow | undefined;
+      try {
+        win = Application.instance.windows.list.find(
+          (x) => browserWindow && x.win && x.win.id === browserWindow.id,
+        );
+      } catch {
+        win = undefined;
+      }
+      if (!win) {
+        win = Application.instance.windows.current;
+      }
+      if (!win) return;
+      try {
+        action(win, menuItem, key);
+      } catch {
+        // Swallow exceptions triggered by mis-matched states to prevent
+        // crashes when commands are executed outside of a valid context.
+      }
+    },
   }));
 
   return result;

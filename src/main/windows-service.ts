@@ -6,9 +6,15 @@ import { NEWTAB_URL } from '~/constants/tabs';
 export class WindowsService {
   public list: AppWindow[] = [];
 
-  public current: AppWindow;
+  public lastFocused: AppWindow | undefined;
 
-  public lastFocused: AppWindow;
+  public get current(): AppWindow | undefined {
+    return this.lastFocused ?? this.list[0];
+  }
+
+  public set current(window: AppWindow | undefined) {
+    this.lastFocused = window;
+  }
 
   constructor() {
 
@@ -130,6 +136,8 @@ export class WindowsService {
     const window = new AppWindow(incognito);
     this.list.push(window);
 
+    this.lastFocused = window;
+
     window.win.on('focus', () => {
       this.lastFocused = window;
     });
@@ -142,7 +150,8 @@ export class WindowsService {
   }
 
   public fromBrowserWindow(browserWindow: BrowserWindow) {
-    return this.list.find((x) => x.id === browserWindow.id);
+    if (!browserWindow) return undefined;
+    return this.list.find((x) => x.win && x.win.id === browserWindow.id);
   }
 
   public broadcast(channel: string, ...args: unknown[]) {
