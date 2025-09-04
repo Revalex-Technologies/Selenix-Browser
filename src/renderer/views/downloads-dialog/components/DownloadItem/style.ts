@@ -46,6 +46,7 @@ export const Progress = styled.div`
   height: 100%;
   background-color: ${BLUE_500};
   border-radius: 16px;
+
 `;
 
 export const ProgressBackground = styled.div`
@@ -54,7 +55,7 @@ export const ProgressBackground = styled.div`
   border-radius: 16px;
   overflow: hidden;
   margin-top: 4px;
-  flex: 1;
+  width: 100%;
 
   ${({ theme }: { theme?: ITheme }) => css`
     background-color: ${theme['dialog.lightForeground']

@@ -47,6 +47,12 @@ export const DownloadItem = observer(({ item }: { item: IDownloadItem }) => {
     received = receivedSplit[0];
   }
 
+  const totalBytes = Number(item.totalBytes) || 0;
+  const receivedBytes = Number(item.receivedBytes) || 0;
+  const progressPercent = totalBytes > 0
+    ? Math.max(0, Math.min(1, receivedBytes / totalBytes)) * 100
+    : 100;
+
   return (
     <StyledDownloadItem onClick={onClick(item)}>
       <Icon></Icon>
@@ -55,11 +61,7 @@ export const DownloadItem = observer(({ item }: { item: IDownloadItem }) => {
         {!item.completed && (
           <>
             <ProgressBackground>
-              <Progress
-                style={{
-                  width: `calc((${item.receivedBytes} / ${item.totalBytes}) * 100%)`,
-                }}
-              ></Progress>
+              <Progress style={{ width: `${progressPercent}%` }}></Progress>
             </ProgressBackground>
             <SecondaryText>{`${received}/${total}`}</SecondaryText>
           </>
