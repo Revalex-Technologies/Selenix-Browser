@@ -332,7 +332,29 @@ export const getMainMenu = () => {
               ['CmdOrCtrl+Shift+I', 'CmdOrCtrl+Shift+J', 'F12'],
               () => {
                 setTimeout(() => {
-                  Application.instance.windows.current.viewManager.selected.webContents.toggleDevTools();
+                  const win = Application.instance.windows.current;
+                  const viewManager = win?.viewManager;
+                  const selectedView = viewManager?.selected;
+                  const wc = selectedView?.webContents;
+                  if (!wc) return;
+
+                  if (wc.isDevToolsOpened()) {
+                    wc.closeDevTools();
+                    return;
+                  }
+
+                  const platform = process.platform;
+                  const detach = platform === 'win32' || platform === 'linux';
+                  const mode: any = detach ? 'detach' : 'undocked';
+                  try {
+                    wc.openDevTools({ mode });
+                    (wc as any)._hasOpenedDevTools = true;
+                  } catch {
+                    try {
+                      wc.toggleDevTools();
+                      (wc as any)._hasOpenedDevTools = true;
+                    } catch {}
+                  }
                 });
               },
               'Developer tools...',
@@ -340,9 +362,12 @@ export const getMainMenu = () => {
 
             ...createMenuItem(['CmdOrCtrl+Shift+F12'], () => {
               setTimeout(() => {
-                webContents
-                  .getFocusedWebContents()
-                  .openDevTools({ mode: 'detach' });
+                const focused = webContents.getFocusedWebContents();
+                if (!focused) return;
+                try {
+                  focused.openDevTools({ mode: 'detach' });
+                  (focused as any)._hasOpenedDevTools = true;
+                } catch {}
               });
             }),
           ],

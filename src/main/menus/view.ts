@@ -274,8 +274,29 @@ export const getViewMenu = (
     click: () => {
       webContents.inspectElement(params.x, params.y);
 
-      if (webContents.isDevToolsOpened()) {
-        webContents.devToolsWebContents.focus();
+      const anyWC: any = webContents as any;
+      if (!anyWC._hasOpenedDevTools) {
+        setTimeout(() => {
+          try {
+            webContents.openDevTools({ mode: 'bottom' });
+          } catch {
+            // Silently ignore failures; docking issues should not interfere
+            // with normal browser operation.
+          }
+        }, 0);
+        anyWC._hasOpenedDevTools = true;
+      } else if (!webContents.isDevToolsOpened()) {
+        setTimeout(() => {
+          try {
+            webContents.openDevTools();
+          } catch {
+            // Ignore any errors.
+          }
+        }, 0);
+      } else {
+        try {
+          webContents.devToolsWebContents?.focus();
+        } catch {}
       }
     },
   });
