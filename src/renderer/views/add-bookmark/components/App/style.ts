@@ -6,6 +6,7 @@ import { DialogStyle } from '~/renderer/mixins/dialogs';
 
 export const StyledApp = styled(DialogStyle)`
   padding: 16px;
+  overflow: visible;
 
   & .textfield,
   .dropdown {

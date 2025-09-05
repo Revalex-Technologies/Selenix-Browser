@@ -4,11 +4,11 @@ import { ThemeProvider } from 'styled-components';
 
 import { StyledApp, Title, Row, Label, Buttons } from './style';
 import store from '../../store';
-import { Input, Dropdown } from '~/renderer/components/Input';
+import { Input } from '~/renderer/components/Input';
+import { Dropdown } from '~/renderer/components/Dropdown';
 import { Button } from '~/renderer/components/Button';
 
 import { ipcRenderer } from 'electron';
-import * as remote from '@electron/remote';
 import { getBookmarkTitle } from '~/renderer/views/bookmarks/utils';
 import { UIStyle } from '~/renderer/mixins/default-styles';
 
@@ -26,24 +26,12 @@ const onChange = () => {
   updateBookmark();
 };
 
-const onDropdownClick = (e: React.MouseEvent<HTMLDivElement>) => {
-  const { left, top, height } = e.currentTarget.getBoundingClientRect();
-  const menu = remote.Menu.buildFromTemplate([
-    ...store.folders.map((folder) => ({
-      label: getBookmarkTitle(folder),
-      click: () => {
-        store.currentFolder = folder;
-        store.bookmark.parent = folder._id;
-        updateBookmark();
-      },
-    })),
-  ]);
-
-  const { x, y } = (remote.webContents as any).fromWebContents(
-    remote.getCurrentWebContents(),
-  ).getBounds();
-
-  menu.popup({ x: x + left, y: y + top + height });
+const onFolderChange = (value: string) => {
+  const folder = store.folders.find((f) => f._id === value);
+  if (!folder) return;
+  store.currentFolder = folder;
+  store.bookmark.parent = folder._id;
+  updateBookmark();
 };
 
 const onRemove = () => {
@@ -69,14 +57,18 @@ export const App = observer(() => {
         </Row>
         <Row>
           <Label>Folder</Label>
-          <Dropdown
-            dark={store.theme['dialog.lightForeground']}
-            tabIndex={1}
-            className="dropdown"
-            onMouseDown={onDropdownClick}
-          >
-            {store.currentFolder && getBookmarkTitle(store.currentFolder)}
-          </Dropdown>
+          <div className="dropdown">
+            <Dropdown
+              defaultValue={store.currentFolder ? store.currentFolder._id : ''}
+              onChange={onFolderChange}
+            >
+              {store.folders.map((folder) => (
+                <Dropdown.Item key={folder._id} value={folder._id}>
+                  {getBookmarkTitle(folder)}
+                </Dropdown.Item>
+              ))}
+            </Dropdown>
+          </div>
         </Row>
         <Buttons>
           <Button onClick={onDone}>Done</Button>
