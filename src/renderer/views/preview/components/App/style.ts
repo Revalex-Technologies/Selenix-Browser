@@ -12,30 +12,42 @@ export const StyledApp = styled(PersistentDialogStyle)`
 
   ${({ theme, xTransition }: { theme?: ITheme; xTransition: boolean }) => css`
     color: ${theme['dialog.textColor']};
-    transition: 0.15s opacity ${xTransition ? ', 0.08s transform' : ''};
+    transition: 0.15s opacity${xTransition ? ', 0.08s transform' : ''};
   `}
 `;
 
 export const Title = styled.div`
-  font-weight: 500;
+  ${maxLines(1)}
+  font-weight: 600;
   line-height: 1.3rem;
-  ${maxLines(2)};
-  opacity: 0.87;
 `;
 
 export const Domain = styled.div`
-  opacity: 0.7;
-  line-height: 1.3rem;
+  ${maxLines(1)}
+  opacity: 0.65;
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.2rem;
 `;
 
-export const Subtitle = styled.div`
-  font-size: 13px;
-  opacity: 0.54;
-  margin-top: 8px;
+export const Divider = styled.div`
+  height: 1px;
+  background: ${({ theme }: { theme?: ITheme }) => theme['dialog.separator.color']};
+  margin: 8px 0 10px 0;
+  opacity: 0.75;
 `;
 
-export const Buttons = styled.div`
+export const MemoryRow = styled.div`
   display: flex;
-  margin-top: 16px;
-  float: right;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 12px;
+  line-height: 1;
+  & > span {
+    opacity: 0.7;
+  }
+  & > strong {
+    font-weight: 600;
+  }
 `;

@@ -1,12 +1,24 @@
 import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { ThemeProvider } from 'styled-components';
 
-import { StyledApp, Title, Domain } from './style';
+import { StyledApp, Title, Domain, Divider, MemoryRow } from './style';
 import store from '../../store';
 import { UIStyle } from '~/renderer/mixins/default-styles';
 
 export const App = observer(() => {
+  const [calcState, setCalcState] = useState(false);
+  useEffect(() => {
+    if (!store.visible) {
+      setCalcState(false);
+      return undefined;
+    }
+    setCalcState(true);
+    const t = setTimeout(() => setCalcState(false), 1000);
+    return () => clearTimeout(t);
+  }, [store.visible]);
+
   return (
     <ThemeProvider theme={{ ...store.theme }}>
       <UIStyle />
@@ -17,6 +29,11 @@ export const App = observer(() => {
       >
         <Title>{store.title}</Title>
         <Domain>{store.domain}</Domain>
+        <Divider />
+        <MemoryRow>
+          <span>Memory</span>
+          <strong>{calcState && !store.hasSample ? 'Calculating…' : (store.hasSample && store.memoryMB != null ? `${store.memoryMB} MB` : 'N/A')}</strong>
+        </MemoryRow>
       </StyledApp>
     </ThemeProvider>
   );

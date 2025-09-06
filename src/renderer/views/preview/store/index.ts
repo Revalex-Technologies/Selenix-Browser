@@ -14,6 +14,14 @@ export class Store extends DialogStore {
 
   @observable
 
+  public memoryMB: number | null = null;
+
+  @observable
+  public hasSample: boolean = false;
+
+
+  @observable
+
   public url = '';
 
   @observable
@@ -58,8 +66,18 @@ export class Store extends DialogStore {
 
     makeObservable(this);
 
-    ipcRenderer.on('visible', (e, visible, tab) => {
-      clearTimeout(this.timeout);
+    ipcRenderer.on('memory', (_, { memoryMB }) => {
+  this.memoryMB = memoryMB ?? null;
+});
+
+ipcRenderer.on('visible', (e, visible, tab) => {
+      if (tab && typeof (tab as any).memoryMB === 'number' && !Number.isNaN((tab as any).memoryMB)) {
+        this.memoryMB = (tab as any).memoryMB;
+        this.hasSample = true;
+      }
+      this.memoryMB = this.memoryMB ?? null;
+      this.hasSample = false;
+clearTimeout(this.timeout);
       clearTimeout(this.timeout1);
 
       if (!visible) {
@@ -70,7 +88,16 @@ export class Store extends DialogStore {
         this.timeout1 = setTimeout(() => {
           this.xTransition = true;
         }, 80);
-      } else if (!visible) {
+      
+    ipcRenderer.on('memory-update', (e, payload) => {
+      const { memoryMB } = payload || ({} as any);
+      if (typeof memoryMB === 'number') {
+        this.memoryMB = memoryMB;
+      } else if (this.memoryMB == null) {
+        this.memoryMB = null;
+      }
+    });
+  } else if (!visible) {
         this.timeout = setTimeout(() => {
           this.xTransition = false;
         }, 100);
@@ -86,7 +113,15 @@ export class Store extends DialogStore {
         }
       }
     });
-  }
+  
+    ipcRenderer.on('memory-update', (e, payload) => {
+      const { memoryMB } = (payload || {}) as any;
+      if (typeof memoryMB === 'number' && !Number.isNaN(memoryMB)) {
+        this.memoryMB = memoryMB;
+        this.hasSample = true;
+      }
+    });
+}
 }
 
 export default new Store();
