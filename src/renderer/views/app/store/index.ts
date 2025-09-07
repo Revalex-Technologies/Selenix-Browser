@@ -82,22 +82,23 @@ export class Store {
     'downloads-dialog': false,
   };
 
-  public get downloadProgress() {
-    const downloading = this.downloads.filter((x) => !x.completed);
+  
+public get downloadProgress() {
+  const active = this.downloads.filter((x: any) => !x.completed && !x.canceled);
+  if (active.length === 0) return 0;
 
-    if (downloading.length === 0) return 0;
+  const { totalBytes } = active.reduce(
+    (prev, cur) => ({ totalBytes: prev.totalBytes + (cur.totalBytes || 0) }),
+    { totalBytes: 0 },
+  );
 
-    const { totalBytes } = this.downloads.reduce((prev, cur) => ({
-      totalBytes: prev.totalBytes + cur.totalBytes,
-    }));
+  const { receivedBytes } = active.reduce(
+    (prev, cur) => ({ receivedBytes: prev.receivedBytes + (cur.receivedBytes || 0) }),
+    { receivedBytes: 0 },
+  );
 
-    const { receivedBytes } = this.downloads.reduce((prev, cur) => ({
-      receivedBytes: prev.receivedBytes + cur.receivedBytes,
-    }));
-
-    return receivedBytes / totalBytes;
-  }
-
+  return totalBytes > 0 ? receivedBytes / totalBytes : 0;
+}
   public get isCompact() {
     return this.settings.object.topBarVariant === 'compact';
   }
@@ -219,6 +220,11 @@ export class Store {
 
     ipcRenderer.on('download-progress', (e, item: IDownloadItem) => {
       const i = this.downloads.find((x) => x.id === item.id);
+
+    ipcRenderer.on('download-cancelled', (e, id: string) => {
+      const i = this.downloads.find((x) => x.id === id) as any;
+      if (i) i.canceled = true;
+    });
       i.receivedBytes = item.receivedBytes;
     });
 

@@ -5,4 +5,5 @@ export interface IDownloadItem {
   savePath?: string;
   id?: string;
   completed?: boolean;
+  canceled?: boolean;
 }

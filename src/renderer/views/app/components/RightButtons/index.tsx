@@ -182,7 +182,7 @@ export const RightButtons = observer(() => {
           icon={ICON_DOWNLOAD}
           badgeTop={9}
           badgeRight={9}
-          preloader
+          preloader={store.downloads.some((x: any) => !x.completed && !x.canceled)}
           value={store.downloadProgress}
         ></ToolbarButton>
       )}

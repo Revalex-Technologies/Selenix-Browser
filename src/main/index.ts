@@ -77,13 +77,21 @@ ipcMain.handle(
       const result = (wc as any)[actualMethod](...args);
 
       if (result instanceof Promise) {
-        return await result.catch(err => {
+        return await result.catch((err: any): any => {
+          if ((err && (err.code === 'ERR_ABORTED' || err.errno === -3))) {
+            // Swallow navigation aborts; they are normal when navigating away mid-load
+            return null;
+          }
           console.error('Error in webContents method:', actualMethod, err);
           throw err;
         });
       }
       return result;
-    } catch (error) {
+    } catch (error: any) {
+      if (error && (error.code === 'ERR_ABORTED' || error.errno === -3)) {
+        // benign abort, ignore
+        return null;
+      }
       console.error('Error in web-contents-call handler:', error);
       throw error;
     }

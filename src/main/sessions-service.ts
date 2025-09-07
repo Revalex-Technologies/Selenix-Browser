@@ -120,9 +120,35 @@ export class SessionsService {
 
     const downloads: IDownloadItem[] = [];
 
+    const activeDownloadItems = new Map<string, DownloadItem>();
+
+
     ipcMain.handle('get-downloads', () => {
       return downloads;
     });
+
+    ipcMain.handle('pause-download', (_e, id: string) => {
+      const di = activeDownloadItems.get(id);
+      if (di && !di.isPaused()) {
+        try { di.pause(); return true; } catch { return false; }
+      }
+      return false;
+    });
+    ipcMain.handle('resume-download', (_e, id: string) => {
+      const di = activeDownloadItems.get(id);
+      if (di && (di.isPaused?.() || di.canResume?.())) {
+        try { di.resume(); return true; } catch { return false; }
+      }
+      return false;
+    });
+    ipcMain.handle('cancel-download', (_e, id: string) => {
+      const di = activeDownloadItems.get(id);
+      if (di) {
+        try { di.cancel(); return true; } catch { return false; }
+      }
+      return false;
+    });
+
 
     const setupDownloadListeners = (ses: Session) => {
       ses.on('will-download', (event: Electron.Event, item: DownloadItem, webContents: WebContents) => {
@@ -131,6 +157,7 @@ export class SessionsService {
 
         const fileName = item.getFilename();
         const id = makeId(32);
+        activeDownloadItems.set(id, item);
         const window = webContents ? Application.instance.windows.findByContentsView(webContents.id) : undefined;
 
         if (!preChosenPath && !Application.instance.settings.object.downloadsDialog) {
@@ -149,14 +176,16 @@ export class SessionsService {
         }
 
         const downloadItem = getDownloadItem(item, id);
+        (downloadItem as any).savePath = (item as any).savePath || (typeof item.getSavePath === 'function' ? item.getSavePath() : undefined);
         downloads.push(downloadItem);
+
 
         downloadsDialog()?.send('download-started', downloadItem);
         window?.send('download-started', downloadItem);
 
         item.on('updated', (event: Electron.Event, state: string) => {
           if (state === 'interrupted') {
-            console.log('Download is interrupted but can be resumed');
+            // interrupted update; wait for final 'done' state
           } else if (state === 'progressing') {
             if (item.isPaused()) {
               console.log('Download is paused');
@@ -172,51 +201,34 @@ export class SessionsService {
         });
 
         item.once('done', async (event: Electron.Event, state: string) => {
-          if (state === 'completed') {
+          const totalBytes = typeof item.getTotalBytes === 'function' ? item.getTotalBytes() : (downloadItem.totalBytes || 0);
+          const receivedBytes = typeof item.getReceivedBytes === 'function' ? item.getReceivedBytes() : (downloadItem.receivedBytes || 0);
+          const savePath = (item as any).savePath || (downloadItem as any).savePath;
+          const hasFile = !!savePath;
+          const bytesOk = totalBytes > 0 && receivedBytes >= totalBytes;
+
+          if (state === 'completed' || (bytesOk && hasFile)) {
             const dialog = downloadsDialog();
             dialog?.send('download-completed', id);
             window?.send('download-completed', id, !!dialog);
-
             downloadItem.completed = true;
-
-            if (process.env.ENABLE_EXTENSIONS && extname(fileName) === '.crx') {
-              const crxBuf = await promises.readFile(item.savePath);
-              const crxInfo = parseCrx(crxBuf);
-
-              if (!crxInfo.id) {
-                crxInfo.id = makeId(32);
-              }
-
-              const extensionsPath = getPath('extensions');
-              const path = resolve(extensionsPath, crxInfo.id);
-              const manifestPath = resolve(path, 'manifest.json');
-
-              if (await pathExists(path)) {
-                console.log('Extension is already installed');
-                return;
-              }
-
-              await extractZip(crxInfo.zip, path);
-
-              const extension = await this.view.loadExtension(path);
-
-              if (crxInfo.publicKey) {
-                const manifest = JSON.parse(
-                  await promises.readFile(manifestPath, 'utf8'),
-                );
-
-                manifest.key = crxInfo.publicKey.toString('base64');
-
-                await promises.writeFile(
-                  manifestPath,
-                  JSON.stringify(manifest, null, 2),
-                );
-              }
-
-              window?.send('load-browserAction', extension);
-            }
+            activeDownloadItems.delete(id);
+          } else if (state === 'cancelled') {
+            const dialog = downloadsDialog();
+            dialog?.send('download-cancelled', id);
+            window?.send('download-cancelled', id, !!dialog);
+            (downloadItem as any).canceled = true;
+            activeDownloadItems.delete(id);
+          } else if (state === 'interrupted') {
+            const dialog = downloadsDialog();
+            dialog?.send('download-cancelled', id);
+            window?.send('download-cancelled', id, !!dialog);
+            (downloadItem as any).canceled = true;
+            activeDownloadItems.delete(id);
           } else {
-            console.log(`Download failed: ${state}`);
+            // Unknown state
+            activeDownloadItems.delete(id);
+            console.log(`Download finished with state: ${state}`);
           }
         });
       });

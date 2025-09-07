@@ -34,6 +34,11 @@ export class Store extends DialogStore {
       };
     });
 
+    ipcRenderer.on('download-cancelled', (e, id: string) => {
+      const i = this.downloads.find((x) => x.id === id);
+      if (i) (i as any).canceled = true;
+    });
+
     ipcRenderer.on('download-completed', (e, id: string) => {
       const i = this.downloads.find((x) => x.id === id);
       i.completed = true;

@@ -26,6 +26,11 @@ export class DownloadsStore {
       i.receivedBytes = item.receivedBytes;
     });
 
+    ipcRenderer.on('download-cancelled', (e, id: string) => {
+      const i = this.list.find((x) => x.id === id);
+      if (i) (i as any).canceled = true;
+    });
+
     ipcRenderer.on('download-completed', (e, id: string) => {
       const i = this.list.find((x) => x.id === id);
       i.completed = true;

@@ -12,7 +12,24 @@ import {
   SecondaryText,
 } from './style';
 import { IDownloadItem } from '~/interfaces';
-import { shell } from 'electron';
+
+
+const showDownloadContextMenu = (item: IDownloadItem, ev?: React.MouseEvent) => {
+  if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+  const menu = Menu.buildFromTemplate([
+    { label: 'Pause', enabled: !item.completed, click: () => ipcRenderer.invoke('pause-download', item.id) },
+    { label: 'Resume', enabled: !item.completed, click: () => ipcRenderer.invoke('resume-download', item.id) },
+    { type: 'separator' },
+    { label: 'Cancel', enabled: !item.completed, click: () => ipcRenderer.invoke('cancel-download', item.id) },
+    { type: 'separator' },
+    { label: 'Open file', enabled: !!item.savePath && !!item.completed, click: () => item.savePath && shell.openPath(item.savePath) },
+    { label: 'View in file manager', enabled: !!item.savePath, click: () => item.savePath && shell.showItemInFolder(item.savePath) },
+  ]);
+  menu.popup({ window: getCurrentWindow() });
+};
+
+import { shell, ipcRenderer } from 'electron';
+import { Menu, getCurrentWindow } from '@electron/remote';
 
 const prettyBytes = (input: number): string => {
   if (typeof input !== 'number' || !isFinite(input)) return '0 B';
@@ -26,7 +43,7 @@ const prettyBytes = (input: number): string => {
 };
 
 const onClick = (item: IDownloadItem) => () => {
-  if (item.completed) {
+  if (item.completed && item.savePath) {
     shell.openPath(item.savePath);
   }
 };
@@ -57,8 +74,8 @@ export const DownloadItem = observer(({ item }: { item: IDownloadItem }) => {
     <StyledDownloadItem onClick={onClick(item)}>
       <Icon></Icon>
       <Info>
-        <Title>{item.fileName}</Title>
-        {!item.completed && (
+        <Title>{item.fileName}</Title>{(item as any).canceled ? <SecondaryText>Canceled</SecondaryText> : (item.completed ? <SecondaryText>Completed</SecondaryText> : null)}
+        {!item.completed && !(item as any).canceled && (
           <>
             <ProgressBackground>
               <Progress style={{ width: `${progressPercent}%` }}></Progress>
@@ -68,7 +85,7 @@ export const DownloadItem = observer(({ item }: { item: IDownloadItem }) => {
         )}
       </Info>
       <Separator></Separator>
-      <MoreButton onClick={onMoreClick(item)}></MoreButton>
+      <MoreButton onClick={(e) => showDownloadContextMenu(item, e)} onContextMenu={(e) => showDownloadContextMenu(item, e)}></MoreButton>
     </StyledDownloadItem>
   );
 });
