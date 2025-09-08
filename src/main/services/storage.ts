@@ -1,8 +1,6 @@
-import { ipcMain, dialog } from 'electron';
+import { ipcMain, dialog, nativeImage } from 'electron';
 import * as Datastore from 'nedb';
 import { fileTypeFromBuffer } from 'file-type/core';
-import * as icojs from 'icojs';
-
 import { getPath } from '~/utils';
 import {
   IFindOperation,
@@ -25,7 +23,11 @@ interface Databases {
 }
 
 const convertIcoToPng = async (icoData: Buffer): Promise<ArrayBuffer> => {
-  return (await icojs.parse(icoData, 'image/png'))[0].buffer;
+  const img = nativeImage.createFromBuffer(icoData);
+  const pngBuffer = img.toPNG(); // Node Buffer (Uint8Array)
+  const out = new ArrayBuffer(pngBuffer.byteLength);
+  new Uint8Array(out).set(pngBuffer);
+  return out;
 };
 
 const encodeHref = (str: string) => {
