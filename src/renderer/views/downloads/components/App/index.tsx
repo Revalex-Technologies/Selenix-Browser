@@ -9,7 +9,7 @@ import { GlobalNavigationDrawer } from '~/renderer/components/GlobalNavigationDr
 import { ICON_DOWNLOAD } from '~/renderer/constants/icons';
 import { IDownloadItem } from '~/interfaces';
 import DownloadRow from '../DownloadRow';
-import { Page, Title, SubTitle, List } from './style';
+import { Page, Title, SubTitle, List, Header, Scroller } from './style';
 
 
 const GlobalNoScroll = createGlobalStyle`
@@ -35,17 +35,19 @@ const App = observer(() => {
       <Container>
         <GlobalNavigationDrawer />
         <LocalContent>
-          <LeftContent>
-            <Page>
+          <Page>
+            <Header>
               <Title>Downloads</Title>
               <SubTitle>Items you download will appear here.</SubTitle>
+            </Header>
+            <Scroller>
               <List>
                 {store.downloads.map((item: IDownloadItem) => (
                   <DownloadRow key={item.id} item={item} />
                 ))}
               </List>
-            </Page>
-          </LeftContent>
+            </Scroller>
+          </Page>
         </LocalContent>
       </Container>
     </ThemeProvider>

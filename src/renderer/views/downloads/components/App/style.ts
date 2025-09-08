@@ -20,7 +20,19 @@ export const SubTitle = styled.div`
 
 export const List = styled.div`
   max-width: 1024px;
+  margin: 0 auto;
+  padding: 0 64px 32px;
+`;
+
+
+export const Scroller = styled.div`
   flex: 1;
-  overflow: auto; /* scroll inside list only when items overflow */
-  padding-bottom: 32px;
+  width: 100%;
+  overflow: auto; /* scrollbar at the edge of the page/content */
+`;
+
+export const Header = styled.div`
+  max-width: 1024px;
+  margin: 64px auto 0;
+  padding: 0 64px 16px;
 `;
