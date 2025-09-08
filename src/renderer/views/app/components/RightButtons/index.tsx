@@ -5,13 +5,15 @@ import { ipcRenderer } from 'electron';
 
 import { ToolbarButton } from '../ToolbarButton';
 
+
+import { RemovedActions as BrowserActionsExtensions } from '../BrowserAction/index';
 import {
   ICON_SHIELD,
   ICON_DOWNLOAD,
   ICON_INCOGNITO,
   ICON_MORE,
 } from '~/renderer/constants/icons';
-import { Buttons, Separator, ExtensionsWrapper } from './style';
+import { Buttons, Separator } from './style';
 
 const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
 import store from '../../store';
@@ -37,63 +39,6 @@ ipcRenderer.on('show-menu-dialog', () => {
 const onMenuClick = async () => {
   showMenuDialog();
 };
-
-const RemovedActions = observer(({ onPresenceChange }: { onPresenceChange?: (present: boolean) => void }) => {
-  const listRef = React.useRef<any>(null);
-
-  if (store.isIncognito) {
-    try { onPresenceChange?.(false); } catch {}
-    return null;
-  }
-
-  if (process.env.ENABLE_EXTENSIONS) {
-    const { selectedTabId } = store.tabs;
-    const [present, setPresent] = React.useState(false);
-
-    React.useEffect(() => {
-      const el = listRef.current as HTMLElement | null;
-      const RO = (window as any).ResizeObserver;
-      const handle = () => {
-        const isPresent = !!el && el.offsetWidth > 0;
-        setPresent(isPresent);
-        try { onPresenceChange?.(isPresent); } catch {}
-      };
-      let cleanup: (() => void) | undefined;
-
-      if (el) {
-        handle();
-        if (RO) {
-          const ro = new RO(handle);
-          ro.observe(el);
-          cleanup = () => ro.disconnect();
-        } else {
-          const id = window.setInterval(handle, 300);
-          cleanup = () => window.clearInterval(id);
-        }
-      }
-
-      return cleanup;
-    }, [onPresenceChange, store.tabs.selectedTabId]);
-
-    return (
-      <ExtensionsWrapper present={present}>
-        {React.createElement('browser-action-list', {
-          id: 'actions',
-          alignment: 'bottom right',
-          partition: 'persist:view',
-          tab: selectedTabId ?? undefined,
-          ref: listRef,
-        } as any)}
-      </ExtensionsWrapper>
-    );
-  }
-
-  const { selectedTabId } = store.tabs;
-  const hasMv2 = !!selectedTabId && store.extensions.browserActions.some((x) => x.tabId === selectedTabId);
-  React.useEffect(() => { try { onPresenceChange?.(hasMv2); } catch {} }, [hasMv2, onPresenceChange]);
-
-  return <ExtensionsWrapper present={hasMv2}>{null}</ExtensionsWrapper>;
-})
 
 export const RightButtons = observer(() => {
   const buttonsRef = React.useRef<HTMLDivElement | null>(null);
@@ -155,11 +100,11 @@ export const RightButtons = observer(() => {
     <Buttons ref={buttonsRef}>
       {}
       {store.isCompact && (
-        <RemovedActions onPresenceChange={setHasExtensionActions} />
+        <BrowserActionsExtensions onPresenceChange={setHasExtensionActions} />
       )}
       {!store.isIncognito && !store.isCompact && (
         <>
-          <RemovedActions onPresenceChange={setHasExtensionActions} />
+          <BrowserActionsExtensions onPresenceChange={setHasExtensionActions} />
           {}
           {hasExtensionActions || store.extensions.browserActions.length > 0 ? (
             <Separator />

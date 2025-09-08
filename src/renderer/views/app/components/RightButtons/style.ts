@@ -15,15 +15,6 @@ export const Separator = styled.div`
   width: 1px;
   margin-left: 4px;
   margin-right: 4px;
-  opacity: 0.12;
-  background: currentColor;
+  background: ${({ theme }: { theme?: any }) => theme?.['toolbar.separator.color']};
 `;
 
-export const ExtensionsWrapper = styled.div<{present?: boolean}>`
-  display: flex;
-  align-items: center;
-
-  -webkit-app-region: no-drag;
-
-  margin-left: ${({present, theme}: {present?: boolean; theme?: any}) => (theme?.isCompact ? '0' : (present ? '6px' : '0'))};
-`;

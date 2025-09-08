@@ -1,6 +1,7 @@
 import { AppWindow } from './windows/app';
 
 import { BrowserWindow, ipcMain } from 'electron';
+
 import { NEWTAB_URL } from '~/constants/tabs';
 
 export class WindowsService {
