@@ -18,43 +18,28 @@ export class AppWindow {
   public incognito: boolean;
 
   public constructor(incognito: boolean) {
-    const isMac = process.platform === 'darwin';
-    const isWin = process.platform === 'win32';
-    const isLinux = process.platform === 'linux';
-
     this.win = new BrowserWindow({
-      frame: isLinux ? false : true,
+      frame: false,
       minWidth: 400,
       minHeight: 450,
       width: 900,
       height: 700,
-
-      titleBarStyle: isMac ? 'hiddenInset' : ((isWin || isLinux) ? 'hidden' : undefined),
+      // this is commented out because i use it when taking screenshots
+      // for the browser
+      // roundedCorners: false, 
+      titleBarStyle: 'hiddenInset',
       backgroundColor: nativeTheme.shouldUseDarkColors ? '#939090ff' : '#ffffff',
-      trafficLightPosition: isMac ? { x: 12, y: 12 } : undefined,
-
-      titleBarOverlay: (isWin || isLinux)
-        ? {
-            color: nativeTheme.shouldUseDarkColors ? '#1f1f1f' : '#ffffff',
-            symbolColor: nativeTheme.shouldUseDarkColors ? '#ffffff' : '#000000',
-            height: 32,
-          }
-        : undefined,
       webPreferences: {
         plugins: true,
         nodeIntegration: true,
         contextIsolation: false,
         javascript: true,
-
       },
       icon: resolve(
         app.getAppPath(),
         `static/${isNightly ? 'nightly-icons' : 'icons'}/icon.png`,
       ),
       show: false,
-
-      autoHideMenuBar: true,
-      useContentSize: true,
     });
 
     try {
@@ -69,28 +54,7 @@ export class AppWindow {
 
     this.viewManager = new ViewManager(this, incognito);
 
-    const applyOverlayColors = () => {
-      if (isWin || isLinux) {
-        const dark = nativeTheme.shouldUseDarkColors;
-        try {
-          this.win.setTitleBarOverlay?.({
-            color: dark ? '#1c1c1c' : '#d4d4d4',
-            symbolColor: dark ? '#ffffffff' : '#000000ff',
-            height: 32,
-          } as any);
-        } catch {}
-      }
-      try {
-        const dark = nativeTheme.shouldUseDarkColors;
-        this.win.setBackgroundColor(dark ? '#1f1f1f' : '#ffffff');
-      } catch {}
-    };
-    applyOverlayColors();
-
-    nativeTheme.on('updated', () => {
-      applyOverlayColors();
-    });
-
+    // Handle window control events from renderer.
     try { ipcMain.removeHandler('window-control'); } catch {}
     ipcMain.handle('window-control', (_evt, action: string) => {
       switch (action) {
@@ -109,8 +73,6 @@ export class AppWindow {
           maximized: this.win.isMaximized(),
           fullScreen: this.win.isFullScreen(),
           focused: this.win.isFocused(),
-
-          overlaySupported: !!this.win.setTitleBarOverlay && (isWin || isLinux),
         });
       } catch {}
     };
@@ -126,7 +88,7 @@ export class AppWindow {
 
     (async () => {
       try {
-
+        // Read the last window state from file.
         windowState = JSON.parse(
           await promises.readFile(windowDataPath, 'utf8'),
         );
@@ -134,6 +96,7 @@ export class AppWindow {
         await promises.writeFile(windowDataPath, JSON.stringify({}));
       }
 
+      // Merge bounds from the last window state to the current window options.
       if (windowState) {
         this.win.setBounds({ ...windowState.bounds });
       }
@@ -151,21 +114,22 @@ export class AppWindow {
     this.win.once('ready-to-show', () => {
       this.win.show();
 
-if (this.incognito) {
-  try {
-    dialog.showMessageBox(this.win, {
-      type: 'info',
-      buttons: ['OK'],
-      defaultId: 0,
-      title: 'Incognito mode',
-      message: 'Since incognito is not persistant, extensions are disabled',
-    });
-  } catch {}
-}
-emitPlatformAndState();
+      if (this.incognito) {
+        try {
+          dialog.showMessageBox(this.win, {
+            type: 'info',
+            buttons: ['OK'],
+            defaultId: 0,
+            title: 'Incognito mode',
+            message: 'Since incognito is not persistant, extensions are disabled',
+          });
+        } catch {}
+      }
+      emitPlatformAndState();
     });
 
-this.win.on('resize', () => {
+    // Update window bounds on resize and on move when window is not maximized.
+    this.win.on('resize', () => {
       if (!this.win.isMaximized()) {
         windowState.bounds = this.win.getBounds();
       }
@@ -228,6 +192,7 @@ this.win.on('resize', () => {
         }
       }
 
+      // Save current window state to a file.
       windowState.maximized = this.win.isMaximized();
       windowState.fullscreen = this.win.isFullScreen();
       writeFileSync(windowDataPath, JSON.stringify(windowState));
@@ -252,11 +217,12 @@ this.win.on('resize', () => {
       );
     });
 
+    // this.webContents.openDevTools({ mode: 'detach' });
+
     if (process.env.NODE_ENV === 'development') {
       this.webContents.openDevTools({ mode: 'detach' });
       this.win.loadURL('http://localhost:4444/app.html');
     } else {
-
       const filePath = join(app.getAppPath(), 'build', 'app.html');
       this.win.loadFile(filePath);
     }
@@ -300,11 +266,10 @@ this.win.on('resize', () => {
   }
 
   public get webContents() {
-
     try {
       if (!this.win || this.win.isDestroyed()) return null as any;
       const wc = this.win.webContents as any;
-      if (!wc || (typeof wc.isDestroyed === "function" && wc.isDestroyed())) return null as any;
+      if (!wc || (typeof wc.isDestroyed === 'function' && wc.isDestroyed())) return null as any;
       return wc;
     } catch {
       return null as any;
@@ -322,7 +287,7 @@ this.win.on('resize', () => {
   public send(channel: string, ...args: any[]) {
     const wc = this.webContents as any;
     if (!wc) { return; }
-    try { wc.send(channel, ...args); } catch {  }
+    try { wc.send(channel, ...args); } catch {}
   }
 
   public updateTitle() {

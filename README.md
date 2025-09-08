@@ -51,11 +51,11 @@ As developers, many of us have attempted to compile Chromium from source, only t
 - Find in page
 - Dark and light theme
 - Omnibox with autocomplete algorithm similar to Chromium
-- State of the art tab system
+- State of the art tab system along with tab tearing.
 
-# Screenshot
+# Preview
 
-<img width="1228" height="947" alt="Screenshot 2025-09-05 144209" src="https://github.com/user-attachments/assets/a729f1c4-9f07-4d19-ba2f-525ec6d27639" />
+![Preview](preview.png)
 
 # Downloads
 - [Stable](https://github.com/Revalex-Technologies/Selenix-Browser/releases)

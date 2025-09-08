@@ -11,38 +11,35 @@ import { ITheme } from '~/interfaces';
 
 export const StyledTabbar = styled.div`
   height: 100%;
-  flex: 1;
-  min-width: 0;
+  width: 100%;
   position: relative;
-  padding-right: ${({ theme }: { theme?: any }) => (
-    theme?.isCompact
-      ? 'calc(max(var(--right-buttons-width, 0px), var(--overlay-reserved-right, 120px)) + 8px)'
-      : 'calc(var(--overlay-right-inset, 0px) + 16px)'
-  )};
-  padding-left: ${({ theme }: { theme?: any }) => (theme?.isCompact ? '0px' : 'var(--overlay-left-inset, 0px)') };
-
   overflow: hidden;
   align-items: center;
-  margin-right: ${({ theme }: { theme?: any }) => (theme?.isCompact ? '0px' : '0px')};
+  margin-right: 32px;
   display: flex;
   margin-left: 4px;
 `;
 
+/* &:hover {
+    ${({ theme }: { theme?: ITheme }) => css`
+      &::-webkit-scrollbar-thumb {
+        background-color: ${theme['toolbar.lightForeground']
+          ? 'rgba(255, 255, 255, 0.2)'
+          : 'rgba(0, 0, 0, 0.2)'};
+
+        &:hover {
+          background-color: ${theme['toolbar.lightForeground']
+            ? 'rgba(255, 255, 255, 0.3)'
+            : 'rgba(0, 0, 0, 0.3)'};
+        }
+      }
+    `};
+  } */
+
 export const TabsContainer = styled.div`
   height: 100%;
-  width: ${({ theme }: { theme?: any }) =>
-    (theme?.isCompact
-      ? 'calc(100% - max(var(--right-buttons-width, 0px), var(--overlay-reserved-right, 120px)) - 8px)'
-      : `calc(100% - ${TOOLBAR_BUTTON_WIDTH}px - 16px)`)};
-  min-width: 0;
+  width: calc(100% - ${TOOLBAR_BUTTON_WIDTH}px);
   position: relative;
-  padding-right: ${({ theme }: { theme?: any }) => (
-    theme?.isCompact
-      ? 'calc(max(var(--right-buttons-width, 0px), var(--overlay-reserved-right, 120px)) + 8px)'
-      : 'calc(var(--overlay-right-inset, 0px) + 16px)'
-  )};
-  padding-left: ${({ theme }: { theme?: any }) => (theme?.isCompact ? '0px' : 'var(--overlay-left-inset, 0px)') };
-
   overflow: hidden;
   overflow-x: overlay;
   white-space: nowrap;
@@ -57,7 +54,7 @@ export const TabsContainer = styled.div`
 
 export const AddTab = styled(ToolbarButton)`
   position: absolute;
-  left: ${({ theme }: { theme?: any }) => (theme?.isCompact ? '0px' : 'var(--overlay-left-inset, 0px)')};
+  left: 0;
   min-width: ${ADD_TAB_BUTTON_WIDTH}px;
   height: ${ADD_TAB_BUTTON_HEIGHT}px;
 
