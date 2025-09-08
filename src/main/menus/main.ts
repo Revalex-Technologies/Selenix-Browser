@@ -5,6 +5,7 @@ import { WEBUI_BASE_URL, WEBUI_URL_SUFFIX } from '~/constants/files';
 import { AppWindow } from '../windows';
 import { Application } from '../application';
 import { showMenuDialog } from '../dialogs/menu';
+import { createDropdown } from './bookmarks';
 import { getWebUIURL } from '~/common/webui';
 
 const isMac = process.platform === 'darwin';
@@ -22,26 +23,14 @@ const createMenuItem = (
     accelerator: shortcut,
     visible: label != null && key === 0,
     label: label != null && key === 0 ? label : '',
-    click: (menuItem: MenuItem, browserWindow: BrowserWindow) => {
-      let win: AppWindow | undefined;
-      try {
-        win = Application.instance.windows.list.find(
-          (x) => browserWindow && x.win && x.win.id === browserWindow.id,
-        );
-      } catch {
-        win = undefined;
-      }
-      if (!win) {
-        win = Application.instance.windows.current;
-      }
-      if (!win) return;
-      try {
-        action(win, menuItem, key);
-      } catch {
-        // Swallow exceptions triggered by mis-matched states to prevent
-        // crashes when commands are executed outside of a valid context.
-      }
-    },
+    click: (menuItem: MenuItem, browserWindow: BrowserWindow) =>
+      action(
+        Application.instance.windows.list.find(
+          (x) => x.win.id === browserWindow.id,
+        ),
+        menuItem,
+        key,
+      ),
   }));
 
   return result;
@@ -136,12 +125,16 @@ export const getMainMenu = () => {
           'Print',
         ),
 
+        // Hidden items
+
+        // Focus address bar
         ...createMenuItem(['Ctrl+Space', 'CmdOrCtrl+L', 'Alt+D', 'F6'], () => {
           Application.instance.dialogs
             .getPersistent('search')
             .show(Application.instance.windows.current.win);
         }),
 
+        // Toggle menu
         ...createMenuItem(['Alt+F', 'Alt+E'], () => {
           Application.instance.windows.current.send('show-menu-dialog');
         }),
@@ -203,13 +196,27 @@ export const getMainMenu = () => {
         ...createMenuItem(
           ['CmdOrCtrl+Shift+H'],
           () => {
+            // Open the browser's Home / New Tab page in the CURRENT tab
             const { selected } = Application.instance.windows.current.viewManager;
-            if (selected) {
-              const home = (selected as any).homeUrl || 'about:blank';
-              selected.webContents.loadURL(home);
+            if (selected && selected.webContents) {
+              try {
+                selected.webContents.loadURL(getWebUIURL('newtab'));
+              } catch (err) {
+                // Fallback: if anything goes wrong, open in a new tab
+                Application.instance.windows.current.viewManager.create({
+                  url: getWebUIURL('newtab'),
+                  active: true,
+                });
+              }
+            } else {
+              // No selected tab; create one
+              Application.instance.windows.current.viewManager.create({
+                url: getWebUIURL('newtab'),
+                active: true,
+              });
             }
           },
-          'Homepage',
+          'Open Home',
         ),
         ...createMenuItem(
           isMac ? ['Cmd+[', 'Cmd+Left'] : ['Alt+Left'],
@@ -218,7 +225,7 @@ export const getMainMenu = () => {
               selected,
             } = Application.instance.windows.current.viewManager;
             if (selected) {
-              selected.webContents.navigationHistory.goBack();
+              selected.webContents.goBack();
             }
           },
           'Go back',
@@ -230,41 +237,49 @@ export const getMainMenu = () => {
               selected,
             } = Application.instance.windows.current.viewManager;
             if (selected) {
-              selected.webContents.navigationHistory.goForward();
+              selected.webContents.goForward();
             }
           },
           'Go forward',
         ),
-
+        // { type: 'separator' }
         { type: 'separator' },
         {
-          label: 'Recently closed',
-          submenu:
-            Application.instance.windows.current.viewManager.recentlyClosed
-              .slice(0, 10)
-              .map((item) => ({
-                label: (item.title || item.url || 'Closed Tab'),
-                click: () => {
-                  const { selected } = Application.instance.windows.current.viewManager;
-                  if (selected && item.url) selected.webContents.loadURL(item.url);
-                },
-              })),
+          label: 'Recently Closed',
+          submenu: (() => {
+            const vm = Application.instance.windows.current.viewManager;
+            const items = vm.recentlyClosed.slice(0, 10);
+            return items.length
+              ? items.map(({ title, url }) => ({
+                  label: (title && title.trim()) ? title.trim() : (url || '(untitled)'),
+                  click: () => {
+                    if (url) vm.create({ url, active: true });
+                  },
+                }))
+              : [{ label: '(empty)', enabled: false }];
+          })(),
         },
-
-        { type: 'separator' },
+        // { type: 'separator' }
         {
-          label: 'Recently visited',
-          submenu:
-            (Application.instance.storage?.history || [])
-              .slice(-15)
-              .reverse()
-              .map((item: any) => ({
-                label: (item.title || item.url),
-                click: () => {
-                  const { selected } = Application.instance.windows.current.viewManager;
-                  if (selected && item?.url) selected.webContents.loadURL(item.url);
-                },
-              })),
+          label: 'Recently Visited',
+          submenu: (() => {
+            try {
+              const { history } = Application.instance.storage;
+              const items = (history || []).slice(-10).reverse();
+              return items.length
+                ? items.map((h) => ({
+                    label: (h.title && h.title.trim()) ? h.title.trim() : (h.url || '(untitled)'),
+                    click: () => {
+                      if (h?.url) {
+                        Application.instance.windows.current.viewManager.create({ url: h.url, active: true });
+                      }
+                    },
+                  }))
+                : [{ label: '(empty)', enabled: false }];
+            } catch {
+              return [{ label: '(unavailable)', enabled: false }];
+            }
+          })(),
         },
         { type: 'separator' },
         ...createMenuItem(
@@ -311,20 +326,34 @@ export const getMainMenu = () => {
           },
           'Add this website to bookmarks',
         ),
-
+        // { type: 'separator' }
+        { type: 'separator' },
         {
-              label: 'Bookmarks',
-              submenu: (Application.instance.storage?.bookmarks || [])
-                .filter((b: any) => !b.isFolder && b.url)
-                .slice(0, 15)
-                .map((b: any) => ({
-                  label: b.title || b.url,
-                  click: () => {
-                    const { selected } = Application.instance.windows.current.viewManager;
-                    if (selected) selected.webContents.loadURL(b.url);
-                  },
-                })),
+          label: 'Bookmarks Bar',
+          submenu: (() => {
+            try {
+              const appWindow = Application.instance.windows.current;
+              const all = Application.instance.storage.bookmarks || [];
+              const bar = all.find((x: any) => x.static === 'main');
+              return bar ? createDropdown(appWindow, bar._id, all) : Menu.buildFromTemplate([{ label: '(empty)', enabled: false }]);
+            } catch {
+              return Menu.buildFromTemplate([{ label: '(unavailable)', enabled: false }]);
             }
+          })() as any,
+        },
+        {
+          label: 'Other Bookmarks',
+          submenu: (() => {
+            try {
+              const appWindow = Application.instance.windows.current;
+              const all = Application.instance.storage.bookmarks || [];
+              const other = all.find((x: any) => x.static === 'other');
+              return other ? createDropdown(appWindow, other._id, all) : Menu.buildFromTemplate([{ label: '(empty)', enabled: false }]);
+            } catch {
+              return Menu.buildFromTemplate([{ label: '(unavailable)', enabled: false }]);
+            }
+          })() as any,
+        }
       ],
     },
     {
@@ -344,42 +373,18 @@ export const getMainMenu = () => {
               ['CmdOrCtrl+Shift+I', 'CmdOrCtrl+Shift+J', 'F12'],
               () => {
                 setTimeout(() => {
-                  const win = Application.instance.windows.current;
-                  const viewManager = win?.viewManager;
-                  const selectedView = viewManager?.selected;
-                  const wc = selectedView?.webContents;
-                  if (!wc) return;
-
-                  if (wc.isDevToolsOpened()) {
-                    wc.closeDevTools();
-                    return;
-                  }
-
-                  const platform = process.platform;
-                  const detach = platform === 'win32' || platform === 'linux';
-                  const mode: any = detach ? 'detach' : 'undocked';
-                  try {
-                    wc.openDevTools({ mode });
-                    (wc as any)._hasOpenedDevTools = true;
-                  } catch {
-                    try {
-                      wc.toggleDevTools();
-                      (wc as any)._hasOpenedDevTools = true;
-                    } catch {}
-                  }
+                  Application.instance.windows.current.viewManager.selected.webContents.toggleDevTools();
                 });
               },
               'Developer tools...',
             ),
 
+            // Developer tools (current webContents) (dev)
             ...createMenuItem(['CmdOrCtrl+Shift+F12'], () => {
               setTimeout(() => {
-                const focused = webContents.getFocusedWebContents();
-                if (!focused) return;
-                try {
-                  focused.openDevTools({ mode: 'detach' });
-                  (focused as any)._hasOpenedDevTools = true;
-                } catch {}
+                webContents
+                  .getFocusedWebContents()
+                  .openDevTools({ mode: 'detach' });
               });
             }),
           ],
@@ -437,6 +442,7 @@ export const getMainMenu = () => {
     },
   ];
 
+  // Ctrl+1 - Ctrl+8
   template[0].submenu = template[0].submenu.concat(
     createMenuItem(
       Array.from({ length: 8 }, (v, k) => k + 1).map((i) => `CmdOrCtrl+${i}`),
@@ -449,6 +455,7 @@ export const getMainMenu = () => {
     ),
   );
 
+  // Ctrl+9
   template[0].submenu = template[0].submenu.concat(
     createMenuItem(['CmdOrCtrl+9'], () => {
       Application.instance.windows.current.webContents.send('select-last-tab');

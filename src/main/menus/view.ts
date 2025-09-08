@@ -22,16 +22,14 @@ export const getViewMenu = (
       {
         label: 'Open link in new tab',
         click: () => {
-
-          const v = appWindow.viewManager.create(
+          const view = appWindow.viewManager.create(
             {
               url: params.linkURL,
               active: true,
             },
             true,
           );
-
-          try { appWindow.viewManager.select(v.id, true); } catch {}
+          try { if (view?.id != null) appWindow.viewManager.select(view.id, true); } catch {}
         },
       },
       {
@@ -55,15 +53,14 @@ export const getViewMenu = (
       {
         label: 'Open image in new tab',
         click: () => {
-
-          const v = appWindow.viewManager.create(
+          const view = appWindow.viewManager.create(
             {
               url: params.srcURL,
               active: true,
             },
             true,
           );
-          try { appWindow.viewManager.select(v.id, true); } catch {}
+          try { if (view?.id != null) appWindow.viewManager.select(view.id, true); } catch {}
         },
       },
       {
@@ -78,7 +75,7 @@ export const getViewMenu = (
         },
       },
       {
-
+        
         label: 'Save image as...',
         click: async () => {
           try {
@@ -110,11 +107,12 @@ export const getViewMenu = (
                 }
               } catch {}
             };
-
+            // One-shot path assignment for this download only
             ses.on('will-download', handler);
 
+            // Kick off the download
             try {
-
+              // Prefer session.downloadURL with saveAs flag when available
               if (typeof (ses as any).downloadURL === 'function') {
                 try { (ses as any).downloadURL(url, { saveAs: true }); }
                 catch { appWindow.webContents.downloadURL(url); }
@@ -274,29 +272,8 @@ export const getViewMenu = (
     click: () => {
       webContents.inspectElement(params.x, params.y);
 
-      const anyWC: any = webContents as any;
-      if (!anyWC._hasOpenedDevTools) {
-        setTimeout(() => {
-          try {
-            webContents.openDevTools({ mode: 'bottom' });
-          } catch {
-            // Silently ignore failures; docking issues should not interfere
-            // with normal browser operation.
-          }
-        }, 0);
-        anyWC._hasOpenedDevTools = true;
-      } else if (!webContents.isDevToolsOpened()) {
-        setTimeout(() => {
-          try {
-            webContents.openDevTools();
-          } catch {
-            // Ignore any errors.
-          }
-        }, 0);
-      } else {
-        try {
-          webContents.devToolsWebContents?.focus();
-        } catch {}
+      if (webContents.isDevToolsOpened()) {
+        webContents.devToolsWebContents.focus();
       }
     },
   });

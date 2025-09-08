@@ -34,7 +34,6 @@ function getIcon(
   if (favicon) {
     let dataURL = Application.instance.storage.favicons.get(favicon);
     if (dataURL) {
-
       if (!dataURL.split(',')[0].includes('image')) {
         const split = dataURL.split(':');
         dataURL = split.join(':image/');
