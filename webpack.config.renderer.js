@@ -59,6 +59,7 @@ applyEntries(appConfig, [
   'history',
   'newtab',
   'bookmarks',
+  'downloads',
 ]);
 
 module.exports = appConfig;

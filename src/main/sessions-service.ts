@@ -1,4 +1,4 @@
-import { session, ipcMain, app, Session, Extension, DownloadItem, WebContents } from 'electron';
+import { session, ipcMain, app, Session, Extension, DownloadItem, WebContents, Menu, shell, BrowserWindow } from 'electron';
 import { getPath, makeId } from '~/utils';
 import { promises, existsSync } from 'fs';
 import { resolve, basename, parse, extname } from 'path';
@@ -126,6 +126,29 @@ export class SessionsService {
     ipcMain.handle('get-downloads', () => {
       return downloads;
     });
+
+    ipcMain.handle('show-download-context-menu', (e, id: string) => {
+      const item = downloads.find((d) => d.id === id);
+      const di = activeDownloadItems.get(id);
+      const canPause = !!di && !(di as any).isPaused?.() && !item?.completed;
+      const canResume = !!di && ((di as any).isPaused?.() || (di as any).canResume?.()) && !item?.completed;
+      const canCancel = !!di && !item?.completed;
+
+      const template: Electron.MenuItemConstructorOptions[] = [
+        { label: 'Pause', enabled: !!canPause, click: () => { try { di?.pause?.(); } catch {} } },
+        { label: 'Resume', enabled: !!canResume, click: () => { try { di?.resume?.(); } catch {} } },
+        { type: 'separator' },
+        { label: 'Cancel', enabled: !!canCancel, click: () => { try { di?.cancel?.(); } catch {} } },
+        { type: 'separator' },
+        { label: 'Open file', enabled: !!(item as any)?.savePath && !!item?.completed, click: () => { try { (item as any)?.savePath && shell.openPath((item as any).savePath); } catch {} } },
+        { label: 'View in file manager', enabled: !!(item as any)?.savePath, click: () => { try { (item as any)?.savePath && shell.showItemInFolder((item as any).savePath); } catch {} } },
+      ];
+
+      const menu = Menu.buildFromTemplate(template);
+      const win = BrowserWindow.fromWebContents(e.sender);
+      try { menu.popup({ window: win }); } catch { menu.popup(); }
+    });
+
 
     ipcMain.handle('pause-download', (_e, id: string) => {
       const di = activeDownloadItems.get(id);

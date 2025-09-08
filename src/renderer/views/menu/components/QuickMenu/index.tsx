@@ -224,7 +224,7 @@ export const QuickMenu = observer(() => {
             <Icon icon={ICON_BOOKMARKS} />
             <MenuItemTitle>Bookmarks</MenuItemTitle>
           </MenuItem>
-          <MenuItem disabled onClick={goToWebUIPage('downloads')}>
+          <MenuItem onClick={goToWebUIPage('downloads')}>
             <Icon icon={ICON_DOWNLOAD} />
             <MenuItemTitle>Downloads</MenuItemTitle>
           </MenuItem>

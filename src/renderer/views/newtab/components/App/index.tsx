@@ -79,6 +79,12 @@ export default observer(() => {
                 icon={ICON_BOOKMARKS}
                 onClick={onIconClick('bookmarks')}
               ></IconItem>
+              <IconItem
+                imageSet={store.imageVisible}
+                title="Downloads"
+                icon={ICON_DOWNLOAD}
+                onClick={onIconClick('downloads')}
+              ></IconItem>
               {}
             </Menu>
           )}
