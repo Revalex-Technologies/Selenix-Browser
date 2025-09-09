@@ -6,10 +6,12 @@ import { isURL } from '~/utils';
 import { callViewMethod } from '~/utils/view';
 import { ipcRenderer } from 'electron';
 import { ToolbarButton } from '../ToolbarButton';
-import { StyledAddressBar, InputContainer, Input, Text } from './style';
-import { ICON_SEARCH } from '~/renderer/constants';
+import { StyledAddressBar, InputContainer, Input, Text, SecurityButton } from './style';
+import { ICON_SEARCH, ICON_SECURE, ICON_NOT_SECURE, } from '~/renderer/constants';
 import { SiteButtons } from '../SiteButtons';
 import { DEFAULT_TITLEBAR_HEIGHT } from '~/constants/design';
+import { NEWTAB_URL } from '~/constants/tabs';
+import { WEBUI_BASE_URL } from '~/constants/files';
 
 let mouseUpped = false;
 
@@ -120,18 +122,67 @@ const onBlur = (e: React.FocusEvent<HTMLInputElement>) => {
 };
 
 export const AddressBar = observer(() => {
+  const [appIconUrl, setAppIconUrl] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const p = await ipcRenderer.invoke('get-app-icon-path');
+      if (p) setAppIconUrl(p);
+      } catch {}
+    })();
+  }, []);
   return (
     <StyledAddressBar
       ref={(r) => (addressbarRef = r)}
       focus={store.addressbarFocused}
     >
-      <ToolbarButton
-        toggled={false}
-        icon={ICON_SEARCH}
-        size={16}
-        dense
-        iconStyle={{ transform: 'scale(-1,1)' }}
-      />
+
+      {(() => {
+        const tab = store.tabs.selectedTab;
+        const url = tab?.url || '';
+        const isNewTab = url.startsWith(NEWTAB_URL);
+        const isInternal = !isNewTab && url.startsWith(WEBUI_BASE_URL);
+        const isSecure = /^https:\/\//i.test(url);
+        const isNotSecure = /^http:\/\//i.test(url) || (!isSecure && !isInternal && !!url);
+
+        if (isNewTab) {
+          return (
+            <ToolbarButton
+              toggled={false}
+              icon={ICON_SEARCH}
+              size={16}
+              dense
+              iconStyle={{ transform: 'scale(-1,1)' }}
+            />
+          );
+        }
+
+        const expanded = isInternal || isNotSecure;
+        const danger = isNotSecure && !isInternal;
+        const icon = isInternal ? (appIconUrl || ICON_SECURE) : (isSecure ? ICON_SECURE : ICON_NOT_SECURE);
+        const label = isInternal ? 'Selenix' : danger ? 'Not Secure' : '';
+
+        return (
+          <SecurityButton
+            expanded={expanded}
+            danger={danger}
+            onClick={() => {}}
+            className={expanded ? 'expanded' : ''}
+            style={{ cursor: 'pointer'}}
+          >
+            <div
+              className="icon"
+              style={{
+                backgroundImage: `url(${icon})`,
+                filter: store.theme['toolbar.lightForeground'] && !danger && !isInternal ? 'brightness(0) invert(1)' : 'none',
+                marginLeft: (isSecure && !isInternal) ? '1.5px' : '-1px',
+              }}
+            />
+            {expanded && <div className="label">{label}</div>}
+          </SecurityButton>
+        );
+      })()}
+    
       <InputContainer>
         <Input
           ref={(r) => (store.inputRef = r)}

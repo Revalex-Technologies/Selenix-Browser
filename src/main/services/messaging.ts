@@ -1,4 +1,8 @@
-import { ipcMain } from 'electron';
+import { isNightly } from '..';
+import { ipcMain, app } from 'electron';
+import { resolve } from 'path';
+import * as path from 'path';
+import * as fs from 'fs';
 import { parse } from 'url';
 
 type PasswordStore = {
@@ -81,6 +85,39 @@ import { showZoomDialog } from '../dialogs/zoom';
 import { showTabGroupDialog } from '../dialogs/tabgroup';
 
 export const runMessagingService = (appWindow: AppWindow) => {
+    ipcMain.handle('get-app-icon-path', async () => {
+    try {
+      // Try to get the current process's icon (native app executable)
+      const exePath = process.execPath;
+      // 'large' gives a nice crisp icon for the address bar button
+      const image = await app.getFileIcon(exePath, { size: 'large' as any });
+      if (image) {
+        // Return a data URL so the renderer can use it directly in CSS
+        return image.toDataURL();
+      }
+    } catch {}
+    // Fallback to the previous static icon lookup
+    try {
+      const candidates = [
+        require('path').join(app.getAppPath(), 'static', 'icons', 'icon.png'),
+        require('path').join(app.getAppPath(), 'static', 'nightly-icons', 'icon.png'),
+        process.resourcesPath ? require('path').join(process.resourcesPath, 'static', 'icons', 'icon.png') : null,
+      ].filter(Boolean) as string[];
+
+      const fs_ = require('fs');
+      const found = (candidates as string[]).find(p => fs_.existsSync(p));
+      if (!found) return null;
+
+      const normalized = process.platform === 'win32'
+        ? 'file:///' + found.replace(/\\/g, '/')
+        : 'file://' + found;
+
+      return normalized;
+    } catch {
+      return null;
+    }
+  });
+
   const { id } = appWindow;
 
   ipcMain.on(`window-focus-${id}`, () => {

@@ -3,7 +3,7 @@ import { ITheme } from '~/interfaces';
 import { BLUE_300 } from '~/renderer/constants';
 
 export const StyledAddressBar = styled.div`
-  height: 30px;
+  height: 26px;
   flex: 1;
   border-radius: 4px;
   margin: 0 7px;
@@ -31,13 +31,12 @@ export const StyledAddressBar = styled.div`
 
     ${!theme.isCompact &&
     css`
-      &:hover {
-        border: ${theme['toolbar.lightForeground']
-          ? '1px solid rgba(255, 255, 255, 0.12)'
-          : '1px solid rgba(0, 0, 0, 0.12)'};
+      &:hover, &:focus, &:focus-visible, &:focus-within { background-color: ${theme['toolbar.lightForeground'] ? 'rgba(255, 255, 255, 0.10)' : 'rgba(0, 0, 0, 0.08)'} !important; } !important; }; };
       }
     `}
   `};
+  
+  --danger-color: #ff6b6b;
 `;
 
 export const InputContainer = styled.div`
@@ -97,4 +96,66 @@ export const Input = styled.input`
       }
     `}
   `};
+`;
+
+
+
+export const SecurityButton = styled.div<{expanded?: boolean; danger?: boolean;}>`
+  &:hover {
+    background-color: rgba(255,255,255,0.14);
+  }
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  height: 26px;
+  min-width: 34px;
+  border-radius: 4px;
+  margin-left: 0; /* hug the address bar edge */
+  transition: 0.2s background-color, max-width 180ms ease, padding 180ms ease;
+  user-select: none;
+  -webkit-app-region: no-drag;
+  position: relative;
+  z-index: 1;
+  background-clip: padding-box;
+  cursor: pointer;
+
+  ${({ theme, danger }: { theme: ITheme; danger?: boolean }) => css`
+    background-color: transparent; /* transparent until hover */
+    color: ${danger ? '#ff6b6b' : (theme['toolbar.lightForeground']
+      ? 'rgba(255, 255, 255, 0.86)'
+      : 'rgba(0, 0, 0, 0.86)')};
+
+    &:active { background-color: ${theme['toolbar.lightForeground'] ? 'rgba(255, 255, 255, 0.14)' : 'rgba(0, 0, 0, 0.12)'} !important; } !important; } !important; };
+    }
+  `};
+
+  .icon {
+    width: 16px;
+    height: 16px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 16px 16px;
+    will-change: filter;
+    transform: translateX(-1px); /* tiny left nudge */
+  }
+
+  .label {
+    color: inherit;
+    max-width: ${'${'}(p: any) => (p.expanded ? '200px' : '0')${'}'};
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: clip;
+    transition: max-width 180ms ease;
+    font-size: 12px;
+  }
+
+  &.expanded {
+    /* keep footprint stable */
+  }
+
+  &.danger { color: #ff6b6b; }
+  &.danger svg { filter: none; }
+  &.danger svg path { fill: currentColor; }
 `;
