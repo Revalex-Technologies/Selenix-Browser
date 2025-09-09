@@ -9,15 +9,17 @@ import {
 } from '~/constants/design';
 import { ITheme } from '~/interfaces';
 
-export const StyledTabbar = styled.div`
+interface StyledTabbarProps { hasDockButton?: boolean }
+export const StyledTabbar = styled.div<StyledTabbarProps>`
   height: 100%;
   width: 100%;
   position: relative;
   overflow: hidden;
+  ${(props: StyledTabbarProps) => props.hasDockButton ? 'padding-left: 0px;' : ''}
   align-items: center;
   margin-right: 32px;
   display: flex;
-  margin-left: 4px;
+  margin-left: 0;
 `;
 
 /* &:hover {

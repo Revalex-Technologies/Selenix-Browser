@@ -13,6 +13,7 @@ export interface IStartupBehavior {
 export type TopBarVariant = 'default' | 'compact';
 
 export interface ISettings {
+  leftDockTabs: boolean;
   theme: string;
   themeAuto: boolean;
   shield: boolean;

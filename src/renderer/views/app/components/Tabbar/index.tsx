@@ -50,9 +50,11 @@ export const TabGroups = observer(() => {
   );
 });
 
-export const Tabbar = observer(() => {
+interface TabbarProps { hasDockButton?: boolean }
+
+export const Tabbar = observer(({hasDockButton}: TabbarProps) => {
   return (
-    <StyledTabbar>
+    <StyledTabbar hasDockButton={hasDockButton}>
       <TabsContainer
         onMouseEnter={onMouseEnter}
         onMouseLeave={onTabsMouseLeave}

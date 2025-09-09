@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import { ITheme } from '~/interfaces';
 import { TOOLBAR_HEIGHT } from '~/constants/design';
 
-export const StyledToolbar = styled.div`
+export const StyledToolbar = styled.div<{ docked?: boolean }>`
   position: relative;
   z-index: 100;
   display: flex;
@@ -12,6 +12,7 @@ export const StyledToolbar = styled.div`
   color: rgba(0, 0, 0, 0.8);
   width: 100%;
   height: ${TOOLBAR_HEIGHT}px;
+  
 
   ${({ theme }: { theme: ITheme }) => css`
     background-color: ${theme['toolbar.backgroundColor']};

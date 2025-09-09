@@ -10,16 +10,15 @@ import { WindowsControls } from 'react-windows-controls';
 import { StyledTitlebar, FullscreenExitButton } from './style';
 import { NavigationButtons } from '../NavigationButtons';
 import { RightButtons } from '../RightButtons';
+import { DockLeftButton } from '../DockLeftButton';
 import { Separator } from '../RightButtons/style';
 import { SiteButtons } from '../SiteButtons';
 
 const onCloseClick = () => ipcRenderer.send(`window-close-${store.windowId}`);
 
-const onMaximizeClick = () =>
-  ipcRenderer.send(`window-toggle-maximize-${store.windowId}`);
+const onMaximizeClick = () => ipcRenderer.send(`window-toggle-maximize-${store.windowId}`);
 
-const onMinimizeClick = () =>
-  ipcRenderer.send(`window-minimize-${store.windowId}`);
+const onMinimizeClick = () => ipcRenderer.send(`window-minimize-${store.windowId}`);
 
 const onMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
   if (store.addressbarFocused) {
@@ -38,8 +37,15 @@ export const Titlebar = observer(() => {
       isFullscreen={store.isFullscreen}
       isHTMLFullscreen={store.isHTMLFullscreen}
     >
-      {store.isCompact && <NavigationButtons />}
-      <Tabbar />
+            {store.isCompact && <NavigationButtons />}
+      {!store.settings.object.leftDockTabs && (
+        <>
+          <div style={{display:'flex',alignItems:'center',paddingLeft:0,paddingRight:0}}>
+            <DockLeftButton />
+          </div>
+          <Tabbar hasDockButton />
+        </>
+      )}
       {store.isCompact && <RightButtons />}
 
       {platform() !== 'darwin' && (

@@ -261,3 +261,11 @@ export async function setupExtensions(app: Application): Promise<void> {
     }
   
 }
+
+// TODO: Dynamic Security Button (future):
+// Add a small preferences dialog for the address bar security chip
+// (internal/extension/not secure).
+// Suggested:
+//   channel: 'open-security-chip-dialog' (renderer -> main)
+//   payload: { source: 'internal' | 'extension' | 'other', url?: string }
+//   behavior: open BrowserWindow modal to choose label/icon and per-origin rules.

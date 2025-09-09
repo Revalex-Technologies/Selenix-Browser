@@ -30,7 +30,22 @@ export const StyledClose = styled.div`
   &:hover {
     background-color: rgba(0, 0, 0, 0.1);
   }
+
+  /* Left dock overrides: turn tabs into a vertical list when inside the left dock */
+  
+
+  ${({ theme }) => css`
+    /* Left dock overrides */
+    #left-dock & {
+      position: relative;
+      height: 36px;
+      width: 100% !important;
+      left: 0 !important;
+      transform: none !important;
+    }
+  `};
 `;
+
 
 interface ActionProps {
   visible: boolean;
@@ -106,6 +121,15 @@ export const StyledTab = styled.div`
   ${({ selected }: TabProps) => css`
     z-index: ${selected ? 2 : 1};
   `};
+
+  /* Left dock overrides: vertical-list mode */
+  #left-dock & {
+    position: relative;
+    height: 36px;
+    width: 100% !important;
+    left: 0 !important;
+    transform: none !important;
+  }
 `;
 
 interface TitleProps {
@@ -168,6 +192,7 @@ export const TabContainer = styled.div`
   display: flex;
   backface-visibility: hidden;
   transition: 0.1s background-color;
+  position: relative;
   border-bottom: transparent !important;
   border: 2px solid;
 
@@ -180,4 +205,38 @@ export const TabContainer = styled.div`
     border-top-right-radius: 4px;
     box-shadow: ${selected ? '0px 0px 6px 0px rgba(0,0,0,0.12)' : 'none'};
   `};
+
+  ${({ theme }) => css`
+    #left-dock & {
+      max-width: 100% !important;
+      margin-top: 0 !important;
+      height: 36px;
+      padding: 0 8px;
+      border: none !important;
+    }
+  `};
+
+  /* Left dock overrides: list layout */
+  #left-dock & {
+    max-width: 100% !important;
+    margin-top: 0 !important;
+    height: 36px;
+    padding: 0 8px;
+    border: none !important;
+  }
+`;
+
+
+  /* Left dock overrides: list layout */
+  
+
+export const EdgeMask = styled.div`
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 60%;
+  background: ${({ theme }: { theme: ITheme }) => theme['toolbar.backgroundColor']};
+  left: -1px;
+  pointer-events: none;
 `;

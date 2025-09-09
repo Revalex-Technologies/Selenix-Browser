@@ -4,6 +4,7 @@ import { ThemeProvider } from 'styled-components';
 
 import { StyledApp, Line } from './style';
 import { Titlebar } from '../Titlebar';
+import { LeftDock } from '../LeftDock';
 import { Toolbar } from '../Toolbar';
 import store from '../../store';
 import { UIStyle } from '~/renderer/mixins/default-styles';
@@ -62,8 +63,9 @@ const App = observer(() => {
           height: !store.isFullscreen || store.titlebarVisible ? null : 0,
         }}
       >
+        <LeftDock />
         <UIStyle />
-        <Titlebar />
+        {!store.settings.object.leftDockTabs && <Titlebar />}
         {store.settings.object.topBarVariant === 'default' && <Toolbar />}
         <BookmarkBar />
       </StyledApp>

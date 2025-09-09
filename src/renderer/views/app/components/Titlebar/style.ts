@@ -6,7 +6,8 @@ import { centerIcon } from '~/renderer/mixins';
 
 // margin-top: ${isHTMLFullscreen ? -TOOLBAR_HEIGHT : 0}px;
 
-export const StyledTitlebar = styled.div`
+export const StyledTitlebar = styled.div<{ isFullscreen: boolean; isHTMLFullscreen: boolean }>`
+  ${({ theme }: { theme: ITheme }) => ``};
   position: relative;
   z-index: 100;
   display: flex;
@@ -50,7 +51,7 @@ export const FullscreenExitButton = styled.div`
   height: 32px;
   min-width: 45px;
   -webkit-app-region: no-drag;
-  marginLeft: 8;
+  margin-left: 8px;
   background-image: url(${ICON_FULLSCREEN_EXIT});
   transition: 0.1s background-color;
   ${centerIcon(24)};

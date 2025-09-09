@@ -258,33 +258,47 @@ export class ViewManager extends EventEmitter {
   }
 
   public async fixBounds() {
-    const view = this.selected;
+  const view = this.selected;
+  if (!view) return;
 
-    if (!view) return;
+  const { width, height } = this.window.win.getContentBounds();
 
-    const { width, height } = this.window.win.getContentBounds();
+  const sizes: any = await this.window.win.webContents.executeJavaScript(`
+    (() => {
+      const app = document.getElementById('app');
+      const dock = document.getElementById('left-dock');
+      return {
+        toolbarContentHeight: app ? app.offsetHeight : 0,
+        leftDockWidth: dock ? dock.offsetWidth : 0
+      };
+    })()
+  `);
 
-    const toolbarContentHeight = await this.window.win.webContents
-      .executeJavaScript(`
-      document.getElementById('app').offsetHeight
-    `);
+  const left = (sizes && sizes.leftDockWidth) || 0;
+  const top = this.fullscreen ? 0 : ((sizes && sizes.toolbarContentHeight) || 0);
 
-    const newBounds = {
-      x: 0,
-      y: this.fullscreen ? 0 : toolbarContentHeight,
-      width,
-      height: this.fullscreen ? height : height - toolbarContentHeight,
-    };
+  const newBounds = {
+    x: left,
+    y: top,
+    width: Math.max(0, width - left),
+    height: this.fullscreen ? height : Math.max(0, height - top),
+  };
 
-    if (newBounds !== view.bounds) {
-      try {
-        if (view.webContentsView && typeof view.webContentsView.setBounds === 'function') {
-          view.webContentsView.setBounds(newBounds);
-        }
-      } catch {}
-      view.bounds = newBounds;
-    }
+  const prev = (view as any).bounds || {};
+  if (
+    prev.x !== newBounds.x ||
+    prev.y !== newBounds.y ||
+    prev.width !== newBounds.width ||
+    prev.height !== newBounds.height
+  ) {
+    try {
+      if ((view as any).webContentsView && typeof (view as any).webContentsView.setBounds === 'function') {
+        (view as any).webContentsView.setBounds(newBounds);
+      }
+    } catch {}
+    (view as any).bounds = newBounds as any;
   }
+}
 
   private setBoundsListener() {
 

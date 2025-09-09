@@ -70,3 +70,4 @@ export const ICON_WEATHER_NIGHT_STORM = require('~/renderer/resources/icons/weat
 
 export const ICON_SECURE = require('~/renderer/resources/icons/secure.svg');
 export const ICON_NOT_SECURE = require('~/renderer/resources/icons/not-secure.svg');
+export const ICON_DOCKLEFT = require('~/renderer/resources/icons/dockleft.svg');

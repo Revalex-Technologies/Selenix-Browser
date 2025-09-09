@@ -11,6 +11,7 @@ import {
   StyledAction,
   StyledPinAction,
   TabContainer,
+  EdgeMask,
 } from './style';
 import { ICON_VOLUME_HIGH, ICON_VOLUME_OFF } from '~/renderer/constants';
 import { ITab } from '../../models';
@@ -282,9 +283,7 @@ const Close = observer(({ tab }: { tab: ITab }) => {
 });
 
 export default observer(({ tab }: { tab: ITab }) => {
-  const defaultColor = store.theme['toolbar.lightForeground']
-    ? 'rgba(255, 255, 255, 0.04)'
-    : 'rgba(255, 255, 255, 0.3)';
+  const defaultColor = 'transparent';
 
   const defaultHoverColor = store.theme['toolbar.lightForeground']
     ? 'rgba(255, 255, 255, 0.08)'
@@ -294,7 +293,19 @@ export default observer(({ tab }: { tab: ITab }) => {
     ? '#393939'
     : '#fcfcfc';
 
-  return (
+  
+  // Divider line between inactive tabs (subtle, theme-aware)
+  const dividerColor = store.theme['toolbar.lightForeground']
+    ? 'rgba(255, 255, 255, 0.18)'
+    : 'rgba(0, 0, 0, 0.18)';
+  // Determine if the previous tab is selected to suppress divider next to active tab
+  const tabsList = store.tabs.list;
+  const currentIndex = tabsList.findIndex((t) => t.id === tab.id);
+  const prevSelected = currentIndex > 0 ? tabsList[currentIndex - 1].isSelected : false;
+  const nextSelected = currentIndex < tabsList.length - 1 ? tabsList[currentIndex + 1].isSelected : false;
+  // Hide divider only if this tab or the tab to its right is selected
+  const showDivider = !tab.isSelected && !nextSelected;
+return (
     <StyledTab
       selected={tab.isSelected}
       onMouseDown={onMouseDown(tab)}
@@ -310,6 +321,7 @@ export default observer(({ tab }: { tab: ITab }) => {
         pinned={tab.isPinned}
         selected={tab.isSelected}
         style={{
+          // Make inactive tabs fully transparent, keep hover effect below
           backgroundColor: tab.isSelected
             ? store.isCompact && tab.isHovered
               ? defaultSelectedHoverColor
@@ -321,8 +333,16 @@ export default observer(({ tab }: { tab: ITab }) => {
             tab.isSelected && tab.tabGroupId !== -1 && !store.isCompact
               ? tab.tabGroup.color
               : 'transparent',
-        }}
+        
+          /* smart divider injected */
+          backgroundImage: showDivider ? `linear-gradient(${dividerColor}, ${dividerColor})` : 'none',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: '2px 42%',
+          backgroundPosition: 'right center',
+          borderRight: 'none',
+}}
       >
+        {tab.isSelected && <EdgeMask />}
         <Content tab={tab} />
       </TabContainer>
     </StyledTab>

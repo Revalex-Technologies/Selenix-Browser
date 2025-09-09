@@ -54,6 +54,7 @@ export const DEFAULT_SEARCH_ENGINES = [
 ];
 
 export const DEFAULT_SETTINGS: ISettings = {
+  leftDockTabs: false,
   theme: 'selenix-light',
   darkContents: false,
   shield: true,
