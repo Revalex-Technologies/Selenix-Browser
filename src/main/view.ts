@@ -244,21 +244,39 @@ this.webContents.addListener('did-start-navigation', async (e: any, ...args: any
     this.webContents.addListener(
       'page-favicon-updated',
       async (e: any, favicons: any) => {
-        this.favicon = favicons[0];
+        let iconUrl = Array.isArray(favicons) && favicons.length > 0 ? favicons[0] : '';
 
+        if (!iconUrl && this.url) {
+          try {
+            const origin = new URL(this.url).origin;
+            iconUrl = origin + '/favicon.ico';
+          } catch {}
+        }
+
+        if (!iconUrl) {
+          this.favicon = '';
+          return;
+        }
+
+        this.favicon = iconUrl;
         this.updateData();
 
         try {
           let fav = this.favicon;
-
           if (fav.startsWith('http')) {
             fav = await Application.instance.storage.addFavicon(fav);
           }
-
           this.emitEvent('favicon-updated', fav);
         } catch (e) {
+          try {
+            const origin = new URL(this.url).origin;
+            const fallback = origin + '/favicon.ico';
+            if (fallback !== this.favicon) {
+              const fav = await Application.instance.storage.addFavicon(fallback);
+              this.emitEvent('favicon-updated', fav);
+            }
+          } catch {}
           this.favicon = '';
-
         }
       },
     );

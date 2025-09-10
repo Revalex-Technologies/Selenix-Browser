@@ -168,6 +168,12 @@ export const StyledIcon = styled.div`
   min-width: 16px;
   transition: 0.2s opacity, 0.2s min-width;
   ${centerIcon()};
+
+margin-left: 4px;
+
+#left-dock & {
+  margin-left: 0 !important;
+}
   ${({ isIconSet }: { isIconSet: boolean }) => css`
     min-width: ${isIconSet ? 0 : 16},
     opacity: ${isIconSet ? 0 : 1};

@@ -2,7 +2,8 @@ import { RendererToMainChannel } from '@wexond/rpc-electron';
 
 export interface ResponseDetails {
   statusCode: number;
-  data: string;
+  data: string; // binary string
+  headers?: Record<string, string | string[] | undefined>;
 }
 
 export interface NetworkService {

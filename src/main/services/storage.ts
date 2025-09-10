@@ -395,33 +395,44 @@ export class StorageService {
     if (!this.favicons.get(url)) {
       const res = await requestURL(url);
 
-      if (res.statusCode === 404) {
-        throw new Error('404 favicon not found');
+      if (res.statusCode >= 400) {
+        throw new Error(res.statusCode + ' favicon fetch failed');
       }
 
-      let data = Buffer.from(res.data, 'binary');
+      let dataBuf = Buffer.from(res.data, 'binary');
 
-      const type = await fileTypeFromBuffer(data);
+      const detected = await fileTypeFromBuffer(dataBuf);
+      let mime = detected?.mime;
 
-      if (type && type.ext === 'ico') {
-        data = Buffer.from(new Uint8Array(await convertIcoToPng(data)));
+      if (!mime) {
+        const headCT = ((res.headers && (res.headers['content-type'] as string)) || '');
+        if (headCT) {
+          mime = headCT.split(';')[0].trim();
+        }
+      }
+      if (!mime) {
+        const textHead = dataBuf.slice(0, 256).toString('utf8');
+        if (/^\s*<svg[\s>]/i.test(textHead)) {
+          mime = 'image/svg+xml';
+        }
+      }
+      if (!mime) {
+        mime = 'image/x-icon';
       }
 
-      const str = `data:${(await fileTypeFromBuffer(data)).ext};base64,${data.toString(
-        'base64',
-      )}`;
+      const dataUrl = `data:${mime};base64,${dataBuf.toString('base64')}`;
 
       this.insert({
         scope: 'favicons',
         item: {
           url,
-          data: str,
+          data: dataUrl,
         },
       });
 
-      this.favicons.set(url, str);
+      this.favicons.set(url, dataUrl);
 
-      return str;
+      return dataUrl;
     } else {
       return this.favicons.get(url);
     }
