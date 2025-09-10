@@ -16,6 +16,8 @@ export const DockLeftButton = observer(() => {
     store.settings.save();
     // trigger bounds recompute
     ipcRenderer.send('resize-height');
+    // also trigger a renderer resize so tab layout updates immediately
+    try { window.dispatchEvent(new Event('resize')); } catch {}
   };
 
   return (

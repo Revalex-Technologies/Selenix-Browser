@@ -130,14 +130,14 @@ let addressbarRef: HTMLDivElement;
 const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   store.tabs.selectedTab.addressbarValue = e.currentTarget.value;
 
-  const { left, width } = addressbarRef.getBoundingClientRect();
+  const { left, top, width } = addressbarRef.getBoundingClientRect();
 
   if (e.currentTarget.value.trim() !== '') {
     ipcRenderer.send(`search-show-${store.windowId}`, {
       text: e.currentTarget.value,
       cursorPos: e.currentTarget.selectionStart,
       x: left,
-      y: !store.isCompact ? DEFAULT_TITLEBAR_HEIGHT : 0,
+      y: !store.isCompact ? Math.round(top) : 0,
       width: width,
     });
     store.addressbarEditing = true;

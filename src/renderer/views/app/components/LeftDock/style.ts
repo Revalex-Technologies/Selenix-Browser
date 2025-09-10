@@ -27,6 +27,8 @@ export const TabsColumn = styled.div`
 `;
 
 export const AddTabColumn = styled(ToolbarButton)`
+  pointer-events: auto;
+  align-self: center;
   min-height: 32px;
   min-width: 32px;
   margin: 6px;
