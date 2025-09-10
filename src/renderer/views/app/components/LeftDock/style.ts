@@ -13,6 +13,8 @@ export const StyledLeftDock = styled.div`
   flex-direction: column;
   border-right: 1px solid rgba(0,0,0,0.1);
   transition: width 0.2s ease;
+  z-index: 50;
+
   ${({ theme }: { theme: ITheme }) => css`
     background-color: ${theme['toolbar.backgroundColor']};
   `}

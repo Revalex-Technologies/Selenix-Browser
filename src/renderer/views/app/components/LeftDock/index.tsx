@@ -20,8 +20,7 @@ export const LeftDock = observer(() => {
   return (
     <StyledLeftDock id="left-dock">
       <TabsContainer
-        ref={store.tabs.containerRef}
-        style={{ display: 'flex', flexDirection: 'column', overflow: 'auto' }}
+        ref={store.tabs.containerRef} style={{ display: 'flex', flexDirection: 'column', overflow: 'auto' }}
       >
         <TabGroups />
         <Tabs />

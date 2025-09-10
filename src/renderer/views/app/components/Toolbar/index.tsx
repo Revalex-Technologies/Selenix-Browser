@@ -11,7 +11,7 @@ import { WindowsControls } from 'react-windows-controls';
 import store from '../../store';
 
 const noDragStyle: React.CSSProperties & { WebkitAppRegion?: 'no-drag' | 'drag' } = {
-  marginLeft: 'auto',
+  position: 'absolute', right: 0, top: 0,
   WebkitAppRegion: 'no-drag',
   display: 'flex',
   alignItems: 'center',
