@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import { VIEW_Y_OFFSET } from '~/constants/design';
+import { VIEW_Y_OFFSET, DEFAULT_TAB_MARGIN_TOP } from '~/constants/design';
 import { View } from './view';
 import { AppWindow } from './windows';
 import { WEBUI_BASE_URL } from '~/constants/files';
@@ -263,23 +263,21 @@ export class ViewManager extends EventEmitter {
 
   const { width, height } = this.window.win.getContentBounds();
 
-  const sizes: any = await this.window.win.webContents.executeJavaScript(`
-    (() => {
-      const app = document.getElementById('app');
-      const dock = document.getElementById('left-dock');
-      return {
-        toolbarContentHeight: app ? app.offsetHeight : 0,
-        leftDockWidth: dock ? dock.offsetWidth : 0
-      };
-    })()
-  `);
+    
+const sizes: any = await this.window.win.webContents.executeJavaScript(`
+  (() => {
+    const app = document.getElementById('app');
+    const dock = document.getElementById('left-dock');
+    const toolbarContentHeight = app ? app.offsetHeight : 0;
+    const leftDockWidth = dock ? dock.offsetWidth : 0;
+    return { toolbarContentHeight, leftDockWidth };
+  })()
+`);
 
-  const left = (sizes && sizes.leftDockWidth) || 0;
-  const top = this.fullscreen ? 0 : ((sizes && sizes.toolbarContentHeight) || 0);
+const left = (sizes && sizes.leftDockWidth) || 0;
+let top = this.fullscreen ? 0 : (((sizes && sizes.toolbarContentHeight) || 0));
 
-  const newBounds = {
-    x: left,
-    y: top,
+const newBounds = {x: left, y: Math.max(0, top),
     width: Math.max(0, width - left),
     height: this.fullscreen ? height : Math.max(0, height - top),
   };
@@ -309,6 +307,11 @@ export class ViewManager extends EventEmitter {
         });
         const app = document.getElementById('app');
         resizeObserver.observe(app);
+        const dock = document.getElementById('left-dock');
+        if (dock) {
+          const dockResize = new ResizeObserver(() => ipcRenderer.send('resize-height'));
+          dockResize.observe(dock);
+        }
       `);
 
     this.window.webContents.on('ipc-message', (_event: unknown, message: string, ..._args: unknown[]) => {

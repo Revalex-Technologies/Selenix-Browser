@@ -9,9 +9,10 @@ export const StyledLeftDock = styled.div`
   top: ${TOOLBAR_HEIGHT}px;
   left: 0;
   bottom: 0;
-  width: 248px;
+  width: 300px;
   display: flex;
   flex-direction: column;
+  min-width: 0;
   border-right: 1px solid rgba(0,0,0,0.1);
   transition: width 0.2s ease;
   z-index: 50;
@@ -27,7 +28,9 @@ export const TabsColumn = styled.div`
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
-  padding: 6px 6px 6px 6px;
+  min-width: 0;
+  padding: 0;
+  scrollbar-gutter: stable both-edges;
 `;
 
 export const AddTabColumn = styled(ToolbarButton)`
@@ -51,5 +54,6 @@ export const LeftDockFixes = styled.div`
     overflow-y: auto;
     overflow-x: hidden;
     overscroll-behavior: contain;
+    padding-right: 2px; /* keep scrollbar off the content */
   }
 `;

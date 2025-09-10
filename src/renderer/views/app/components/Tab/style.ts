@@ -15,16 +15,34 @@ export const StyledClose = styled.div`
   width: 20px;
   margin-left: 2px;
   margin-right: 6px;
+  #left-dock & { display: block !important; visibility: visible !important; opacity: 1 !important; background-image: none !important; background: transparent !important; filter: none !important; margin-left: auto !important; cursor: pointer; flex: 0 0 20px; display: flex; align-items: center; justify-content: center;}
   border-radius: 2px;
   background-image: url('${ICON_CLOSE}');
   transition: 0.1s background-color;
   z-index: 10;
   ${centerIcon(16)};
+  /* Ensure the close button is always visible in left-dock mode */
+  #left-dock & {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background-image: url('${ICON_CLOSE}') !important;
+    background-repeat: no-repeat !important;
+    background-position: center center !important;
+    background-size: 16px 16px !important;
+    margin-left: auto !important;
+    cursor: pointer;
+    flex: 0 0 20px;
+  }
+
+  /* Fallback visual in case icon fails to load */
+  #left-dock &::before { content: '×'; font-size: 16px; line-height: 1; display: block; opacity: 0.9; -webkit-font-smoothing: antialiased; }
+
 
     ${({ visible, theme }: CloseProps) => css`
       opacity: ${visible ? transparency.icons.inactive : 0};
       display: ${visible ? 'block' : 'none'};
-      filter: ${theme['toolbar.lightForeground'] ? 'invert(100%)' : 'none'};
+      filter: ${theme['toolbar.lightForeground'] ? 'invert(100%)' : 'none'}; #left-dock & { filter: none !important; }
     `}
 
   &:hover {
@@ -36,7 +54,7 @@ export const StyledClose = styled.div`
 
   ${({ theme }) => css`
     /* Left dock overrides */
-    #left-dock & { position: relative; height: 20px; width: 20px; left: 0 !important; transform: none !important; }
+    #left-dock & { position: static; width: auto; height: auto; transform: none !important; flex: 0 0 auto; }
   `};
 `;
 
@@ -59,7 +77,7 @@ export const StyledAction = styled.div`
   ${({ visible, theme, icon }: ActionProps) => css`
       opacity: ${visible ? transparency.icons.inactive : 0};
       display: ${visible ? 'block' : 'none'};
-      filter: ${theme['toolbar.lightForeground'] ? 'invert(100%)' : 'none'};
+      filter: ${theme['toolbar.lightForeground'] ? 'invert(100%)' : 'none'}; #left-dock & { filter: none !important; }
       background-image: url('${icon}');
     `}
 
@@ -117,7 +135,7 @@ export const StyledTab = styled.div`
   `};
 
   /* Left dock overrides: vertical-list mode */
-  #left-dock & { position: relative; height: 20px; width: 20px; left: 0 !important; transform: none !important; }
+  #left-dock & { position: static; width: auto; height: auto; transform: none !important; flex: 0 0 auto; }
 `;
 
 interface TitleProps {
@@ -135,6 +153,7 @@ export const StyledTitle = styled.div`
   margin-left: 8px;
   min-width: 0;
   flex: 1;
+  min-width: 0;
 
   ${({ isIcon, selected, theme }: TitleProps) => css`
     margin-left: ${!isIcon ? 0 : 12}px;
@@ -156,12 +175,16 @@ export const StyledIcon = styled.div`
 `;
 
 export const StyledContent = styled.div`
+  /* ensure the trailing buttons remain visible */
+  #left-dock & { overflow: visible !important; }
+  gap: 6px;
   overflow: hidden;
   z-index: 2;
   align-items: center;
   display: flex;
   margin-left: 10px;
   flex: 1;
+  min-width: 0;
 `;
 
 interface TabContainerProps {
@@ -172,6 +195,8 @@ interface TabContainerProps {
 }
 
 export const TabContainer = styled.div`
+  /* ensure nothing inside gets clipped in left dock */
+  #left-dock & { overflow: visible !important; }
   position: relative;
 
   width: 100%;
@@ -195,23 +220,11 @@ export const TabContainer = styled.div`
   `};
 
   ${({ theme }) => css`
-    #left-dock & {
-      max-width: 100% !important;
-      margin-top: 0 !important;
-      height: 36px;
-      padding: 0 8px;
-      border: none !important;
-    }
+    #left-dock & { max-width: 100% !important; margin-top: 0 !important; border: none !important; box-sizing: border-box; padding: 0; }
   `};
 
   /* Left dock overrides: list layout */
-  #left-dock & {
-    max-width: 100% !important;
-    margin-top: 0 !important;
-    height: 36px;
-    padding: 0 8px;
-    border: none !important;
-  }
+  #left-dock & { max-width: 100% !important; margin-top: 0 !important; border: none !important; box-sizing: border-box; padding: 0; }
 `;
 
 

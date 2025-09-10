@@ -3,6 +3,8 @@ import {
   DIALOG_MIN_HEIGHT,
   DIALOG_MARGIN_TOP,
   DIALOG_MARGIN,
+  DIALOG_TOP,
+  VIEW_Y_OFFSET,
 } from '~/constants/design';
 import { PersistentDialog } from './dialog';
 import { Application } from '../application';
@@ -26,7 +28,7 @@ export class SearchDialog extends PersistentDialog {
       bounds: {
         width: WIDTH,
         height: HEIGHT,
-        y: 48,
+        y: DIALOG_TOP,
       },
 
       devtools: false,
@@ -59,6 +61,20 @@ export class SearchDialog extends PersistentDialog {
 
   public async show(browserWindow: BrowserWindow) {
     super.show(browserWindow, true, false);
+    // /* NORMAL-MODE ALIGNMENT */
+    try {
+      const flags: any = await browserWindow.webContents.executeJavaScript(`(() => {
+        const hasLeftDock = !!document.getElementById('left-dock');
+        const isCompact = !!document.querySelector('[data-compact="true"], .compact, .compact-mode');
+        const hasAddressBar = !!document.querySelector('[data-addressbar-input="true"]');
+        return { hasLeftDock, isCompact, hasAddressBar };
+      })()`);
+      const isNormal = flags && flags.hasAddressBar && !flags.hasLeftDock && !flags.isCompact;
+      if (isNormal) {
+        super.rearrange({ y: -VIEW_Y_OFFSET + 114 });
+      }
+    } catch {}
+
 
     browserWindow.once('resize', this.onResize);
 

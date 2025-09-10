@@ -277,7 +277,7 @@ const Close = observer(({ tab }: { tab: ITab }) => {
     <StyledClose
       onMouseDown={onCloseMouseDown}
       onClick={removeTab(tab)}
-      visible={tab.isExpanded && !tab.isPinned}
+      visible={(store.settings.object.leftDockTabs ? !tab.isPinned : (tab.isExpanded && !tab.isPinned))}
     />
   );
 });

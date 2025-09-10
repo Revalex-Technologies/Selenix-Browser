@@ -331,7 +331,8 @@ this.webContents.addListener('did-start-navigation', async (e: any, ...args: any
 
         const w = Math.max(0, width ?? 0);
         const h = Math.max(0, height ?? 0);
-        (this.webContentsView as any).setBounds?.({ x: 0, y: 0, width: w, height: h });
+        const __curB = (this.webContentsView as any).getBounds?.() || { x: 0, y: 0 };
+      (this.webContentsView as any).setBounds?.({ x: __curB.x ?? 0, y: __curB.y ?? 0, width: w, height: Math.max(0, h - (__curB.y ?? 0)) });
       } catch (err) {
 
       }

@@ -231,12 +231,22 @@ export class ITab {
 
   @action
   public setLeft(left: number, animation: boolean) {
+    if (store.settings.object.leftDockTabs) {
+      // In left dock mode we don't animate or translate tabs; list layout handles position.
+      this.left = 0;
+      return;
+    }
     animateTab('translateX', left, this.ref.current, animation);
     this.left = left;
   }
 
   @action
   public setWidth(width: number, animation: boolean) {
+    if (store.settings.object.leftDockTabs) {
+      // In left dock mode, width is controlled by CSS (auto/full width). Avoid inline width animations.
+      this.width = width;
+      return;
+    }
     animateTab('width', width, this.ref.current, animation);
     this.width = width;
   }

@@ -5,6 +5,8 @@ import { DialogStyle } from '~/renderer/mixins/dialogs';
 import { TOOLBAR_HEIGHT } from '~/constants/design';
 
 export const StyledApp = styled(DialogStyle)`
+  /* position flush with toolbar */
+  margin-top: -8px !important;
   transition: none;
   padding-bottom: 4px;
 
