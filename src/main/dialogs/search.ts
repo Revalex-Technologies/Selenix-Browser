@@ -71,7 +71,7 @@ export class SearchDialog extends PersistentDialog {
       })()`);
       const isNormal = flags && flags.hasAddressBar && !flags.hasLeftDock && !flags.isCompact;
       if (isNormal) {
-        super.rearrange({ y: -VIEW_Y_OFFSET + 114 });
+        super.rearrange({ y: -VIEW_Y_OFFSET + 120 });
       }
     } catch {}
 
