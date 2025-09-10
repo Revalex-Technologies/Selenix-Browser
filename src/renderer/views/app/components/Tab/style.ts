@@ -36,13 +36,7 @@ export const StyledClose = styled.div`
 
   ${({ theme }) => css`
     /* Left dock overrides */
-    #left-dock & {
-      position: relative;
-      height: 36px;
-      width: 100% !important;
-      left: 0 !important;
-      transform: none !important;
-    }
+    #left-dock & { position: relative; height: 20px; width: 20px; left: 0 !important; transform: none !important; }
   `};
 `;
 
@@ -123,13 +117,7 @@ export const StyledTab = styled.div`
   `};
 
   /* Left dock overrides: vertical-list mode */
-  #left-dock & {
-    position: relative;
-    height: 36px;
-    width: 100% !important;
-    left: 0 !important;
-    transform: none !important;
-  }
+  #left-dock & { position: relative; height: 20px; width: 20px; left: 0 !important; transform: none !important; }
 `;
 
 interface TitleProps {
