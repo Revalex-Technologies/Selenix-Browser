@@ -71,6 +71,7 @@ export class SearchDialog extends PersistentDialog {
       })()`);
       const isNormal = flags && flags.hasAddressBar && !flags.hasLeftDock && !flags.isCompact;
       if (isNormal) {
+        // adjust y position of the suggestions omnibox here:
         super.rearrange({ y: -VIEW_Y_OFFSET + 120 });
       }
     } catch {}
