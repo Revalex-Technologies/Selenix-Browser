@@ -5,6 +5,8 @@ import store from '../../store';
 import { ThemeProvider } from 'styled-components';
 import { Wrapper, Content, IconItem, Menu, Image, RightBar } from './style';
 import { TopSites } from '../TopSites';
+import { Clock } from '../Clock';
+import { Weather } from '../Weather';
 import { News } from '../News';
 import { Preferences } from '../Preferences';
 import {
@@ -47,8 +49,12 @@ export default observer(() => {
         <Preferences />
 
         <Wrapper fullSize={store.fullSizeImage}>
+          <Weather />
           <Image src={store.imageVisible ? store.image : ''}></Image>
-          <Content>{store.topSitesVisible && <TopSites></TopSites>}</Content>
+          <Content>{store.topSitesVisible && (<>
+            <Clock />
+            <TopSites />
+          </>)}</Content>
 
           <RightBar>
             <IconItem

@@ -44,7 +44,7 @@ As developers, many of us have attempted to compile Chromium from source, only t
 
 ## Other basic features
 
-- Downloads popup with currently downloaded items (download manager WebUI page is WIP)
+- Downloads popup with currently downloaded items and a download manager WebUI page
 - History manager
 - Bookmarks bar & manager
 - Settings
