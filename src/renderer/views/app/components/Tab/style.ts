@@ -169,7 +169,6 @@ export const StyledIcon = styled.div`
   transition: 0.2s opacity, 0.2s min-width;
   ${centerIcon()};
 
-margin-left: 4px;
 
 #left-dock & {
   margin-left: 0 !important;
@@ -183,7 +182,7 @@ margin-left: 4px;
 export const StyledContent = styled.div`
   /* ensure the trailing buttons remain visible */
   #left-dock & { overflow: visible !important; }
-  gap: 6px;
+  gap: 0;
   overflow: hidden;
   z-index: 2;
   align-items: center;
