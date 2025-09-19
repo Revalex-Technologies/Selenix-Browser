@@ -18,12 +18,7 @@ export class SearchDialog extends PersistentDialog {
   private yAdjust: number = 0;
   private isPreviewVisible = false;
 
-  public data = {
-    text: '',
-    x: 0,
-    y: 0,
-    width: 200,
-  };
+  public data = { text: '', cursorPos: 0, x: 0, y: 0, width: 200, isCompact: false };
 
   public constructor() {
     super({
@@ -51,7 +46,7 @@ export class SearchDialog extends PersistentDialog {
   }
 
   public rearrange() {
-    const compact = ((this.data?.y ?? 0) <= 60);
+    const compact = !!this.data.isCompact;
     const yRaw = this.data.y - DIALOG_MARGIN_TOP - this.yAdjust;
     const chromeHeight = TOOLBAR_HEIGHT + COMPACT_TITLEBAR_HEIGHT;
     const y = compact ? (-(TOOLBAR_HEIGHT + COMPACT_TITLEBAR_HEIGHT - DIALOG_TOP) + COMPACT_OMNIBOX_Y_OFFSET) : yRaw;

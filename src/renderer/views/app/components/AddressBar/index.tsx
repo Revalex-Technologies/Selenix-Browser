@@ -137,7 +137,8 @@ const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       text: e.currentTarget.value,
       cursorPos: e.currentTarget.selectionStart,
       x: left,
-      y: !store.isCompact ? Math.round(top) : -8,
+      y: Math.round(top),
+      isCompact: store.isCompact,
       width: width,
     });
     store.addressbarEditing = true;
