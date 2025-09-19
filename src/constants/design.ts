@@ -26,3 +26,5 @@ export const DIALOG_MIN_HEIGHT = 130;
 export const DIALOG_MARGIN = 16;
 export const DIALOG_TOP = 34;
 export const DIALOG_MARGIN_TOP = 0;
+
+export const COMPACT_OMNIBOX_Y_OFFSET = 55;

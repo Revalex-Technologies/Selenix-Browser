@@ -5,14 +5,17 @@ import {
   DIALOG_MARGIN,
   DIALOG_TOP,
   VIEW_Y_OFFSET,
+  COMPACT_TITLEBAR_HEIGHT,
+  TOOLBAR_HEIGHT,
+  COMPACT_OMNIBOX_Y_OFFSET,
 } from '~/constants/design';
 import { PersistentDialog } from './dialog';
 import { Application } from '../application';
 
 const WIDTH = 800;
 const HEIGHT = 80;
-
 export class SearchDialog extends PersistentDialog {
+  private yAdjust: number = 0;
   private isPreviewVisible = false;
 
   public data = {
@@ -48,14 +51,17 @@ export class SearchDialog extends PersistentDialog {
   }
 
   public rearrange() {
+    const compact = ((this.data?.y ?? 0) <= 60);
+    const yRaw = this.data.y - DIALOG_MARGIN_TOP - this.yAdjust;
+    const chromeHeight = TOOLBAR_HEIGHT + COMPACT_TITLEBAR_HEIGHT;
+    const y = compact ? (-(TOOLBAR_HEIGHT + COMPACT_TITLEBAR_HEIGHT - DIALOG_TOP) + COMPACT_OMNIBOX_Y_OFFSET) : yRaw;
     super.rearrange({
       x: this.data.x - DIALOG_MARGIN,
-      y: this.data.y - DIALOG_MARGIN_TOP,
+      y,
       width: this.data.width + 2 * DIALOG_MARGIN,
     });
   }
-
-  private onResize = () => {
+private onResize = () => {
     this.hide();
   };
 
@@ -70,14 +76,14 @@ export class SearchDialog extends PersistentDialog {
         return { hasLeftDock, isCompact, hasAddressBar };
       })()`);
       const isNormal = flags && flags.hasAddressBar && !flags.hasLeftDock && !flags.isCompact;
-      if (isNormal) {
-        // adjust y position of the suggestions omnibox here:
-        super.rearrange({ y: -VIEW_Y_OFFSET + 120 });
-      }
+      const isCompact = flags && flags.isCompact;
+      // Persist a y-offset so rearrange() corrects for UI chrome in compact mode
+      this.yAdjust = isCompact ? 1 : 0;
+      // Re-apply bounds using the latest data with the new offset so it overlays the addressbar
+      this.rearrange();
     } catch {}
 
-
-    browserWindow.once('resize', this.onResize);
+browserWindow.once('resize', this.onResize);
 
     this.send('visible', true, {
       id: Application.instance.windows.current.viewManager.selectedId,
