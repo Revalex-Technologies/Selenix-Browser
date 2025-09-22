@@ -30,7 +30,6 @@ export class AppWindow {
       titleBarStyle: 'hiddenInset',
       backgroundColor: nativeTheme.shouldUseDarkColors ? '#939090ff' : '#ffffff',
       webPreferences: {
-        plugins: true,
         nodeIntegration: true,
         contextIsolation: false,
         javascript: true,
