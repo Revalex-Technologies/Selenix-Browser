@@ -1,6 +1,5 @@
 import { protocol } from 'electron';
 import { join } from 'path';
-import { parse } from 'url';
 import { ERROR_PROTOCOL, WEBUI_PROTOCOL } from '~/constants/files';
 
 protocol.registerSchemesAsPrivileged([
@@ -21,7 +20,7 @@ export const registerProtocol = (session: Electron.Session) => {
   session.protocol.registerFileProtocol(
     ERROR_PROTOCOL,
     (request, callback: any) => {
-      const parsed = parse(request.url);
+      const parsed = new URL(request.url);
 
       if (parsed.hostname === 'network-error') {
         return callback({
@@ -35,15 +34,17 @@ export const registerProtocol = (session: Electron.Session) => {
     session.protocol.registerFileProtocol(
       WEBUI_PROTOCOL,
       (request, callback: any) => {
-        const parsed = parse(request.url);
+        const parsed = new URL(request.url);
 
-        if (!parsed.path || parsed.path === '' || parsed.path === '/') {
+        if (parsed.pathname === '' || parsed.pathname === '/') {
           return callback({
             path: join(__dirname, `${parsed.hostname}.html`),
           });
         }
 
-        callback({ path: join(__dirname, parsed.path) });
+        const _p = decodeURIComponent(parsed.pathname.replace(/^\/+/,'').replace(/\+/g,'/'));
+        const _safePath = join(__dirname, _p);
+        callback({ path: _safePath });
       },
     );
   }

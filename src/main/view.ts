@@ -1,5 +1,4 @@
 import { WebContentsView, app, ipcMain } from 'electron';
-import { parse as parseUrl } from 'url';
 import { getViewMenu } from './menus/view';
 import { AppWindow } from './windows';
 import { IHistoryItem, IBookmark } from '~/interfaces';
@@ -566,7 +565,7 @@ this.webContents.addListener('did-start-navigation', async (e: any, ...args: any
   }
 
   public get hostname() {
-    return parseUrl(this.url).hostname;
+    return new URL(this.url).hostname;
   }
 
   public emitEvent(event: TabEvent, ...args: any[]) {

@@ -3,8 +3,6 @@ import { ipcMain, app } from 'electron';
 import { resolve } from 'path';
 import * as path from 'path';
 import * as fs from 'fs';
-import { parse } from 'url';
-
 type PasswordStore = {
   get(service: string, account: string): Promise<string | null>;
   set(service: string, account: string, password: string): Promise<void>;
@@ -218,7 +216,7 @@ export const runMessagingService = (appWindow: AppWindow) => {
       `form-fill-update-${id}`,
       async (e, _id: string, persistent = false) => {
         const url = appWindow.viewManager.selected.url;
-        const { hostname } = parse(url);
+        const hostname = new URL(url).hostname;
 
         const item =
           _id &&

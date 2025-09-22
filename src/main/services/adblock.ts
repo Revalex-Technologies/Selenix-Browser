@@ -9,8 +9,6 @@ import {
   ipcMain,
 } from 'electron';
 import type * as Ghostery from '@ghostery/adblocker-electron';
-import fetch from 'cross-fetch';
-
 import { getPath } from '~/utils';
 import { Application } from '../application';
 

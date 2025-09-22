@@ -4,7 +4,6 @@ import { promises, existsSync } from 'fs';
 import { resolve, basename, parse, extname } from 'path';
 import { Application } from './application';
 import { registerProtocol } from './models/protocol';
-import * as url from 'url';
 import { IDownloadItem, BrowserActionChangeType } from '~/interfaces';
 import { parseCrx } from '~/utils/crx';
 import { pathExists } from '~/utils/files';
@@ -70,7 +69,7 @@ export class SessionsService {
         }
 
         try {
-          const { hostname } = url.parse(details.requestingUrl);
+          const hostname = new URL(details.requestingUrl).hostname;
           const perm: any = await Application.instance.storage.findOne({
             scope: 'permissions',
             query: { url: hostname, permission },
