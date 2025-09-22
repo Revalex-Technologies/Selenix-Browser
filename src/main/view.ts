@@ -65,7 +65,6 @@ export class View {
         contextIsolation: true,
         sandbox: true,
         partition: incognito ? 'view_incognito' : 'persist:view',
-        plugins: true,
         webSecurity: true,
         javascript: true,
       },
@@ -196,35 +195,7 @@ this.webContents.addListener('did-start-navigation', async (e: any, ...args: any
         }
       },
     );
-
-    (this.webContents as any).addListener(
-      'new-window',
-      (e: any, url: string, frameName: string, disposition: string) => {
-        if (disposition === 'new-window') {
-          if (frameName === '_self') {
-            e.preventDefault();
-            this.window.viewManager.selected.webContents.loadURL(url);
-          } else if (frameName === '_blank') {
-            e.preventDefault();
-            this.window.viewManager.create(
-              {
-                url,
-                active: true,
-              },
-              true,
-            );
-          }
-        } else if (disposition === 'foreground-tab') {
-          e.preventDefault();
-          this.window.viewManager.create({ url, active: true }, true);
-        } else if (disposition === 'background-tab') {
-          e.preventDefault();
-          this.window.viewManager.create({ url, active: false }, true);
-        }
-      },
-    );
-
-    this.webContents.addListener(
+this.webContents.addListener(
       'did-fail-load',
       (e: any, errorCode: any, errorDescription: any, validatedURL: any, isMainFrame: any) => {
 
