@@ -55,32 +55,30 @@
     </div>
 
     <script>
-      // --- Preserve original design & behavior, add robust fallbacks ---
-      // Prefer WebUI background & foreground flags, then fall back to app/pages values,
-      // then finally to prefers-color-scheme defaults.
       const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
       const theme = (typeof window !== 'undefined' && window.theme) ? window.theme : {};
       const getTheme = (k, d) => (Object.prototype.hasOwnProperty.call(theme, k) ? theme[k] : d);
 
       try {
-        const bg = getTheme('webui.backgroundColor',
-                   getTheme('webui.background',
-                   getTheme('pages.backgroundColor',
-                   prefersDark ? '#121212' : '#ffffff')));
+        const isDark = !!getTheme('webui.lightForeground', getTheme('pages.lightForeground', prefersDark));
+        // Allow an explicit per‑page override
+        const bg = getTheme('webui.networkError.backgroundColor',
+                  isDark ? '#212121'
+                         : getTheme('webui.backgroundColor',
+                             getTheme('webui.background',
+                               getTheme('pages.backgroundColor', '#ffffff'))));
         document.body.style.backgroundColor = bg;
       } catch (e) {}
 
       const iconEl = document.getElementById('main-icon');
       try {
-        const lightFg = !!getTheme('webui.lightForeground',
-                          getTheme('pages.lightForeground', prefersDark));
+        const lightFg = !!getTheme('webui.lightForeground', getTheme('pages.lightForeground', prefersDark));
         if (lightFg) {
           document.body.style.color = 'rgba(255, 255, 255, 0.54)';
           iconEl.style.filter = 'invert(1)';
         }
       } catch (e) {}
 
-      // Parse errorCode and failed URL from location hash if provided: "#<code>|<encodedURL>"
 // Parse errorCode and failed URL from location hash if provided: "#<code>|<encodedURL>"
       let errorCode = undefined;
       let failedURLFromHash = '';
@@ -101,7 +99,6 @@
       // url comes from window.errorURL if injected, otherwise from the hash, otherwise referrer
       const url = (typeof window !== 'undefined' && window.errorURL) || failedURLFromHash || document.referrer || '';
 
-      // Keep the original title behavior
       document.title = url || document.title;
 
       const errorCodeEl = document.getElementById('main-error-code');
