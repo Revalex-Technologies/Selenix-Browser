@@ -204,18 +204,22 @@ this.webContents.addListener(
 
           this.hasError = true;
 
-          try { this.webContents.stop(); } catch {}
-          // Avoid loops if the error page itself fails
-          if (!validatedURL?.startsWith(`${ERROR_PROTOCOL}://`)) {
-            setTimeout(() => {
-              if (!this.webContents.isDestroyed()) {
-                this.webContents.loadURL(`${ERROR_PROTOCOL}://${NETWORK_ERROR_HOST}/#${errorCode}`);
-              }
-            }, 0);
-          }
+          this.webContents.loadURL(
+            `${ERROR_PROTOCOL}://${NETWORK_ERROR_HOST}/${errorCode}`,
+          );
         }
       },
     );
+
+    // Extra safety: show our internal error page on renderer crash
+    this.webContents.addListener('render-process-gone', (event: any, details: any) => {
+      try {
+        if (!this.webContents.isDestroyed()) {
+          this.webContents.loadURL(`${ERROR_PROTOCOL}://${NETWORK_ERROR_HOST}/#render-process-gone|${encodeURIComponent(this.webContents.getURL() || '')}`);
+        }
+      } catch {}
+    });
+
 
     this.webContents.addListener(
       'page-favicon-updated',
