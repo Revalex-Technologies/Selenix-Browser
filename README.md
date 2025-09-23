@@ -1,12 +1,12 @@
 <p align="center">
-  <a href="https://revalextechnologies.github.io"><img src="static/icons/icon.png" width="256"></a>
+  <a href="https://revalex-technologies.github.io/Revalex-Technologies-Home/"><img src="static/icons/icon.png" width="256"></a>
 </p>
 
 <div align="center">
   <h1>Selenix Browser</h1>
 
 [![Build Status](https://github.com/Revalex-Technologies/selenix-Browser/actions/workflows/build.yml/badge.svg)](https://github.com/Revalex-Technologies/selenix-Browser/actions)
-[![Downloads](https://img.shields.io/github/downloads/Revalex-Technologies/selenix-Browser/total.svg?style=flat-square)](https://revalextechnologies.github.io)
+[![Downloads](https://img.shields.io/github/downloads/Revalex-Technologies/selenix-Browser/total.svg?style=flat-square)](https://revalex-technologies.github.io/Revalex-Technologies-Home/#/projects/selenix)
 [![Discord](https://discordapp.com/api/guilds/1402495455077732422/widget.png?style=shield)](https://discord.gg/x6BKcWM4pf)
 
 Selenix is a web browser built from wexond base (the version used was prior to them closing the code), on top of modern web technologies such as `Electron` and `React`, that can also be used as a framework to create a custom web browser (see the [License](#license) section).
