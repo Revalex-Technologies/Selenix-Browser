@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://revalextechnologiess.github.io"><img src="static/icons/icon.png" width="256"></a>
+  <a href="https://revalextechnologies.github.io"><img src="static/icons/icon.png" width="256"></a>
 </p>
 
 <div align="center">
