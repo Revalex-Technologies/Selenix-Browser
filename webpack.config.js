@@ -26,7 +26,6 @@ const mainConfig = getConfig({
     new CopyPlugin({
       patterns: [
         {
-          // Use the package's exported entry (no subpath) to satisfy "exports"
           from: require.resolve('@ghostery/adblocker-electron-preload'),
           to: 'preload.js',
           transform: async (fileContent) =>
@@ -101,8 +100,6 @@ if (process.env.START === '1') {
   });
 }
 
-
-// Ensure static error page is available in the main bundle dir
 if (!mainConfig.plugins) mainConfig.plugins = [];
 mainConfig.plugins.push(new CopyPlugin({
   patterns: [

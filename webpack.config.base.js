@@ -35,7 +35,7 @@ const tsLoader = {
   loader: 'ts-loader',
   options: {
     experimentalWatchApi: dev,
-    transpileOnly: true, // keep typechecking in a separate plugin if desired
+    transpileOnly: true,
     getCustomTransformers: () => ({
       before: [styledComponentsTransformer],
     }),
@@ -92,7 +92,6 @@ const config = {
 
   module: { rules },
 
-  // Electron-friendly
   node: {
     __dirname: false,
     __filename: false,
@@ -140,8 +139,6 @@ const config = {
       : [],
   },
 };
-
-// Helper utilities preserved from your original file
 
 function getConfig(...cfg) {
   return merge(config, ...cfg);
