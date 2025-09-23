@@ -80,7 +80,7 @@ const rules = [
 const config = {
   mode: dev ? 'development' : 'production',
 
-  devtool: dev ? 'eval-source-map' : false,
+  devtool: dev ? 'inline-source-map' : false,
 
   output: {
     path: resolve(__dirname, 'build'),

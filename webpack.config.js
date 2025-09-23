@@ -101,4 +101,13 @@ if (process.env.START === '1') {
   });
 }
 
+
+// Ensure static error page is available in the main bundle dir
+if (!mainConfig.plugins) mainConfig.plugins = [];
+mainConfig.plugins.push(new CopyPlugin({
+  patterns: [
+    { from: 'static/pages/network-error.html', to: 'network-error.html' }
+  ]
+}));
+
 module.exports = [mainConfig, preloadConfig];

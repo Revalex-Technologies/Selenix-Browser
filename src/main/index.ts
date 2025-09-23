@@ -1,4 +1,5 @@
-import { ipcMain, app, webContents } from 'electron';
+import { registerProtocol } from './models/protocol';
+import { ipcMain, app, webContents, session } from 'electron';
 import { setIpcMain } from '@wexond/rpc-electron';
 setIpcMain(ipcMain);
 
@@ -97,3 +98,8 @@ ipcMain.handle(
     }
   }
 );
+
+
+app.whenReady().then(() => {
+  try { registerProtocol(session.defaultSession); } catch (e) { console.error('registerProtocol defaultSession failed', e); }
+});

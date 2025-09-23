@@ -62,4 +62,16 @@ applyEntries(appConfig, [
   'downloads',
 ]);
 
+
+// Inject static network error page into build output so protocol handler can serve it
+if (!appConfig.plugins) appConfig.plugins = [];
+appConfig.plugins.push(
+  new HtmlWebpackPlugin({
+    filename: 'network-error.html',
+    template: join(__dirname, 'static/pages/network-error.html'),
+    // no chunks needed; this is a static fallback page
+    chunks: []
+  })
+);
+
 module.exports = appConfig;

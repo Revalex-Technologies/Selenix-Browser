@@ -204,9 +204,15 @@ this.webContents.addListener(
 
           this.hasError = true;
 
-          this.webContents.loadURL(
-            `${ERROR_PROTOCOL}://${NETWORK_ERROR_HOST}/${errorCode}`,
-          );
+          try { this.webContents.stop(); } catch {}
+          // Avoid loops if the error page itself fails
+          if (!validatedURL?.startsWith(`${ERROR_PROTOCOL}://`)) {
+            setTimeout(() => {
+              if (!this.webContents.isDestroyed()) {
+                this.webContents.loadURL(`${ERROR_PROTOCOL}://${NETWORK_ERROR_HOST}/#${errorCode}`);
+              }
+            }, 0);
+          }
         }
       },
     );
