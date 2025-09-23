@@ -55,28 +55,33 @@
     </div>
 
     <script>
+      // --- Preserve original design & behavior, add robust fallbacks ---
+      // Prefer WebUI background & foreground flags, then fall back to app/pages values,
+      // then finally to prefers-color-scheme defaults.
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = (typeof window !== 'undefined' && window.theme) ? window.theme : {};
+      const getTheme = (k, d) => (Object.prototype.hasOwnProperty.call(theme, k) ? theme[k] : d);
+
       try {
-        if (window.theme && window.theme['pages.backgroundColor']) {
-          document.body.style.backgroundColor = window.theme['pages.backgroundColor'];
-        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-          document.body.style.backgroundColor = '#121212';
-        } else {
-          document.body.style.backgroundColor = '#ffffff';
-        }
+        const bg = getTheme('webui.backgroundColor',
+                   getTheme('webui.background',
+                   getTheme('pages.backgroundColor',
+                   prefersDark ? '#121212' : '#ffffff')));
+        document.body.style.backgroundColor = bg;
       } catch (e) {}
 
       const iconEl = document.getElementById('main-icon');
       try {
-        if (window.theme && window.theme['pages.lightForeground']) {
-          document.body.style.color = 'rgba(255, 255, 255, 0.54)';
-          iconEl.style.filter = 'invert(1)';
-        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        const lightFg = !!getTheme('webui.lightForeground',
+                          getTheme('pages.lightForeground', prefersDark));
+        if (lightFg) {
           document.body.style.color = 'rgba(255, 255, 255, 0.54)';
           iconEl.style.filter = 'invert(1)';
         }
       } catch (e) {}
 
       // Parse errorCode and failed URL from location hash if provided: "#<code>|<encodedURL>"
+// Parse errorCode and failed URL from location hash if provided: "#<code>|<encodedURL>"
       let errorCode = undefined;
       let failedURLFromHash = '';
       try {
