@@ -1,10 +1,36 @@
 import { app, ipcMain, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { Application } from '../application';
+import { join } from 'path';
+import { existsSync, writeFileSync, unlinkSync } from 'fs';
+
+const UPDATE_PENDING_MARKER = () => join(app.getPath('userData'), 'update-pending.marker');
+
+export async function installOnNextLaunchIfPending(): Promise<boolean> {
+  try {
+    const marker = UPDATE_PENDING_MARKER();
+    if (existsSync(marker)) {
+      try { unlinkSync(marker); } catch {}
+      // Check & download if not already downloaded
+      const res = await (autoUpdater as any).checkForUpdates();
+      try {
+        await (autoUpdater as any).downloadUpdate();
+      } catch {}
+      try {
+        (autoUpdater as any).quitAndInstall(false, true);
+        return true;
+      } catch {}
+    }
+  } catch {}
+  return false;
+}
 
 export const runAutoUpdaterService = () => {
 
   const updater = autoUpdater as any;
+
+  let __updateAvailable = false;
+  let __updateDownloaded = false;
 
   updater.autoDownload = false;
   updater.autoInstallOnAppQuit = false;
@@ -143,6 +169,15 @@ export const runAutoUpdaterService = () => {
       reportError(err, 'Update initiation failed');
       installRequested = false;
     }
+  });
+
+  app.on('before-quit', () => {
+try {
+  if (__updateAvailable) {
+    const marker = UPDATE_PENDING_MARKER();
+    try { writeFileSync(marker, '1'); } catch {}
+  }
+} catch {}
   });
 
   setTimeout(() => {

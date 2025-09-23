@@ -11,6 +11,7 @@ import { WindowsService } from './windows-service';
 import { StorageService } from './services/storage';
 import { getMainMenu } from './menus/main';
 import { runAutoUpdaterService } from './services';
+import { installOnNextLaunchIfPending } from './services/auto-updater';
 import { DialogsService } from './services/dialogs-service';
 import { requestAuth } from './dialogs/auth';
 import { setupExtensions } from './dialogs/extensions';
@@ -109,6 +110,9 @@ export class Application {
     await setupExtensions(this)
 
     await setupChromeWebStore(this)
+
+    const installedNow = await installOnNextLaunchIfPending();
+    if (installedNow) { return; }
 
     this.windows.open()
 
