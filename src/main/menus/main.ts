@@ -225,7 +225,7 @@ export const getMainMenu = () => {
               selected,
             } = Application.instance.windows.current.viewManager;
             if (selected) {
-              selected.webContents.goBack();
+              selected.webContents.navigationHistory.goBack(); 
             }
           },
           'Go back',
@@ -237,7 +237,7 @@ export const getMainMenu = () => {
               selected,
             } = Application.instance.windows.current.viewManager;
             if (selected) {
-              selected.webContents.goForward();
+              selected.webContents.navigationHistory.goForward();
             }
           },
           'Go forward',

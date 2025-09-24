@@ -51,11 +51,11 @@ const tabId: number = ipcRenderer.sendSync('get-webcontents-id');
 export const windowId: number = ipcRenderer.sendSync('get-window-id');
 
 const goBack = () => {
-  ipcRenderer.invoke('web-contents-call', { webContentsId: tabId, method: 'goBack' });
+  ipcRenderer.invoke('web-contents-call', { webContentsId: tabId, method: 'navigationHistory.goBack' });
 };
 
 const goForward = () => {
-  ipcRenderer.invoke('web-contents-call', { webContentsId: tabId, method: 'goForward' });
+  ipcRenderer.invoke('web-contents-call', { webContentsId: tabId, method: 'navigationHistory.goForward' });
 };
 
 window.addEventListener('mouseup', (e) => {

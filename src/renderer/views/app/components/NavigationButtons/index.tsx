@@ -12,11 +12,11 @@ import {
 } from '~/renderer/constants/icons';
 
 const onBackClick = () => {
-  store.tabs.selectedTab.callViewMethod('goBack');
+  store.tabs.selectedTab.callViewMethod('navigationHistory.goBack');
 };
 
 const onForwardClick = () => {
-  store.tabs.selectedTab.callViewMethod('goForward');
+  store.tabs.selectedTab.callViewMethod('navigationHistory.goForward');
 };
 
 const onRefreshClick = () => {

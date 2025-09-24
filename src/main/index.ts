@@ -66,28 +66,42 @@ ipcMain.handle(
         throw new Error(`WebContents with id ${webContentsId} not found or destroyed`);
       }
 
-      let actualMethod = method;
-      if (method.startsWith('webContents.')) {
-        actualMethod = method.split('.')[1];
-      }
 
-      if (typeof (wc as any)[actualMethod] !== 'function') {
-        throw new Error(`${actualMethod} is not a function on WebContents`);
-      }
-
-      const result = (wc as any)[actualMethod](...args);
-
-      if (result instanceof Promise) {
-        return await result.catch((err: any): any => {
-          if ((err && (err.code === 'ERR_ABORTED' || err.errno === -3))) {
-            // Swallow navigation aborts; they are normal when navigating away mid-load
-            return null;
-          }
-          console.error('Error in webContents method:', actualMethod, err);
-          throw err;
-        });
-      }
-      return result;
+// Support dotted method paths like 'navigationHistory.goBack'
+const segments = method.replace(/^webContents\./, '').split('.');
+let target: any = wc as any;
+const fnName = segments.pop()!;
+for (const seg of segments) {
+  if (typeof target[seg] === 'undefined') {
+    throw new Error(`Property ${seg} is not available on WebContents`);
+  }
+  target = target[seg];
+}
+const callable = target[fnName];
+if (typeof callable !== 'function') {
+  throw new Error(`${fnName} is not a function on ${segments.join('.') || 'WebContents'}`);
+}
+let result: any;
+try {
+  result = callable.apply(target, args);
+} catch (err: any) {
+  if (err && (err.code === 'ERR_ABORTED' || err.errno === -3)) {
+    return null;
+  }
+  console.error('Error in webContents method:', method, err);
+  throw err;
+}
+if (result instanceof Promise) {
+  return await result.catch((err: any): any => {
+    if ((err && (err.code === 'ERR_ABORTED' || err.errno === -3))) {
+      // Swallow navigation aborts; they are normal when navigating away mid-load
+      return null;
+    }
+    console.error('Error in webContents method:', method, err);
+    throw err;
+  });
+}
+return result;
     } catch (error: any) {
       if (error && (error.code === 'ERR_ABORTED' || error.errno === -3)) {
         // benign abort, ignore
