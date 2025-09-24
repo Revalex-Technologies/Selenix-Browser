@@ -7,7 +7,7 @@
     "alwaysStrict": true,
     "skipLibCheck": true,
     "module": "None",
-    "target": "es2020",
+    "target": "ESNext",
     "jsx": "react",
     "allowJs": true,
     "sourceMap": true,
