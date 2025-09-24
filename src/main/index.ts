@@ -66,8 +66,6 @@ ipcMain.handle(
         throw new Error(`WebContents with id ${webContentsId} not found or destroyed`);
       }
 
-
-// Support dotted method paths like 'navigationHistory.goBack'
 const segments = method.replace(/^webContents\./, '').split('.');
 let target: any = wc as any;
 const fnName = segments.pop()!;
