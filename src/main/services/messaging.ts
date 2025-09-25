@@ -11,10 +11,12 @@ type PasswordStore = {
 
 let passwordStore: PasswordStore;
 
-(() => {
+void (async () => {
   try {
 
-    const Store = require('electron-store') as typeof import('electron-store');
+    const electronStoreMod = await import('electron-store');
+    const Store = (electronStoreMod as any).default as typeof import('electron-store').default;
+    try { console.log('[credentials] electron-store version', require('electron-store/package.json').version); } catch {}
 
     const store = new (Store as any)({
       name: 'credentials',
