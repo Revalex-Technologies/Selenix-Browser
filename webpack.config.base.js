@@ -80,10 +80,11 @@ const rules = [
 const config = {
   mode: dev ? 'development' : 'production',
 
-  devtool: dev ? 'inline-source-map' : false,
+  devtool: dev ? 'eval-cheap-module-source-map' : 'source-map',
 
   output: {
     path: resolve(__dirname, 'build'),
+    devtoolModuleFilenameTemplate: info => `file:///${info.absoluteResourcePath.replace(/\\/g, '/')}`,
     filename: '[name].bundle.js',
     // Use a non-MD4 hash to avoid OpenSSL 3 errors
     hashFunction: 'xxhash64',

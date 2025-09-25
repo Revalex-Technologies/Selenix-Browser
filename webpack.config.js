@@ -39,7 +39,7 @@ const mainConfig = getConfig({
 const preloadConfig = getConfig({
   target: 'web',
 
-  devtool: false,
+  devtool: dev ? 'eval-cheap-module-source-map' : 'source-map',
 
   watch: dev,
 
