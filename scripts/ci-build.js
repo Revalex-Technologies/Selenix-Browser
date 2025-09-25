@@ -82,11 +82,6 @@ const restoreOriginalsIfAny = async () => {
       // Override package.json fields only for packaging
       const newPkg = {
         ...packageJson,
-        // IMPORTANT: keep workspace name as-is to avoid Yarn confusion,
-        // but if you truly want the packaged app to have a different "name",
-        // put it under extraMetadata in electron-builder config (below).
-        // Leaving "name" here as 'selenix-nightly' since your original script did it,
-        // but because we already built, Yarn won't be impacted.
         name: 'selenix-nightly',
         repository: {
           type: 'git',
