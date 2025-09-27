@@ -16,6 +16,10 @@ export const baseStyle = css`
   * {
     box-sizing: border-box;
   }
+  ${({ theme }: { theme?: ITheme }) =>
+    theme && (theme as any)['pages.lightForeground'] && css`
+      ::selection { color: #000 !important; background-color: rgba(145, 185, 230, 0.99) !important; }
+    `};
 `;
 
 export const UIStyle = createGlobalStyle`
