@@ -5,6 +5,7 @@ import {
   nativeTheme,
   Menu,
   ipcMain,
+  screen,
 } from 'electron';
 
 import { enable } from '@electron/remote/main';
@@ -18,6 +19,9 @@ import { isNightly } from '..';
 import { ViewManager } from '../view-manager';
 
 export class AppWindow {
+  private _hoverWatcher: NodeJS.Timeout | null = null;
+  private _overlayVisible = false;
+
   public win: BrowserWindow;
 
   public viewManager: ViewManager;
@@ -256,21 +260,33 @@ export class AppWindow {
     }
 
     this.win.on('enter-full-screen', () => {
+      this.startFullscreenHoverWatcher();
+      this.viewManager.fullscreen = true;
+
       this.send('fullscreen', true);
       this.viewManager.fixBounds();
     });
 
     this.win.on('leave-full-screen', () => {
+      this.stopFullscreenHoverWatcher();
+      this.viewManager.fullscreen = false;
+
       this.send('fullscreen', false);
       this.viewManager.fixBounds();
     });
 
     this.win.on('enter-html-full-screen', () => {
+      this.viewManager.fixBounds();
+      this.startFullscreenHoverWatcher();
+
       this.viewManager.fullscreen = true;
       this.send('html-fullscreen', true);
     });
 
     this.win.on('leave-html-full-screen', () => {
+      this.viewManager.fixBounds();
+      this.stopFullscreenHoverWatcher();
+
       this.viewManager.fullscreen = false;
       this.send('html-fullscreen', false);
     });
@@ -305,6 +321,59 @@ export class AppWindow {
     }
   }
 
+  private startFullscreenHoverWatcher() {
+    this.stopFullscreenHoverWatcher();
+    const HOVER_THRESHOLD = 4; // px from top edge
+    const HYSTERESIS = 48; // px to fully hide after leaving
+    const POLL_MS = 60;
+
+    this._hoverWatcher = setInterval(() => {
+      try {
+        if (!this.viewManager.fullscreen) return;
+        if (!this.win.isFocused()) return;
+
+        const cursor = screen.getCursorScreenPoint();
+        const wb = this.win.getBounds();
+        const withinX = cursor.x >= wb.x && cursor.x <= wb.x + wb.width;
+        const atTop = cursor.y >= wb.y && cursor.y <= wb.y + HOVER_THRESHOLD;
+
+        if (withinX && atTop) {
+          if (!this._overlayVisible) {
+            this._overlayVisible = true;
+            this.viewManager.revealOverlay = true;
+            this.viewManager.fixBounds();
+            try {
+              this.send('hover-overlay', true);
+            } catch {}
+          }
+        } else {
+          if (this._overlayVisible && cursor.y > wb.y + HYSTERESIS) {
+            this._overlayVisible = false;
+            this.viewManager.revealOverlay = false;
+            this.viewManager.fixBounds();
+            try {
+              this.send('hover-overlay', false);
+            } catch {}
+          }
+        }
+      } catch {}
+    }, POLL_MS);
+  }
+
+  private stopFullscreenHoverWatcher() {
+    if (this._hoverWatcher) {
+      clearInterval(this._hoverWatcher);
+      this._hoverWatcher = null;
+    }
+    if (this._overlayVisible) {
+      this._overlayVisible = false;
+      this.viewManager.revealOverlay = false;
+      try {
+        this.send('hover-overlay', false);
+      } catch {}
+      this.viewManager.fixBounds();
+    }
+  }
   public fixDragging() {
     const bounds = this.win.getBounds();
     this.win.setBounds({

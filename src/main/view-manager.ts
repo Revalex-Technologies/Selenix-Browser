@@ -18,6 +18,7 @@ export class ViewManager extends EventEmitter {
   public selectedId = 0;
   public recentlyClosed: { title: string; url: string }[] = [];
   public _fullscreen = false;
+  public revealOverlay = false;
 
   public incognito: boolean;
 
@@ -277,16 +278,18 @@ export class ViewManager extends EventEmitter {
   })()
 `);
 
-    const left = (sizes && sizes.leftDockWidth) || 0;
-    const top = this.fullscreen
-      ? 0
-      : (sizes && sizes.toolbarContentHeight) || 0;
+    const overlayVisible = !!this.revealOverlay;
+    const leftDock = (sizes && sizes.leftDockWidth) || 0;
+    const toolbarH = (sizes && sizes.toolbarContentHeight) || 0;
+
+    const left = this.fullscreen ? (overlayVisible ? leftDock : 0) : leftDock;
+    const top = this.fullscreen ? (overlayVisible ? toolbarH : 0) : toolbarH;
 
     const newBounds = {
       x: left,
       y: Math.max(0, top),
       width: Math.max(0, width - left),
-      height: this.fullscreen ? height : Math.max(0, height - top),
+      height: Math.max(0, height - top),
     };
 
     const prev = (view as any).bounds || {};
