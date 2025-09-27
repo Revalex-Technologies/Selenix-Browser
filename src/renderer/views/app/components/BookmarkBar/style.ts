@@ -38,7 +38,7 @@ export const BookmarkSection = styled.div`
   overflow: hidden;
 `;
 
-export const BookmarkButton = styled(Button)`
+export const BookmarkButton = styled(Button).withConfig({ shouldForwardProp: (p) => p !== 'width' })<{ width: number;}>`
   max-width: ${({ width }: { width: number }) => width}px;
   width: auto;
   padding: 4px;

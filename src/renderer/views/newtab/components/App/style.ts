@@ -4,7 +4,7 @@ import { centerIcon } from '~/renderer/mixins';
 import { ContextMenuRow } from '~/renderer/components/ContextMenu';
 import { ITheme } from '~/interfaces';
 
-export const Image = styled.div`
+export const Image = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'src' })<{ src?: string;}>`
   position: absolute;
   z-index: 1;
   background-size: cover;
@@ -39,13 +39,13 @@ export const Image = styled.div`
   `};
 `;
 
-export const Wrapper = styled.div`
+export const Wrapper = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'fullSize' })<{ fullSize?: boolean;}>`
   display: flex;
   align-items: center;
   position: relative;
   overflow: hidden;
 
-  ${({ fullSize }: { fullSize: boolean }) => css`
+  ${({ fullSize = false }: { fullSize?: boolean }) => css`
     height: ${fullSize ? '100vh' : 'auto'};
   `};
 `;
@@ -79,7 +79,7 @@ export const Menu = styled.div`
   bottom: 32px;
 `;
 
-export const IconItem = styled.div`
+export const IconItem = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'imageSet' })<{ imageSet?: boolean;}>`
   width: 34px;
   height: 34px;
   margin-left: 16px;

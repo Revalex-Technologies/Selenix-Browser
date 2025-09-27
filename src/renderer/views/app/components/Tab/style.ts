@@ -10,7 +10,7 @@ interface CloseProps {
   theme?: ITheme;
 }
 
-export const StyledClose = styled.div`
+export const StyledClose = styled.div.withConfig({ shouldForwardProp: (p) => !['visible'].includes(p as string) })<CloseProps>`
   height: 20px;
   width: 20px;
   margin-left: 2px;
@@ -52,7 +52,7 @@ export const StyledClose = styled.div`
   /* Left dock overrides: turn tabs into a vertical list when inside the left dock */
   
 
-  ${({ theme }) => css`
+  ${ ({ theme }: { theme: ITheme }) => css`
     /* Left dock overrides */
     #left-dock & { position: static; width: auto; height: auto; transform: none !important; flex: 0 0 auto; }
   `};
@@ -65,7 +65,7 @@ interface ActionProps {
   theme?: ITheme;
 }
 
-export const StyledAction = styled.div`
+export const StyledAction = styled.div.withConfig({ shouldForwardProp: (p) => !['visible','icon'].includes(p as string) })<ActionProps>`
   height: 20px;
   width: 20px;
   margin-left: 2px;
@@ -92,7 +92,7 @@ interface PinActionProps {
   theme?: ITheme;
 }
 
-export const StyledPinAction = styled.div`
+export const StyledPinAction = styled.div.withConfig({ shouldForwardProp: (p) => !['visible','icon'].includes(p as string) })<PinActionProps>`
   height: 12px;
   width: 12px;
   border-radius: 100%;
@@ -120,7 +120,7 @@ interface TabProps {
   selected: boolean;
 }
 
-export const StyledTab = styled.div`
+export const StyledTab = styled.div.withConfig({ shouldForwardProp: (p) => !['selected'].includes(p as string) })<TabProps>`
   position: absolute;
   height: 100%;
   width: 0;
@@ -138,13 +138,9 @@ export const StyledTab = styled.div`
   #left-dock & { position: static; width: auto; height: auto; transform: none !important; flex: 0 0 auto; }
 `;
 
-interface TitleProps {
-  isIcon: boolean;
-  selected: boolean;
-  theme?: ITheme;
-}
+interface TitleProps { isIcon?: boolean; selected?: boolean; isIconSet?: boolean; theme?: ITheme; }
 
-export const StyledTitle = styled.div`
+export const StyledTitle = styled.div.withConfig({ shouldForwardProp: (p) => !['isIcon','selected'].includes(p as string) })<TitleProps>`
   font-size: 12px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -155,7 +151,7 @@ export const StyledTitle = styled.div`
   flex: 1;
   min-width: 0;
 
-  ${({ isIcon, selected, theme }: TitleProps) => css`
+  ${({ isIcon, selected, theme }: Partial<TitleProps>) => css`
     margin-left: ${!isIcon ? 0 : 12}px;
     color: ${selected
       ? theme['tab.selected.textColor']
@@ -163,7 +159,7 @@ export const StyledTitle = styled.div`
   `};
 `;
 
-export const StyledIcon = styled.div`
+export const StyledIcon = styled.div.withConfig({ shouldForwardProp: (p) => !['isIcon','selected'].includes(p as string) })<TitleProps>`
   height: 16px;
   min-width: 16px;
   transition: 0.2s opacity, 0.2s min-width;
@@ -173,7 +169,7 @@ export const StyledIcon = styled.div`
 #left-dock & {
   margin-left: 0 !important;
 }
-  ${({ isIconSet }: { isIconSet: boolean }) => css`
+  ${({ isIconSet }: { isIconSet?: boolean }) => css`
     min-width: ${isIconSet ? 0 : 16},
     opacity: ${isIconSet ? 0 : 1};
   `};
@@ -199,7 +195,7 @@ interface TabContainerProps {
   selected?: boolean;
 }
 
-export const TabContainer = styled.div`
+export const TabContainer = styled.div.withConfig({ shouldForwardProp: (p) => !['pinned','hasTabGroup','selected'].includes(p as string) })<TabContainerProps>`
   /* ensure nothing inside gets clipped in left dock */
   #left-dock & { overflow: visible !important; }
   position: relative;
@@ -224,7 +220,7 @@ export const TabContainer = styled.div`
     box-shadow: ${selected ? '0px 0px 6px 0px rgba(0,0,0,0.12)' : 'none'};
   `};
 
-  ${({ theme }) => css`
+  ${ ({ theme }: { theme: ITheme }) => css`
     #left-dock & { max-width: 100% !important; margin-top: 0 !important; border: none !important; box-sizing: border-box; padding: 0; }
   `};
 

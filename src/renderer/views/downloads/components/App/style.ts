@@ -2,8 +2,8 @@ import styled from 'styled-components';
 import { ITheme } from '~/interfaces';
 
 export const Page = styled.div`
-  background-color: ${props => ((props.theme as unknown as ITheme).backgroundColor)};
-  color: ${props => ((props.theme as unknown as ITheme)['pages.textColor'] ?? 'inherit')};
+  background-color: ${(props: { theme: ITheme }) => (props.theme.backgroundColor)};
+  color: ${(props: { theme: ITheme }) => (props.theme['pages.textColor'] ?? 'inherit')};
   height: 100vh;
   display: flex;
   flex-direction: column;

@@ -5,7 +5,7 @@ import { transparency } from '~/renderer/constants';
 import { ICON_FOLDER, ICON_DROPDOWN } from '~/renderer/constants/icons';
 import { ITheme } from '~/interfaces';
 
-export const StyledTreeItem = styled.div`
+export const StyledTreeItem = styled.div.withConfig({ shouldForwardProp: (p) => !['selected'].includes(p as string) })<{ theme?: ITheme; selected: boolean;}>`
   width: 100%;
   height: 32px;
   display: flex;
@@ -29,7 +29,7 @@ export const StyledTreeItem = styled.div`
   `}
 `;
 
-export const DropIcon = styled.div`
+export const DropIcon = styled.div.withConfig({ shouldForwardProp: (p) => !['visible','expanded'].includes(p as string) })<{ visible: boolean; expanded: boolean; theme?: ITheme;}>`
   min-width: 24px;
   min-height: 24px;
   margin: 0px 2px;

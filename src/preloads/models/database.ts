@@ -32,7 +32,7 @@ export class PreloadDatabase<T> {
         '*',
       );
 
-      window.addEventListener('message', (e) => {
+      window.addEventListener('message', (e: any) => {
         const { data } = e;
 
         if (data.type === 'result' && data.id === id) {

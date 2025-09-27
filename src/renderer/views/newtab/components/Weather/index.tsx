@@ -1,3 +1,5 @@
+import isPropValid from '@emotion/is-prop-valid';
+import { StyleSheetManager } from 'styled-components';
 import * as React from 'react';
 import { observer } from 'mobx-react-lite';
 import { WeatherWrap, ForecastPanel } from './style';
@@ -102,7 +104,7 @@ export const Weather = observer(() => {
         setDaily(data.daily);
         setLoading(false);
       })
-      .catch((e) => {
+      .catch((e: any) => {
         setError(String(e));
         setLoading(false);
       });
@@ -146,7 +148,7 @@ export const Weather = observer(() => {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
       (pos) => loadWeather({ name: 'My Location', latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
-      (e) => setError(e.message || 'Location unavailable'),
+      (e: any) => setError(e.message || 'Location unavailable'),
       { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
     );
   };
@@ -157,7 +159,7 @@ export const Weather = observer(() => {
     return (
       <WeatherWrap aria-label="Weather error" title={error} onClick={toggle} data-clickable>
         ⚠️ Weather • Click to open
-        <button className="retry" onClick={(e) => { e.stopPropagation(); setError(null); useMyLocation(); }}>
+        <button className="retry" onClick={(e: any) => { e.stopPropagation(); setError(null); useMyLocation(); }}>
           Use My Location
         </button>
       </WeatherWrap>
@@ -190,7 +192,7 @@ export const Weather = observer(() => {
             <div className="loc">{loc ? loc.name : 'Unknown location'}</div>
             <button onClick={useMyLocation} className="small">Use My Location</button>
             <label className="toggle">
-              <input type="checkbox" checked={fahrenheit} onChange={(e) => setFahrenheit(e.target.checked)} />
+              <input type="checkbox" checked={fahrenheit} onChange={(e: any) => setFahrenheit(e.target.checked)} />
               <span>{fahrenheit ? '°F' : '°C'}</span>
             </label>
           </div>
@@ -200,7 +202,7 @@ export const Weather = observer(() => {
               type="text"
               placeholder="Search city..."
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e: any) => setQuery(e.target.value)}
             />
             {results.length > 0 && (
               <div className="results">

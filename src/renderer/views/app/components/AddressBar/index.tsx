@@ -1,3 +1,5 @@
+import isPropValid from '@emotion/is-prop-valid';
+import { StyleSheetManager } from 'styled-components';
 import * as React from 'react';
 import { observer } from 'mobx-react-lite';
 
@@ -159,6 +161,19 @@ const onBlur = (e: React.FocusEvent<HTMLInputElement>) => {
   }
 };
 
+
+const LockIconSvg: React.FC<{ className?: string }> = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+    <path d="M12 2a5 5 0 00-5 5v3H6a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2v-8a2 2 0 00-2-2h-1V7a5 5 0 00-5-5zm3 8V7a3 3 0 10-6 0v3h6zm-3 4a2 2 0 110 4 2 2 0 010-4z" fill="currentColor"/>
+  </svg>
+);
+
+const NotSecureIconSvg: React.FC<{ className?: string }> = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+    <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" fill="currentColor"/>
+  </svg>
+);
+
 export const AddressBar = observer(() => {
   const [appIconUrl, setAppIconUrl] = React.useState<string | null>(null);
   React.useEffect(() => {
@@ -171,7 +186,7 @@ export const AddressBar = observer(() => {
   }, []);
   return (
     <StyledAddressBar onContextMenuCapture={onAddressBarContextMenu}
-      ref={(r) => (addressbarRef = r)}
+      ref={(r: any) => (addressbarRef = r)}
       focus={store.addressbarFocused}
     >
 
@@ -220,14 +235,7 @@ export const AddressBar = observer(() => {
             danger={danger}
             onClick={() => {}}
           >
-<div
-              className="icon"
-              style={{
-                backgroundImage: `url(${icon})`,
-                filter: store.theme['toolbar.lightForeground'] && !danger && !isTrusted ? 'brightness(0) invert(1)' : 'none',
-                marginLeft: (isSecure && !isInternal) ? '1.5px' : '-1px',
-              }}
-            />
+<img className="icon" src={icon} alt="" style={{ width: 16, height: 16, maxWidth: 16, maxHeight: 16, display: "inline-block", filter: store.theme["toolbar.lightForeground"] && !danger && !isTrusted ? "brightness(0) invert(1)" : "none", marginLeft: (isSecure && !isInternal) ? "1.5px" : "-1px" }} />
             {expanded && <div className="label">{label}</div>}
           </SecurityButton>
         );
@@ -237,7 +245,7 @@ export const AddressBar = observer(() => {
         <Input
           data-addressbar-input="true"
           onContextMenuCapture={onAddressBarContextMenu}
-          ref={(r) => (store.inputRef = r)}
+          ref={(r: any) => (store.inputRef = r)}
           spellCheck={false}
           onKeyDown={onKeyDown}
           onMouseDown={onMouseDown}

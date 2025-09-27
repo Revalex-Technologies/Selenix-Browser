@@ -58,7 +58,7 @@ const goForward = () => {
   ipcRenderer.invoke('web-contents-call', { webContentsId: tabId, method: 'navigationHistory.goForward' });
 };
 
-window.addEventListener('mouseup', (e) => {
+window.addEventListener('mouseup', (e: any) => {
   if (e.button === 3) {
     e.preventDefault();
     goBack();
@@ -98,7 +98,7 @@ function getScrollStartPoint(x: number, y: number) {
   return { left, right };
 }
 
-document.addEventListener('wheel', (e) => {
+document.addEventListener('wheel', (e: any) => {
   verticalMouseMove += e.deltaY;
   horizontalMouseMove += e.deltaX;
 

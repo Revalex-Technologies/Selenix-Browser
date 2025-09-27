@@ -1,3 +1,5 @@
+import isPropValid from '@emotion/is-prop-valid';
+import { StyleSheetManager } from 'styled-components';
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -18,7 +20,7 @@ export const CloseButton = () => {
   );
 };
 
-export const Dialog = styled.div`
+export const Dialog = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'visible' })<{ visible?: boolean;}>`
   width: 100%;
   max-width: 512px;
   height: fit-content;
@@ -29,7 +31,7 @@ export const Dialog = styled.div`
   transition: 0.15s transform ${EASING_FUNCTION};
   ${robotoRegular()};
 
-  ${({ visible }: { visible: boolean }) => css`
+  ${({ visible = false }: { visible?: boolean }) => css`
     pointer-events: ${visible ? 'inherit' : 'none'};
     opacity: ${visible ? 1 : 0};
     transform: ${visible ? 'translate3d(0, 0, 0)' : 'translate3d(0, -24px, 0)'};

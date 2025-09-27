@@ -1,6 +1,7 @@
+import isPropValid from '@emotion/is-prop-valid';
 import * as React from 'react';
 import { observer } from 'mobx-react-lite';
-import { ThemeProvider } from 'styled-components';
+import { ThemeProvider, StyleSheetManager  } from 'styled-components';
 
 import { StyledApp, Label, Buttons, Spacer } from './style';
 import { ToolbarButton } from '../../../app/components/ToolbarButton';
@@ -31,7 +32,7 @@ export const App = observer(() => {
   return (
     <ThemeProvider theme={{ ...store.theme }}>
       <StyledApp
-        visible={store.visible}
+        $visible={store.visible}
         onMouseEnter={() => store.stopHideTimer()}
         onMouseLeave={() => store.resetHideTimer()}
       >

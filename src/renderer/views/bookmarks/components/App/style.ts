@@ -31,7 +31,7 @@ export const PathItem = styled.div`
   }
 `;
 
-export const Dialog = styled.div`
+export const Dialog = styled.div.withConfig({ shouldForwardProp: (p) => !['visible'].includes(p as string) })<{ visible: boolean; theme?: ITheme;}>`
   position: fixed;
   width: 512px;
   padding: 16px;

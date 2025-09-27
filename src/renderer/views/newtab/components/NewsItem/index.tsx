@@ -1,3 +1,5 @@
+import isPropValid from '@emotion/is-prop-valid';
+import { StyleSheetManager } from 'styled-components';
 import * as React from 'react';
 import { observer } from 'mobx-react-lite';
 
@@ -31,7 +33,7 @@ export const NewsItem = observer(({ item }: { item: INewsItem }) => {
 
   return (
     <StyledNewsItem href={item.url}>
-      <Img src={img}></Img>
+      <Img $src={img} />
       <Info>
         <Title>{item.title}</Title>
         <Description>{item.description}</Description>

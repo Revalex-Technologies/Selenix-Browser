@@ -10,6 +10,5 @@ export interface NetworkService {
   request(url: string): Promise<ResponseDetails>;
 }
 
-export const networkMainChannel = new RendererToMainChannel<NetworkService>(
-  'NetworkService',
-);
+let _networkMainChannel: RendererToMainChannel<NetworkService> | undefined;
+export const getNetworkMainChannel = () => (_networkMainChannel ??= new RendererToMainChannel<NetworkService>('NetworkService'));

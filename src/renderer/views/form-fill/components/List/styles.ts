@@ -11,14 +11,14 @@ export const StyledList = styled.div`
   ${noButtons()};
 `;
 
-export const StyledItem = styled.div`
+export const StyledItem = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'subtext' })<{ subtext?: boolean;}>`
   width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   cursor: pointer;
 
-  ${({ subtext }: { subtext: boolean }) => css`
+  ${({ subtext = false }: { subtext?: boolean }) => css`
     height: ${subtext ? 56 : 32}px;
   `}
 

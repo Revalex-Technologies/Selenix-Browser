@@ -1,3 +1,5 @@
+import isPropValid from '@emotion/is-prop-valid';
+import { StyleSheetManager } from 'styled-components';
 import * as React from 'react';
 
 import { IFormFillData } from '~/interfaces';
@@ -46,7 +48,7 @@ export const Section = (props: Props) => {
         <Label>{label}</Label>
         <DropIcon expanded={expanded} />
       </Header>
-      <Container expanded={expanded} style={style}>
+      <Container $expanded={expanded} style={style}>
         {children}
       </Container>
     </StyledSection>

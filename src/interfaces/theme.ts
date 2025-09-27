@@ -46,5 +46,7 @@ export interface ITheme {
   tabMarginTop?: number;
   isCompact?: boolean;
 
+  searchBoxHeight?: number;
+
   dark?: boolean;
 }

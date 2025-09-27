@@ -1,9 +1,10 @@
+import isPropValid from '@emotion/is-prop-valid';
 
 import * as React from 'react';
 import { observer } from 'mobx-react-lite';
 
 import store from '../../store';
-import { ThemeProvider, createGlobalStyle } from 'styled-components';
+import { ThemeProvider, StyleSheetManager, createGlobalStyle  } from 'styled-components';
 import { Container, Content, LeftContent } from '~/renderer/components/Pages';
 import styled from 'styled-components';
 import { baseStyle, WebUIStyle } from '~/renderer/mixins/default-styles';

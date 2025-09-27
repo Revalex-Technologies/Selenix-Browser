@@ -4,7 +4,7 @@ import { centerIcon } from '~/renderer/mixins';
 import { ITheme } from '~/interfaces';
 import { transparency } from '~/renderer/constants';
 
-export const StyledNavigationDrawerItem = styled.div`
+export const StyledNavigationDrawerItem = styled.div.withConfig({ shouldForwardProp: (p) => !['selected'].includes(p as string) })<{ selected: boolean }>`
   padding: 4px 16px;
   display: flex;
   height: 40px;
@@ -36,7 +36,7 @@ export const StyledNavigationDrawerItem = styled.div`
   }
 `;
 
-export const Icon = styled.div`
+export const Icon = styled.div.withConfig({ shouldForwardProp: (p) => !['selected'].includes(p as string) })`
   height: 24px;
   width: 24px;
   min-width: 24px;

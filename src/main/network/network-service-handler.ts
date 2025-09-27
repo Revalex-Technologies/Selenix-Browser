@@ -1,5 +1,5 @@
 import { RpcMainEvent, RpcMainHandler } from '@wexond/rpc-electron';
-import { networkMainChannel, NetworkService } from '~/common/rpc/network';
+import { getNetworkMainChannel, NetworkService } from '~/common/rpc/network';
 import { requestURL } from './request';
 
 export class NetworkServiceHandler implements RpcMainHandler<NetworkService> {
@@ -11,7 +11,7 @@ export class NetworkServiceHandler implements RpcMainHandler<NetworkService> {
   }
 
   constructor() {
-    networkMainChannel.getReceiver().handler = this;
+    getNetworkMainChannel().getReceiver().handler = this;
   }
 
   request(e: RpcMainEvent, url: string) {

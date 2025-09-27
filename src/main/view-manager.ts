@@ -123,7 +123,7 @@ export class ViewManager extends EventEmitter {
       this.emitZoomUpdate();
     });
 
-    ipcMain.on('reset-zoom', (e) => {
+    ipcMain.on('reset-zoom', (e: any) => {
       this.selected.webContents.zoomFactor = 1;
       this.selected.emitEvent(
         'zoom-updated',

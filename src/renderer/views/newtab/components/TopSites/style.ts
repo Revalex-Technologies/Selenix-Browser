@@ -21,10 +21,10 @@ export const ItemBase = styled.div`
   height: 90px;
 `;
 
-export const Placeholder = styled(ItemBase)`
+export const Placeholder = styled(ItemBase).withConfig({ shouldForwardProp: (p) => p !== 'imageSet' })<{ imageSet?: boolean; theme?: ITheme;}>`
   box-sizing: border-box;
 
-  ${({ theme, imageSet }: { theme?: ITheme; imageSet: boolean }) => css`
+  ${({ theme, imageSet = false }: { theme?: ITheme; imageSet?: boolean }) => css`
     border: 2px dashed
       ${!imageSet && !theme['pages.lightForeground']
         ? 'rgba(0, 0, 0, 0.2)'

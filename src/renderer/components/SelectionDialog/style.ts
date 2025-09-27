@@ -2,7 +2,7 @@ import styled, { css } from 'styled-components';
 import { shadows } from '~/renderer/mixins';
 import { ITheme } from '~/interfaces';
 
-export const StyledSmallDialog = styled.div`
+export const StyledSmallDialog = styled.div.withConfig({ shouldForwardProp: (p) => !['visible'].includes(p as string) })<{ visible: boolean }>`
   width: fit-content;
   position: fixed;
   top: 16px;
@@ -31,7 +31,7 @@ export const StyledSmallDialog = styled.div`
   `};
 `;
 
-export const Title = styled.div`
+export const Title = styled.div.withConfig({ shouldForwardProp: (p) => !['visible'].includes(p as string) })`
   font-size: 12px;
   margin-right: 4px;
 `;

@@ -1,3 +1,5 @@
+import isPropValid from '@emotion/is-prop-valid';
+import { StyleSheetManager } from 'styled-components';
 import * as React from 'react';
 import { observer } from 'mobx-react-lite';
 import { shell, ipcRenderer } from 'electron';
@@ -39,7 +41,7 @@ const DownloadRow = observer(({ item }: { item: IDownloadItem }) => {
   const received = formatBytes(item.receivedBytes);
 
   return (
-    <StyledDownloadItem onContextMenu={(e) => showDownloadContextMenu(item, e)}>
+    <StyledDownloadItem onContextMenu={(e: any) => showDownloadContextMenu(item, e)}>
       <Icon />
       <Info>
         <Title>{item.fileName}</Title>
@@ -57,7 +59,7 @@ const DownloadRow = observer(({ item }: { item: IDownloadItem }) => {
         )}
       </Info>
       <Separator />
-      <MoreButton onClick={(e) => showDownloadContextMenu(item, e)} />
+      <MoreButton onClick={(e: any) => showDownloadContextMenu(item, e)} />
     </StyledDownloadItem>
   );
 });

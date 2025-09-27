@@ -9,12 +9,12 @@ export const Line = styled.div`
   margin-top: 4px;
   margin-bottom: 4px;
 
-  ${({ theme }: { theme?: ITheme }) => css`
+  ${({ theme }) => css`
     background-color: ${theme['dialog.separator.color']};
   `};
 `;
 
-export const MenuItem = styled.div`
+export const MenuItem = styled.div.withConfig({ shouldForwardProp: (p) => !['arrow','disabled'].includes(p as string) })<{ arrow?: boolean; disabled?: boolean; theme?: ITheme;}>`
   height: 36px;
   align-items: center;
   display: flex;
@@ -34,7 +34,7 @@ export const MenuItem = styled.div`
         opacity: 0.54;
         ${centerIcon(20)};
         background-image: url(${ICON_ARROW_RIGHT});
-        ${({ theme }: { theme?: ITheme }) => css`
+        ${({ theme }) => css`
           filter: ${theme['dialog.lightForeground'] ? 'invert(100%)' : 'none'};
         `};
       }
@@ -47,7 +47,7 @@ export const MenuItem = styled.div`
     `};
 
   &:hover {
-    ${({ theme }: { theme?: ITheme }) => css`
+    ${({ theme }) => css`
       background-color: ${theme['dialog.lightForeground']
         ? 'rgba(255, 255, 255, 0.06)'
         : 'rgba(0, 0, 0, 0.03)'};
@@ -65,7 +65,7 @@ export const MenuItems = styled.div`
   padding-top: 4px;
   padding-bottom: 4px;
 
-  ${({ theme }: { theme?: ITheme }) => css`
+  ${({ theme }) => css`
     background-color: ${theme['dialog.backgroundColor']};
     color: ${theme['dialog.textColor']};
   `};
@@ -77,7 +77,7 @@ export const Content = styled.div`
   position: relative;
 `;
 
-export const Icon = styled.div`
+export const Icon = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'icon' })<{ icon?: string;}>`
   margin-right: 12px;
   width: 20px;
   height: 20px;

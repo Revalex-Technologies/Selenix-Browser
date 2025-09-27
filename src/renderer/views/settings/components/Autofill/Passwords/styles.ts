@@ -31,17 +31,17 @@ export const Wrapper = styled.div`
   align-items: center;
 `;
 
-export const Icon = styled.div`
+export const Icon = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'icon' })<{ icon?: string;}>`
   width: 16px;
   height: 16px;
   ${centerIcon('contain')};
 
-  ${({ icon }: { icon: string }) => css`
+  ${({ icon = '' }: { icon?: string }) => css`
     background-image: url(${icon});
   `};
 `;
 
-export const PasswordIcon = styled.div`
+export const PasswordIcon = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'toggled' })<{ toggled?: boolean;}>`
   width: 20px;
   height: 20px;
   margin-left: auto;

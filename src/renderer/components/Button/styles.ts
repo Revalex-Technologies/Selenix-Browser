@@ -6,7 +6,7 @@ interface StyledButtonProps {
   type?: 'contained' | 'outlined';
 }
 
-export const StyledButton = styled.div`
+export const StyledButton = styled.div.withConfig({ shouldForwardProp: (p) => !['background','foreground','type'].includes(p as string) })<StyledButtonProps>`
   min-width: 80px;
   width: fit-content;
   height: 32px;

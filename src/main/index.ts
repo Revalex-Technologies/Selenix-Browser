@@ -47,11 +47,11 @@ app.on('window-all-closed', () => {
   }
 });
 
-ipcMain.on('get-webcontents-id', (e) => {
+ipcMain.on('get-webcontents-id', (e: any) => {
   e.returnValue = e.sender.id;
 });
 
-ipcMain.on('get-window-id', (e) => {
+ipcMain.on('get-window-id', (e: any) => {
   e.returnValue = (e.sender as any).windowId;
 });
 

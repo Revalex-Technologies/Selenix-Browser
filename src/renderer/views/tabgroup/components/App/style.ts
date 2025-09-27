@@ -7,7 +7,7 @@ export const StyledApp = styled(DialogStyle)`
   padding: 16px;
 `;
 
-export const Title = styled.div`
+export const Title = styled.div.withConfig({ shouldForwardProp: (p) => !['color'].includes(p as string) })<{ color?: string; theme?: ITheme; }>`
   font-size: 16px;
 `;
 
@@ -41,7 +41,7 @@ export const Color = styled.div`
   position: relative;
   overflow: hidden;
 
-  ${({ color }: { color: string }) => css`
+  ${({ color = 'transparent' }: { color?: string }) => css`
     background-color: ${color};
   `}
 

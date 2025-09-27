@@ -1,6 +1,7 @@
+import isPropValid from '@emotion/is-prop-valid';
 import { observer } from 'mobx-react-lite';
 import * as React from 'react';
-import { ThemeProvider } from 'styled-components';
+import { ThemeProvider, StyleSheetManager  } from 'styled-components';
 
 import { StyledApp, Line } from './style';
 import { Titlebar } from '../Titlebar';

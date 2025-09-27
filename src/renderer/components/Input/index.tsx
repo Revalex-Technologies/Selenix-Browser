@@ -31,7 +31,7 @@ export const Input = styled.input.attrs(() => ({
   ${Control}
 `;
 
-export const Dropdown = styled.div`
+export const Dropdown = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'dark' })<{ dark?: boolean;}>`
   ${Control}
 
   &:after {
@@ -43,7 +43,7 @@ export const Dropdown = styled.div`
     ${centerIcon()};
     background-image: url(${ICON_DROPDOWN});
 
-    ${({ dark }: { dark: boolean }) => css`
+    ${({ dark }: { dark?: boolean }) => css`
       filter: ${dark ? 'invert(100%)' : 'none'};
     `}
   }

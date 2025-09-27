@@ -34,13 +34,10 @@ export const DialogStyle = styled(DialogBaseStyle)`
   animation: 0.15s ease-out 0s 1 fadeIn;
 `;
 
-export const PersistentDialogStyle = styled(DialogBaseStyle)`
+export const PersistentDialogStyle = styled(DialogBaseStyle).withConfig({ shouldForwardProp: (p) => !['visible','hideTransition'].includes(p as string) })<{ visible?: boolean; hideTransition?: boolean;}>`
   ${({
     visible,
     hideTransition,
-  }: {
-    visible: boolean;
-    hideTransition?: boolean;
   }) => css`
     transition: ${!visible && !hideTransition ? 'none' : DIALOG_TRANSITION};
     opacity: ${visible ? 1 : 0};

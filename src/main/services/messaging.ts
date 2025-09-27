@@ -16,9 +16,8 @@ void (async () => {
 
     const electronStoreMod = await import('electron-store');
     const Store = (electronStoreMod as any).default as typeof import('electron-store').default;
-    try { console.log('[credentials] electron-store version', require('electron-store/package.json').version); } catch {}
-
-    const store = new (Store as any)({
+    /* removed version log that imported electron-store/package.json to fix webpack export error */
+const store = new (Store as any)({
       name: 'credentials',
 
       encryptionKey: process.env.ELECTRON_STORE_KEY || undefined,
@@ -208,7 +207,7 @@ export const runMessagingService = (appWindow: AppWindow) => {
     appWindow.send(`edit-tabgroup`, tabGroup);
   });
 
-  ipcMain.on(`is-incognito-${id}`, (e) => {
+  ipcMain.on(`is-incognito-${id}`, (e: any) => {
     e.returnValue = appWindow.incognito;
   });
 

@@ -102,7 +102,7 @@ export class StorageService {
       await this.exportBookmarks();
     });
 
-    ipcMain.handle('bookmarks-get', (e) => {
+    ipcMain.handle('bookmarks-get', (e: any) => {
       return this.bookmarks;
     });
 
@@ -123,7 +123,7 @@ export class StorageService {
       return b;
     });
 
-    ipcMain.handle('bookmarks-get-folders', async (e) => {
+    ipcMain.handle('bookmarks-get-folders', async (e: any) => {
       return this.bookmarks.filter((x) => x.isFolder);
     });
 
@@ -131,7 +131,7 @@ export class StorageService {
       await this.updateBookmark(id, change);
     });
 
-    ipcMain.handle('history-get', (e) => {
+    ipcMain.handle('history-get', (e: any) => {
       return this.history;
     });
 

@@ -4,7 +4,7 @@ import { EASING_FUNCTION, BLUE_500 } from '~/renderer/constants';
 import { ICON_CHECK } from '~/renderer/constants/icons';
 import { centerIcon, centerBoth } from '~/renderer/mixins';
 
-export const Container = styled.div`
+export const Container = styled.div.withConfig({ shouldForwardProp: (p) => !['toggled'].includes(p as string) })`
   height: 40px;
   display: flex;
   align-items: center;
@@ -18,7 +18,7 @@ export const Container = styled.div`
   }
 `;
 
-export const StyledCheckbox = styled.div`
+export const StyledCheckbox = styled.div.withConfig({ shouldForwardProp: (p) => !['toggled'].includes(p as string) })< { toggled: boolean } >`
   width: 18px;
   height: 18px;
   box-sizing: border-box;
@@ -28,7 +28,7 @@ export const StyledCheckbox = styled.div`
   border-style: solid;
   transition: 0.15s background-color, 0.15s border-color;
 
-  ${({ toggled }: { toggled: boolean }) => css`
+  ${({ toggled = false }: { toggled?: boolean }) => css`
     background-color: ${toggled ? BLUE_500 : 'transparent'};
     border-color: ${toggled ? BLUE_500 : 'rgba(0, 0, 0, 0.54)'};
 
@@ -52,7 +52,7 @@ export const StyledCheckbox = styled.div`
   }
 `;
 
-export const Icon = styled.div`
+export const Icon = styled.div.withConfig({ shouldForwardProp: (p) => !['toggled'].includes(p as string) })< { toggled: boolean } >`
   width: 100%;
   height: 100%;
   position: absolute;
@@ -64,7 +64,7 @@ export const Icon = styled.div`
   filter: invert(100%);
   ${centerIcon(22)};
 
-  ${({ toggled }: { toggled: boolean }) => css`
+  ${({ toggled = false }: { toggled?: boolean }) => css`
     clip-path: ${toggled ? 'inset(0 0 0 0)' : 'inset(100% 50% 0 50%)'};
   `};
 `;

@@ -1,3 +1,4 @@
+import isPropValid from '@emotion/is-prop-valid';
 import * as React from 'react';
 import { observer } from 'mobx-react-lite';
 
@@ -8,7 +9,7 @@ import { Privacy } from '../Privacy';
 import store from '../../store';
 import { NavigationDrawer } from '~/renderer/components/NavigationDrawer';
 import { Button } from '~/renderer/components/Button';
-import { ThemeProvider } from 'styled-components';
+import { ThemeProvider, StyleSheetManager  } from 'styled-components';
 import { Autofill } from '../Autofill';
 import { OnStartup } from '../Startup';
 import { Content, LeftContent, Container } from '~/renderer/components/Pages';
@@ -156,7 +157,7 @@ export default observer(() => {
       theme={{ ...store.theme, dark: store.theme['pages.lightForeground'] }}
     >
       <Container
-        onMouseDown={(e) => (store.dialogVisible = false)}
+        onMouseDown={(e: any) => (store.dialogVisible = false)}
         darken={store.dialogVisible}
       >
         <WebUIStyle />
@@ -189,7 +190,7 @@ export default observer(() => {
           )}
         </ContextMenu>
         <Dialog
-          onMouseDown={(e) => e.stopPropagation()}
+          onMouseDown={(e: any) => e.stopPropagation()}
           visible={store.dialogVisible}
           ref={store.dialogRef}
           style={{ width: 350 }}

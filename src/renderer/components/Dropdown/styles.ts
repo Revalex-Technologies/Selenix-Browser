@@ -8,7 +8,7 @@ import {
 import { centerIcon } from '~/renderer/mixins';
 import { ITheme } from '~/interfaces';
 
-export const StyledDropdown = styled.div`
+export const StyledDropdown = styled.div.withConfig({ shouldForwardProp: (p) => !['expanded'].includes(p as string) })<{ expanded: boolean }>`
   height: 32px;
   min-width: 200px;
   position: relative;
@@ -27,7 +27,7 @@ export const StyledDropdown = styled.div`
   `}
 `;
 
-export const Label = styled.div`
+export const Label = styled.div.withConfig({ shouldForwardProp: (p) => !['expanded'].includes(p as string) })`
   font-size: 13px;
   margin-left: 8px;
   pointer-events: none;
@@ -37,7 +37,7 @@ export const Label = styled.div`
   `}
 `;
 
-export const DropIcon = styled.div`
+export const DropIcon = styled.div.withConfig({ shouldForwardProp: (p) => !['expanded'].includes(p as string) })<{ expanded: boolean }>`
   width: 24px;
   height: 24px;
   margin-left: auto;

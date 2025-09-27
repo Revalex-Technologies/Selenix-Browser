@@ -1,4 +1,4 @@
-import { networkMainChannel } from '~/common/rpc/network';
+import { getNetworkMainChannel } from '~/common/rpc/network';
 import { IHistoryItem } from '~/interfaces';
 
 import store from '../store';
@@ -94,7 +94,7 @@ export const getSearchSuggestions = (filter: string) =>
 
       const data = JSON.parse(
         (
-          await networkMainChannel
+          await getNetworkMainChannel()
             .getInvoker()
             .request(
               store.searchEngine.keywordsUrl.replace(

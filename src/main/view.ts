@@ -99,7 +99,7 @@ export class View {
       },
     );
 
-    ipcMain.handle(`get-error-url-${this.id}`, async (e) => {
+    ipcMain.handle(`get-error-url-${this.id}`, async (e: any) => {
       return this.errorURL;
     });
 

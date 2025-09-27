@@ -1,9 +1,10 @@
+import isPropValid from '@emotion/is-prop-valid';
 import * as React from 'react';
 import { observer } from 'mobx-react-lite';
 
 import store from '../../store';
 import { NavigationDrawer } from '~/renderer/components/NavigationDrawer';
-import { ThemeProvider } from 'styled-components';
+import { ThemeProvider, StyleSheetManager  } from 'styled-components';
 import { SelectionDialog } from '~/renderer/components/SelectionDialog';
 import { Container, Content, LeftContent } from '~/renderer/components/Pages';
 import { GlobalNavigationDrawer } from '~/renderer/components/GlobalNavigationDrawer';

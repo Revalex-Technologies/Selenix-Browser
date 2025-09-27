@@ -4,7 +4,7 @@ import { robotoRegular } from '~/renderer/mixins';
 import { ITheme } from '~/interfaces';
 import { DialogStyle } from '~/renderer/mixins/dialogs';
 
-export const StyledApp = styled(DialogStyle)`
+export const StyledApp = styled(DialogStyle).withConfig({ shouldForwardProp: (p) => p !== 'visible' })<{ visible?: boolean; theme?: ITheme;}>`
   padding: 16px;
   overflow: visible;
 
@@ -14,7 +14,7 @@ export const StyledApp = styled(DialogStyle)`
     margin-left: auto;
   }
 
-  ${({ theme }: { theme?: ITheme; visible: boolean }) => css`
+  ${({ theme }: { theme?: ITheme; visible?: boolean }) => css`
     color: ${theme['dialog.lightForeground'] ? '#fff' : '#000'};
   `}
 `;

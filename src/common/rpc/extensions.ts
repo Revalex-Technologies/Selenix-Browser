@@ -4,6 +4,5 @@ export interface ExtensionMainService {
   uninstall(id: string): void;
 }
 
-export const extensionMainChannel = new RendererToMainChannel<ExtensionMainService>(
-  'ExtensionMainService',
-);
+let _extensionMainChannel: RendererToMainChannel<ExtensionMainService> | undefined;
+export const getExtensionMainChannel = () => (_extensionMainChannel ??= new RendererToMainChannel<ExtensionMainService>('ExtensionMainService'));

@@ -18,7 +18,7 @@ class Store {
     makeObservable(this);
 
     // Keep the theme in sync with settings messages
-    window.addEventListener('message', (e) => {
+    window.addEventListener('message', (e: any) => {
       if (e.data && e.data.type === 'set-settings') {
         const next = JSON.parse(e.data.data) as ISettings;
         this.settings = { ...this.settings, ...next };

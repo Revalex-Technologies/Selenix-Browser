@@ -1,3 +1,5 @@
+import isPropValid from '@emotion/is-prop-valid';
+import { StyleSheetManager } from 'styled-components';
 import * as React from 'react';
 import { observer } from 'mobx-react-lite';
 
@@ -48,7 +50,7 @@ export const SwitchItem = observer(
     disabled?: boolean;
   }) => {
     return (
-      <ContextMenuItem bigger disabled={disabled} onClick={onSwitchClick(name)}>
+      <ContextMenuItem $bigger disabled={disabled} onClick={onSwitchClick(name)}>
         <div style={{ flex: 1 }}>{children}</div>
         <Switch value={(store as any)[name]}></Switch>
       </ContextMenuItem>
@@ -64,7 +66,7 @@ export const Preferences = observer(() => {
     fileInputRef.current?.click();
   };
 
-  const onCustomFileChange: React.ChangeEventHandler<HTMLInputElement> = async (e) => {
+  const onCustomFileChange: React.ChangeEventHandler<HTMLInputElement> = async (e: any) => {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
     try {
@@ -94,10 +96,10 @@ export const Preferences = observer(() => {
   return (
     <ContextMenu
       translucent
-      bigger
+      $bigger
       style={{ right: 32, top: 68, width: 275 }}
       visible={store.dashboardSettingsVisible}
-      onMouseDown={(e) => e.stopPropagation()}
+      onMouseDown={(e: any) => e.stopPropagation()}
     >
       <div
         style={{
@@ -124,10 +126,10 @@ export const Preferences = observer(() => {
         >
           <Title style={{ marginLeft: 20 }}>Page layout</Title>
 
-          <ContextMenuSeparator bigger></ContextMenuSeparator>
+          <ContextMenuSeparator />
 
           <ContextMenuItem
-            bigger
+            $bigger
             onClick={onPresetClick('focused')}
             selected={store.preset === 'focused'}
             iconSize={28}
@@ -136,7 +138,7 @@ export const Preferences = observer(() => {
             Focused
           </ContextMenuItem>
           <ContextMenuItem
-            bigger
+            $bigger
             onClick={onPresetClick('inspirational')}
             selected={store.preset === 'inspirational'}
             iconSize={28}
@@ -146,7 +148,7 @@ export const Preferences = observer(() => {
           </ContextMenuItem>
           {}
           <ContextMenuItem
-            bigger
+            $bigger
             selected={store.preset === 'custom'}
             onClick={onCustomClick}
             iconSize={28}
@@ -172,16 +174,16 @@ export const Preferences = observer(() => {
           }}
         >
           <Title>
-            <Back onClick={onBackClick} icon={ICON_BACK}></Back>
+            <Back onClick={onBackClick}></Back>
             Custom
           </Title>
-          <ContextMenuSeparator bigger></ContextMenuSeparator>
+          <ContextMenuSeparator />
           <SwitchItem name="imageVisible">Show image</SwitchItem>
           <SwitchItem disabled={!store.imageVisible} name="changeImageDaily">
             Change the image daily
           </SwitchItem>
           <ContextMenuItem
-            bigger
+            $bigger
             disabled={!store.imageVisible || store.changeImageDaily}
             onClick={onPickCustomImage}
           >

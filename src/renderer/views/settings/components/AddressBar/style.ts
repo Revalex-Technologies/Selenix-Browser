@@ -8,7 +8,7 @@ export const EnginesTable = styled.div`
   flex-flow: column;
 `;
 
-export const TableRow = styled.div`
+export const TableRow = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'bold' })<{ bold?: boolean;}>`
   margin-right: 0;
   display: grid;
   grid-template-columns: 4fr 3fr 3fr 38px;

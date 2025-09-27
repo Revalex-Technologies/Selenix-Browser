@@ -28,13 +28,13 @@ export class Settings extends EventEmitter {
       },
     );
 
-    ipcMain.on('get-settings-sync', async (e) => {
+    ipcMain.on('get-settings-sync', async (e: any) => {
       await this.onLoad();
       this.update();
       e.returnValue = this.object;
     });
 
-    ipcMain.on('get-settings', async (e) => {
+    ipcMain.on('get-settings', async (e: any) => {
       await this.onLoad();
       this.update();
       e.sender.send('update-settings', this.object);
@@ -104,7 +104,7 @@ export class Settings extends EventEmitter {
       Application.instance.sessions.viewIncognito,
     ];
 
-    contexts.forEach((e) => {
+    contexts.forEach((e: any) => {
       if (this.object.shield) {
         runAdblockService();
       } else {

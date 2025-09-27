@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components';
 
-export const Container = styled.div`
+export const Container = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'darken' })<{ darken?: boolean;}>`
   display: flex;
   overflow: auto;
   height: 100vh;

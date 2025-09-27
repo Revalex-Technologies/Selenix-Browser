@@ -1,3 +1,5 @@
+import isPropValid from '@emotion/is-prop-valid';
+import { StyleSheetManager } from 'styled-components';
 import * as React from 'react';
 import { observer } from 'mobx-react-lite';
 import {
@@ -85,7 +87,7 @@ export const DownloadItem = observer(({ item }: { item: IDownloadItem }) => {
         )}
       </Info>
       <Separator></Separator>
-      <MoreButton onClick={(e) => showDownloadContextMenu(item, e)} onContextMenu={(e) => showDownloadContextMenu(item, e)}></MoreButton>
+      <MoreButton onClick={(e: any) => showDownloadContextMenu(item, e)} onContextMenu={(e: any) => showDownloadContextMenu(item, e)}></MoreButton>
     </StyledDownloadItem>
   );
 });

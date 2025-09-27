@@ -4,7 +4,7 @@ import { shadows, centerIcon } from '~/renderer/mixins';
 import { ITheme } from '~/interfaces';
 import { DIALOG_EASING } from '~/renderer/constants';
 
-export const ContextMenu = styled.div`
+export const ContextMenu = styled.div.withConfig({ shouldForwardProp: (p) => !['visible','$bigger','translucent'].includes(p as string) })<{ visible: boolean; $bigger?: boolean; translucent?: boolean; theme?: ITheme;}>`
   outline: none;
   position: absolute;
   backface-visibility: hidden;
@@ -19,15 +19,15 @@ export const ContextMenu = styled.div`
   ${({
     visible,
     theme,
-    bigger,
+    $bigger,
     translucent,
   }: {
     visible: boolean;
     theme?: ITheme;
-    bigger?: boolean;
+    $bigger?: boolean;
     translucent?: boolean;
   }) => css`
-    padding: ${bigger ? 8 : 4}px 0;
+    padding: ${$bigger ? 8 : 4}px 0;
     transition: ${visible
       ? `0.35s opacity ${DIALOG_EASING}, 0.35s transform ${DIALOG_EASING}`
       : 'none'};
@@ -40,13 +40,13 @@ export const ContextMenu = styled.div`
   `}
 `;
 
-export const ContextMenuSeparator = styled.div`
+export const ContextMenuSeparator = styled.div.withConfig({ shouldForwardProp: (p) => p !== '$bigger' })<{ $bigger?: boolean }>`
   height: 1px;
   width: 100%;
 
-  ${({ theme, bigger }: { theme?: ITheme; bigger?: boolean }) => css`
+  ${({ theme, $bigger }: { theme?: ITheme; $bigger?: boolean }) => css`
     background-color: ${theme['dropdown.separator.color']};
-    margin: ${bigger ? 8 : 4}px 0px;
+    margin: ${$bigger ? 8 : 4}px 0px;
   `}
 `;
 
@@ -60,13 +60,13 @@ export interface ContextMenuItemProps {
   icon?: string;
   selected?: boolean;
   theme?: ITheme;
-  bigger?: boolean;
+  $bigger?: boolean;
   visible?: boolean;
   iconSize?: number;
   disabled?: boolean;
 }
 
-export const ContextMenuItem = styled.div`
+export const ContextMenuItem = styled.div.withConfig({ shouldForwardProp: (p) => !['icon','selected','$bigger','visible','iconSize','disabled'].includes(p as string) })<ContextMenuItemProps>`
   padding: 12px 24px;
   font-weight: 400;
   position: relative;
@@ -75,15 +75,15 @@ export const ContextMenuItem = styled.div`
     icon,
     selected,
     theme,
-    bigger,
+    $bigger,
     visible,
     iconSize,
     disabled,
   }: ContextMenuItemProps) => css`
     pointer-events: ${disabled ? 'none' : 'inherit'};
     opacity: ${disabled ? 0.38 : 1};
-    font-size: ${bigger ? 14 : 13}px;
-    padding: ${bigger ? 12 : 10}px ${bigger ? 20 : 12}px;
+    font-size: ${$bigger ? 14 : 13}px;
+    padding: ${$bigger ? 12 : 10}px ${$bigger ? 20 : 12}px;
     align-items: center;
     display: ${visible === undefined || visible ? 'flex' : 'none'};
     background-color: ${selected

@@ -2,8 +2,9 @@ import styled, { css } from 'styled-components';
 import { ITheme } from '~/interfaces';
 import { BLUE_300 } from '~/renderer/constants';
 
-export const StyledAddressBar = styled.div`
+export const StyledAddressBar = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'focus' })<{ focus?: boolean;}>`
   height: 26px;
+  line-height: 25px;
   flex: 1;
   border-radius: 4px;
   margin: 0 7px;
@@ -47,7 +48,7 @@ export const InputContainer = styled.div`
   overflow: hidden;
 `;
 
-export const Text = styled.div`
+export const Text = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'visible' })<{ visible?: boolean;}>`
   pointer-events: none;
   position: absolute;
   top: 50%;
@@ -64,14 +65,15 @@ export const Text = styled.div`
   `};
 `;
 
-export const Input = styled.input`
+export const Input = styled.input.withConfig({ shouldForwardProp: (p) => p !== 'visible' })<{ visible?: boolean;}>`
   outline: none;
   min-width: 0;
   width: 100%;
   height: 100%;
+  line-height: 25px;
   background-color: transparent;
   border: none;
-  padding: 0;
+  padding: 0; padding-top: 1px;
   margin: 0;
   color: black;
   font-family: inherit;
@@ -98,9 +100,36 @@ export const Input = styled.input`
   `};
 `;
 
+export const SecurityButton = styled.div.withConfig({ shouldForwardProp: (p) => !['expanded','danger'].includes(p as string) })<{expanded?: boolean; danger?: boolean;}>`
+  /* ensure the icon is perfectly centered within the button */
+  display: inline-grid;
+  place-items: center;
+  /* keep content from shifting on hover/expand */
+  box-sizing: border-box;
 
+  /* nudge the svg slightly left for optical centering */
+  & .icon,
+  & .icon svg {
+    position: relative;
+    left: -1px;
+  }
 
-export const SecurityButton = styled.div<{expanded?: boolean; danger?: boolean;}>`
+  /* clamp any icon elements inside the security button */
+  & .icon,
+  & .icon img,
+  & .icon svg {
+    width: 16px !important;
+    height: 16px !important;
+    max-width: 16px;
+    max-height: 16px;
+    flex: 0 0 16px;
+    display: inline-block;
+    vertical-align: middle;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 16px 16px;
+  }
+
   &:hover {
     background-color: rgba(255,255,255,0.14);
   }
@@ -110,6 +139,7 @@ export const SecurityButton = styled.div<{expanded?: boolean; danger?: boolean;}
   gap: 6px;
   padding: 0 8px;
   height: 26px;
+  line-height: 25px;
   min-width: 34px;
   border-radius: 4px;
   margin-left: 0; /* hug the address bar edge */
@@ -132,14 +162,21 @@ export const SecurityButton = styled.div<{expanded?: boolean; danger?: boolean;}
   `};
 
   .icon {
-    width: 16px;
-    height: 16px;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 16px 16px;
-    will-change: filter;
-    transform: translateX(-1px); /* tiny left nudge */
-  }
+  width:16px !important;
+  height:16px !important;
+  max-width:16px;
+  max-height:16px;
+  flex: 0 0 16px;
+  display:inline-block;
+  vertical-align:middle;
+  transform: translateX(-1px);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 16px 16px;
+  /* allow data: URLs and file:// icons to render crisply */
+  image-rendering: -webkit-optimize-contrast;
+}
+.icon svg, .icon { width:16px; height:16px; }
 
   .label {
     color: inherit;
@@ -159,3 +196,4 @@ export const SecurityButton = styled.div<{expanded?: boolean; danger?: boolean;}
   &.danger svg { filter: none; }
   &.danger svg path { fill: currentColor; }
 `;
+

@@ -11,7 +11,7 @@ interface Props {
   dense: boolean;
 }
 
-export const StyledSwitch = styled.div`
+export const StyledSwitch = styled.div.withConfig({ shouldForwardProp: (p) => !['activated','dense','clickable'].includes(p as string) })<{  dense: boolean; activated: boolean ; clickable?: boolean;}>`
   border-radius: 32px;
   position: relative;
   overflow: hidden;
@@ -43,14 +43,14 @@ export const StyledSwitch = styled.div`
   `}
 `;
 
-export const Thumb = styled.div`
+export const Thumb = styled.div.withConfig({ shouldForwardProp: (p) => !['dense','activated'].includes(p as string) })<{ dense: boolean; activated: boolean }>`
   border-radius: 100%;
   position: absolute;
   z-index: 3;
   transition: 0.15s left;
   ${centerVertical()};
 
-  ${({ activated, dense }: { activated: boolean; dense: boolean }) => css`
+  ${({ activated = false, dense = false }: { activated?: boolean; dense?: boolean }) => css`
     width: ${dense ? 12 : 14}px;
     height: ${dense ? 12 : 14}px;
     left: ${activated ? (dense ? 18 : 20) : 2}px;

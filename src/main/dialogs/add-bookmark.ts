@@ -43,7 +43,7 @@ export const showAddBookmarkDialog = (
 
   if (!dialog) return;
 
-  dialog.on('loaded', (e) => {
+  dialog.on('loaded', (e: any) => {
     e.reply('data', data);
   });
 };

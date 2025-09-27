@@ -1,8 +1,9 @@
+import isPropValid from '@emotion/is-prop-valid';
 import * as React from 'react';
 import { observer } from 'mobx-react-lite';
 
 import store from '../../store';
-import { ThemeProvider } from 'styled-components';
+import { ThemeProvider, StyleSheetManager  } from 'styled-components';
 import { Wrapper, Content, IconItem, Menu, Image, RightBar } from './style';
 import { TopSites } from '../TopSites';
 import { Clock } from '../Clock';
@@ -60,37 +61,37 @@ export default observer(() => {
             <IconItem
               imageSet={store.imageVisible}
               title="Dashboard settings"
-              icon={ICON_TUNE}
-              onMouseDown={(e) => e.stopPropagation()}
-              onClick={onTuneClick}
-            ></IconItem>
+              onMouseDown={onTuneClick}
+            >
+              {ICON_TUNE}
+            </IconItem>
           </RightBar>
           {store.quickMenuVisible && (
             <Menu>
               <IconItem
                 imageSet={store.imageVisible}
                 title="Settings"
-                icon={ICON_SETTINGS}
+               
                 onClick={onIconClick('settings')}
-              ></IconItem>
+              >{ICON_SETTINGS}</IconItem>
               <IconItem
                 imageSet={store.imageVisible}
                 title="History"
-                icon={ICON_HISTORY}
+               
                 onClick={onIconClick('history')}
-              ></IconItem>
+              >{ICON_HISTORY}</IconItem>
               <IconItem
                 imageSet={store.imageVisible}
                 title="Bookmarks"
-                icon={ICON_BOOKMARKS}
+               
                 onClick={onIconClick('bookmarks')}
-              ></IconItem>
+              >{ICON_BOOKMARKS}</IconItem>
               <IconItem
                 imageSet={store.imageVisible}
                 title="Downloads"
-                icon={ICON_DOWNLOAD}
+               
                 onClick={onIconClick('downloads')}
-              ></IconItem>
+              >{ICON_DOWNLOAD}</IconItem>
               {}
             </Menu>
           )}

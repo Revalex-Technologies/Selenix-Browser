@@ -41,7 +41,7 @@ export default class Checkbox extends React.PureComponent<Props, State> {
         >
           <Icon toggled={toggled} />
         </StyledCheckbox>
-        {children && <Label>{children}</Label>}
+        {children && <Label selected={toggled}>{children}</Label>}
       </Container>
     );
   }
