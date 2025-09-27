@@ -1,6 +1,8 @@
 import styled, { css } from 'styled-components';
 
-export const StyledPreloader = styled.div.withConfig({ shouldForwardProp: (p) => !['size','indeterminate'].includes(p as string) })<{ size: number; indeterminate: boolean;}>`
+export const StyledPreloader = styled.div.withConfig({
+  shouldForwardProp: (p) => !['size', 'indeterminate'].includes(p as string),
+})<{ size: number; indeterminate: boolean }>`
   transform-origin: center center;
   z-index: 5;
   transform: rotate(-89deg);
@@ -32,14 +34,17 @@ export const StyledPreloader = styled.div.withConfig({ shouldForwardProp: (p) =>
   }
 `;
 
-export const Path = styled.circle.withConfig({ shouldForwardProp: (p) => !['thickness','value','indeterminate','color'].includes(p as string) })<{ thickness?: number; value?: number; indeterminate?: boolean; color?: string;}>`
+export const Path = styled.circle.withConfig({
+  shouldForwardProp: (p) =>
+    !['thickness', 'value', 'indeterminate', 'color'].includes(p as string),
+})<{
+  thickness?: number;
+  value?: number;
+  indeterminate?: boolean;
+  color?: string;
+}>`
   stroke-linecap: square;
-  ${({
-    color,
-    thickness,
-    value,
-    indeterminate,
-  }) => css`
+  ${({ color, thickness, value, indeterminate }) => css`
     stroke-dasharray: ${indeterminate ? '1, 200' : `199, 200`};
     stroke-dashoffset: ${199 - value * (199 - 82)}px;
     stroke-width: ${thickness};

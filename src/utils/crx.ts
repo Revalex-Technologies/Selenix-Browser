@@ -26,9 +26,7 @@ function getPublicKeyFromProtoBuf(
   startOffset: number,
   endOffset: number,
 ) {
-
   function getvarint() {
-
     let val = bytesView[startOffset] & 0x7f;
     if (bytesView[startOffset++] < 0x80) return val;
     val |= (bytesView[startOffset] & 0x7f) << 7;
@@ -48,7 +46,6 @@ function getPublicKeyFromProtoBuf(
     const key = getvarint();
     const length = getvarint();
     if (key === 80002) {
-
       const sigdatakey = getvarint();
       const sigdatalen = getvarint();
       if (sigdatakey !== 0xa) {
@@ -66,7 +63,6 @@ function getPublicKeyFromProtoBuf(
       continue;
     }
     if (key !== 0x12) {
-
       if (key != 0x1a) {
         console.warn('proto: Unexpected key: ' + key);
       }
@@ -81,7 +77,6 @@ function getPublicKeyFromProtoBuf(
     if (keyproofkey === 0x12) {
       startOffset += keyprooflength;
       if (startOffset >= keyproofend) {
-
         continue;
       }
       keyproofkey = getvarint();
@@ -131,7 +126,6 @@ function getPublicKeyFromProtoBuf(
 }
 
 export const parseCrx = (buf: Buffer) => {
-
   if (buf[0] === 80 && buf[1] === 75 && buf[2] === 3 && buf[3] === 4) {
     return { zip: buf };
   }
@@ -160,7 +154,6 @@ export const parseCrx = (buf: Buffer) => {
       'binary',
     );
   } else if (buf[4] === 3) {
-
     const crx3HeaderLength = calcLength(buf[8], buf[9], buf[10], buf[11]);
 
     zipStartOffset = 12 + crx3HeaderLength;

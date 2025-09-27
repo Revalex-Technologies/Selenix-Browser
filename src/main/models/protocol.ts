@@ -51,7 +51,9 @@ export const registerProtocol = (session: Session) => {
             join(__dirname, '../../static/pages/network-error.html'),
           ];
           for (const p of candidates) {
-            try { if (fs.existsSync(p)) return fs.readFileSync(p, 'utf8'); } catch {}
+            try {
+              if (fs.existsSync(p)) return fs.readFileSync(p, 'utf8');
+            } catch {}
           }
           return '';
         };
@@ -77,13 +79,22 @@ export const registerProtocol = (session: Session) => {
             </body></html>`;
           }
         } else {
-          html = '<!doctype html><html><meta charset="utf-8"><title>Not found</title></html>';
+          html =
+            '<!doctype html><html><meta charset="utf-8"><title>Not found</title></html>';
         }
 
-        return respond({ data: Buffer.from(html, 'utf8'), mimeType: 'text/html', charset: 'utf-8' });
+        return respond({
+          data: Buffer.from(html, 'utf8'),
+          mimeType: 'text/html',
+          charset: 'utf-8',
+        });
       } catch (e) {
         const fallback = '<!doctype html><title>Error</title>';
-        return respond({ data: Buffer.from(fallback, 'utf8'), mimeType: 'text/html', charset: 'utf-8' });
+        return respond({
+          data: Buffer.from(fallback, 'utf8'),
+          mimeType: 'text/html',
+          charset: 'utf-8',
+        });
       }
     },
   );
@@ -94,9 +105,12 @@ export const registerProtocol = (session: Session) => {
       WEBUI_PROTOCOL,
       (request, respond) => {
         const u = new URL(request.url);
-        const page = (u.pathname === '' || u.pathname === '/')
-          ? `${u.hostname}.html`
-          : decodeURIComponent(u.pathname.replace(/^\/+/, '').replace(/\+/g, '/'));
+        const page =
+          u.pathname === '' || u.pathname === '/'
+            ? `${u.hostname}.html`
+            : decodeURIComponent(
+                u.pathname.replace(/^\/+/, '').replace(/\+/g, '/'),
+              );
         respond({ url: `http://localhost:4444/${page}` });
       },
     );
@@ -108,7 +122,9 @@ export const registerProtocol = (session: Session) => {
         if (u.pathname === '' || u.pathname === '/') {
           return respond({ path: join(__dirname, `${u.hostname}.html`) });
         }
-        const p = decodeURIComponent(u.pathname.replace(/^\/+/, '').replace(/\+/g, '/'));
+        const p = decodeURIComponent(
+          u.pathname.replace(/^\/+/, '').replace(/\+/g, '/'),
+        );
         return respond({ path: join(__dirname, p) });
       },
     );

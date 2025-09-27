@@ -2,7 +2,9 @@ import styled, { css } from 'styled-components';
 import { ITheme } from '~/interfaces';
 import { hexToRgb } from '~/utils';
 
-export const StyledAddressBarContainer = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'visible' })<{ visible?: boolean; theme?: ITheme;}>`
+export const StyledAddressBarContainer = styled.div.withConfig({
+  shouldForwardProp: (p) => p !== 'visible',
+})<{ visible?: boolean; theme?: ITheme }>`
   position: absolute;
   left: 0;
   right: 0;
@@ -13,7 +15,9 @@ export const StyledAddressBarContainer = styled.div.withConfig({ shouldForwardPr
   align-items: center;
   padding-left: 72px;
   padding-right: 40px;
-  transition: 0.1s transform, 0.1s opacity;
+  transition:
+    0.1s transform,
+    0.1s opacity;
 
   ${({ visible, theme }: { visible?: boolean; theme?: ITheme }) => css`
     display: ${visible ? 'flex' : 'table'};

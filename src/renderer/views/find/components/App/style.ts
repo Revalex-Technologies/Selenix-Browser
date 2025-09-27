@@ -55,12 +55,10 @@ export const Input = styled.input`
   color: inherit;
 `;
 
-export const Button = styled.div.withConfig({ shouldForwardProp: (p) => !['icon','size'].includes(p as string) })<{ icon?: string; size?: number; theme?: ITheme;}>`
-  ${({
-    size,
-    icon,
-    theme,
-  }) => css`
+export const Button = styled.div.withConfig({
+  shouldForwardProp: (p) => !['icon', 'size'].includes(p as string),
+})<{ icon?: string; size?: number; theme?: ITheme }>`
+  ${({ size, icon, theme }) => css`
     ${centerIcon(size)};
     background-image: url(${icon});
     filter: ${theme['dialog.lightForeground'] ? 'invert(100%)' : 'none'};

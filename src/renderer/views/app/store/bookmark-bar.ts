@@ -39,7 +39,6 @@ export class BookmarkBarStore {
   }
 
   public setBookmarkBarItems(): void {
-
     if (!this.staticMainID) return;
     const barItems: IBookmark[] = [];
     const overflowItems: IBookmark[] = [];

@@ -12,7 +12,9 @@ export const StyledDownloadItem = styled.div`
   position: relative;
   overflow: hidden;
   margin-top: 8px;
-  transition: 0.1s background-color, 0.1s border;
+  transition:
+    0.1s background-color,
+    0.1s border;
 
   ${({ theme }: { theme?: ITheme }) => css`
     background-color: ${theme['dialog.lightForeground']
@@ -46,7 +48,6 @@ export const Progress = styled.div`
   height: 100%;
   background-color: ${BLUE_500};
   border-radius: 16px;
-
 `;
 
 export const ProgressBackground = styled.div`

@@ -365,7 +365,7 @@ export class StorageService {
     }
 
     if (item.order === undefined) {
-      item.order = this.bookmarks.filter((x) => !Boolean(x.static)).length;
+      item.order = this.bookmarks.filter((x) => !x.static).length;
     }
 
     const doc = await this.insert<IBookmark>({ item, scope: 'bookmarks' });
@@ -399,13 +399,14 @@ export class StorageService {
         throw new Error(res.statusCode + ' favicon fetch failed');
       }
 
-      let dataBuf = Buffer.from(res.data, 'binary');
+      const dataBuf = Buffer.from(res.data, 'binary');
 
       const detected = await fileTypeFromBuffer(dataBuf);
       let mime = detected?.mime;
 
       if (!mime) {
-        const headCT = ((res.headers && (res.headers['content-type'] as string)) || '');
+        const headCT =
+          (res.headers && (res.headers['content-type'] as string)) || '';
         if (headCT) {
           mime = headCT.split(';')[0].trim();
         }

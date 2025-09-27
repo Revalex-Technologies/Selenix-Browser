@@ -10,15 +10,12 @@ export class Store extends DialogStore {
   public bookmark: IBookmark;
 
   @observable
-
   public folders: IBookmark[] = [];
 
   @observable
-
   public dialogTitle = '';
 
   @observable
-
   public currentFolder: IBookmark = null;
 
   public constructor() {

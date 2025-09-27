@@ -4,7 +4,9 @@ import { transparency, ICON_SEARCH } from '~/renderer/constants';
 import { ITheme } from '~/interfaces';
 import { centerIcon, noButtons } from '~/renderer/mixins';
 
-export const StyledNavigationDrawer = styled.div.withConfig({ shouldForwardProp: (p) => !['dense'].includes(p as string) })<{ dense?: boolean }>`
+export const StyledNavigationDrawer = styled.div.withConfig({
+  shouldForwardProp: (p) => !['dense'].includes(p as string),
+})<{ dense?: boolean }>`
   height: 100%;
   left: 0;
   display: flex;
@@ -22,7 +24,9 @@ export const StyledNavigationDrawer = styled.div.withConfig({ shouldForwardProp:
   `}
 `;
 
-export const MenuItems = styled.div.withConfig({ shouldForwardProp: (p) => !['dense'].includes(p as string) })<{ dense?: boolean }>`
+export const MenuItems = styled.div.withConfig({
+  shouldForwardProp: (p) => !['dense'].includes(p as string),
+})<{ dense?: boolean }>`
   display: flex;
   flex-flow: column;
   flex: 1;
@@ -32,18 +36,24 @@ export const MenuItems = styled.div.withConfig({ shouldForwardProp: (p) => !['de
   ${noButtons('6px', 'rgba(0, 0, 0, 0.04)', 'rgba(0, 0, 0, 0.12)')};
 `;
 
-export const Header = styled.div.withConfig({ shouldForwardProp: (p) => !['dense'].includes(p as string) })`
+export const Header = styled.div.withConfig({
+  shouldForwardProp: (p) => !['dense'].includes(p as string),
+})`
   display: flex;
   margin-top: 32px;
   align-items: center;
 `;
 
-export const Title = styled.div.withConfig({ shouldForwardProp: (p) => !['dense'].includes(p as string) })`
+export const Title = styled.div.withConfig({
+  shouldForwardProp: (p) => !['dense'].includes(p as string),
+})`
   font-size: 24px;
   font-weight: 300;
 `;
 
-export const Input = styled.input.withConfig({ shouldForwardProp: (p) => !['dense'].includes(p as string) })`
+export const Input = styled.input.withConfig({
+  shouldForwardProp: (p) => !['dense'].includes(p as string),
+})`
   border: none;
   outline: none;
 
@@ -66,7 +76,9 @@ export const Input = styled.input.withConfig({ shouldForwardProp: (p) => !['dens
   `}
 `;
 
-export const Search = styled.div.withConfig({ shouldForwardProp: (p) => !['dense'].includes(p as string) })`
+export const Search = styled.div.withConfig({
+  shouldForwardProp: (p) => !['dense'].includes(p as string),
+})`
   margin-top: 24px;
   height: 42px;
   border-radius: 30px;

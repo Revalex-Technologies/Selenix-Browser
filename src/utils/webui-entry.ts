@@ -15,7 +15,7 @@ export const renderWebUI = (Component: any) => {
 
   try {
     // Prefer React 18 root API if available at runtime
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+
     const client = require('react-dom/client');
     if (client && typeof client.createRoot === 'function') {
       const root = client.createRoot(el);

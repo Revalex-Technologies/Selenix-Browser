@@ -1,7 +1,9 @@
 import styled, { css } from 'styled-components';
 import { ITheme } from '~/interfaces';
 
-export const ListItem = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'selected' })<{ selected: boolean; theme?: ITheme;}>`
+export const ListItem = styled.div.withConfig({
+  shouldForwardProp: (p) => p !== 'selected',
+})<{ selected: boolean; theme?: ITheme }>`
   display: flex;
   align-items: center;
   padding: 0 24px;

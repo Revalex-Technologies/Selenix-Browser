@@ -7,7 +7,9 @@ export const StyledApp = styled(DialogStyle)`
   padding: 16px;
 `;
 
-export const Title = styled.div.withConfig({ shouldForwardProp: (p) => !['color'].includes(p as string) })<{ color?: string; theme?: ITheme; }>`
+export const Title = styled.div.withConfig({
+  shouldForwardProp: (p) => !['color'].includes(p as string),
+})<{ color?: string; theme?: ITheme }>`
   font-size: 16px;
 `;
 

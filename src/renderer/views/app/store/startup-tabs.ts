@@ -62,10 +62,10 @@ export class StartupTabsStore {
             x.pinned && y.pinned
               ? x.order - y.order
               : x.pinned
-              ? -1
-              : y.pinned
-              ? 1
-              : x.order - y.order,
+                ? -1
+                : y.pinned
+                  ? 1
+                  : x.order - y.order,
           )
           .map((tab, i) => ({
             url: prefixHttp(tab.url),
@@ -80,7 +80,6 @@ export class StartupTabsStore {
         needsNewTabPage = true;
       }
     } else {
-
       needsNewTabPage = true;
     }
 

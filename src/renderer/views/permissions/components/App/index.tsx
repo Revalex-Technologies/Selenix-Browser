@@ -1,7 +1,7 @@
 import isPropValid from '@emotion/is-prop-valid';
 import * as React from 'react';
 import { observer } from 'mobx-react-lite';
-import { ThemeProvider, StyleSheetManager  } from 'styled-components';
+import { ThemeProvider, StyleSheetManager } from 'styled-components';
 
 import { StyledApp, Title, Permissions, Permission, Buttons } from './style';
 import store from '../../store';

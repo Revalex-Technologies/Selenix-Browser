@@ -2,7 +2,9 @@ import styled, { css } from 'styled-components';
 import { ITheme } from '~/interfaces';
 import { BLUE_300 } from '~/renderer/constants';
 
-export const StyledAddressBar = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'focus' })<{ focus?: boolean;}>`
+export const StyledAddressBar = styled.div.withConfig({
+  shouldForwardProp: (p) => p !== 'focus',
+})<{ focus?: boolean }>`
   height: 26px;
   line-height: 25px;
   flex: 1;
@@ -23,8 +25,8 @@ export const StyledAddressBar = styled.div.withConfig({ shouldForwardProp: (p) =
           ? 'rgba(255, 255, 255, 0.12)'
           : 'transparent'
         : focus
-        ? `${BLUE_300} !important`
-        : 'transparent'};
+          ? `${BLUE_300} !important`
+          : 'transparent'};
     color: ${theme['addressbar.textColor']};
     box-shadow: ${focus && !theme.isCompact
       ? `0 0 0 1px ${BLUE_300}`
@@ -36,7 +38,7 @@ export const StyledAddressBar = styled.div.withConfig({ shouldForwardProp: (p) =
       }
     `}
   `};
-  
+
   --danger-color: #ff6b6b;
 `;
 
@@ -48,7 +50,9 @@ export const InputContainer = styled.div`
   overflow: hidden;
 `;
 
-export const Text = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'visible' })<{ visible?: boolean;}>`
+export const Text = styled.div.withConfig({
+  shouldForwardProp: (p) => p !== 'visible',
+})<{ visible?: boolean }>`
   pointer-events: none;
   position: absolute;
   top: 50%;
@@ -65,7 +69,9 @@ export const Text = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'vis
   `};
 `;
 
-export const Input = styled.input.withConfig({ shouldForwardProp: (p) => p !== 'visible' })<{ visible?: boolean;}>`
+export const Input = styled.input.withConfig({
+  shouldForwardProp: (p) => p !== 'visible',
+})<{ visible?: boolean }>`
   outline: none;
   min-width: 0;
   width: 100%;
@@ -73,7 +79,8 @@ export const Input = styled.input.withConfig({ shouldForwardProp: (p) => p !== '
   line-height: 25px;
   background-color: transparent;
   border: none;
-  padding: 0; padding-top: 1px;
+  padding: 0;
+  padding-top: 1px;
   margin: 0;
   color: black;
   font-family: inherit;
@@ -100,7 +107,9 @@ export const Input = styled.input.withConfig({ shouldForwardProp: (p) => p !== '
   `};
 `;
 
-export const SecurityButton = styled.div.withConfig({ shouldForwardProp: (p) => !['expanded','danger'].includes(p as string) })<{expanded?: boolean; danger?: boolean;}>`
+export const SecurityButton = styled.div.withConfig({
+  shouldForwardProp: (p) => !['expanded', 'danger'].includes(p as string),
+})<{ expanded?: boolean; danger?: boolean }>`
   /* ensure the icon is perfectly centered within the button */
   display: inline-grid;
   place-items: center;
@@ -131,7 +140,7 @@ export const SecurityButton = styled.div.withConfig({ shouldForwardProp: (p) => 
   }
 
   &:hover {
-    background-color: rgba(255,255,255,0.14);
+    background-color: rgba(255, 255, 255, 0.14);
   }
 
   display: inline-flex;
@@ -143,7 +152,10 @@ export const SecurityButton = styled.div.withConfig({ shouldForwardProp: (p) => 
   min-width: 34px;
   border-radius: 4px;
   margin-left: 0; /* hug the address bar edge */
-  transition: 0.2s background-color, max-width 180ms ease, padding 180ms ease;
+  transition:
+    0.2s background-color,
+    max-width 180ms ease,
+    padding 180ms ease;
   user-select: none;
   -webkit-app-region: no-drag;
   position: relative;
@@ -153,34 +165,42 @@ export const SecurityButton = styled.div.withConfig({ shouldForwardProp: (p) => 
 
   ${({ theme, danger }: { theme: ITheme; danger?: boolean }) => css`
     background-color: transparent; /* transparent until hover */
-    color: ${danger ? '#ff6b6b' : (theme['toolbar.lightForeground']
-      ? 'rgba(255, 255, 255, 0.86)'
-      : 'rgba(0, 0, 0, 0.86)')};
+    color: ${
+      danger
+        ? '#ff6b6b'
+        : theme['toolbar.lightForeground']
+          ? 'rgba(255, 255, 255, 0.86)'
+          : 'rgba(0, 0, 0, 0.86)'
+    };
 
     &:active { background-color: ${theme['toolbar.lightForeground'] ? 'rgba(255, 255, 255, 0.14)' : 'rgba(0, 0, 0, 0.12)'} !important; } !important; } !important; };
     }
   `};
 
   .icon {
-  width:16px !important;
-  height:16px !important;
-  max-width:16px;
-  max-height:16px;
-  flex: 0 0 16px;
-  display:inline-block;
-  vertical-align:middle;
-  transform: translateX(-1px);
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 16px 16px;
-  /* allow data: URLs and file:// icons to render crisply */
-  image-rendering: -webkit-optimize-contrast;
-}
-.icon svg, .icon { width:16px; height:16px; }
+    width: 16px !important;
+    height: 16px !important;
+    max-width: 16px;
+    max-height: 16px;
+    flex: 0 0 16px;
+    display: inline-block;
+    vertical-align: middle;
+    transform: translateX(-1px);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 16px 16px;
+    /* allow data: URLs and file:// icons to render crisply */
+    image-rendering: -webkit-optimize-contrast;
+  }
+  .icon svg,
+  .icon {
+    width: 16px;
+    height: 16px;
+  }
 
   .label {
     color: inherit;
-    max-width: ${'${'}(p: any) => (p.expanded ? '200px' : '0')${'}'};
+    max-width: ${'${'}(p: any) => (p.expanded ? '200px': '0') ${'}'};
     overflow: hidden;
     white-space: nowrap;
     text-overflow: clip;
@@ -192,8 +212,13 @@ export const SecurityButton = styled.div.withConfig({ shouldForwardProp: (p) => 
     /* keep footprint stable */
   }
 
-  &.danger { color: #ff6b6b; }
-  &.danger svg { filter: none; }
-  &.danger svg path { fill: currentColor; }
+  &.danger {
+    color: #ff6b6b;
+  }
+  &.danger svg {
+    filter: none;
+  }
+  &.danger svg path {
+    fill: currentColor;
+  }
 `;
-

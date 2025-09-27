@@ -4,7 +4,9 @@ import { transparency, BLUE_500 } from '~/renderer/constants';
 import { robotoRegular } from '~/renderer/mixins';
 import { ITheme } from '~/interfaces';
 
-export const Container = styled.div.withConfig({ shouldForwardProp: (p) => !['selected'].includes(p as string) })`
+export const Container = styled.div.withConfig({
+  shouldForwardProp: (p) => !['selected'].includes(p as string),
+})`
   height: 40px;
   display: flex;
   align-items: center;
@@ -18,13 +20,17 @@ export const Container = styled.div.withConfig({ shouldForwardProp: (p) => !['se
   }
 `;
 
-export const Circle = styled.div.withConfig({ shouldForwardProp: (p) => !['selected'].includes(p as string) })<{ selected: boolean }>`
+export const Circle = styled.div.withConfig({
+  shouldForwardProp: (p) => !['selected'].includes(p as string),
+})<{ selected: boolean }>`
   border-radius: 100%;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  transition: width 0.1s ease-in, height 0.1s ease-in;
+  transition:
+    width 0.1s ease-in,
+    height 0.1s ease-in;
   pointer-events: none;
   z-index: 1;
 
@@ -46,14 +52,16 @@ export const Circle = styled.div.withConfig({ shouldForwardProp: (p) => !['selec
         ${selected
           ? BLUE_500
           : theme.dark
-          ? 'rgba(255, 255, 255, 0.54)'
-          : 'rgba(0, 0, 0, 0.54)'};
+            ? 'rgba(255, 255, 255, 0.54)'
+            : 'rgba(0, 0, 0, 0.54)'};
       border-radius: 100%;
     }
   `}
 `;
 
-export const Root = styled.div.withConfig({ shouldForwardProp: (p) => !['selected'].includes(p as string) })`
+export const Root = styled.div.withConfig({
+  shouldForwardProp: (p) => !['selected'].includes(p as string),
+})`
   margin: 5px;
   cursor: pointer;
   width: 18px;
@@ -75,7 +83,9 @@ export const Root = styled.div.withConfig({ shouldForwardProp: (p) => !['selecte
   }
 `;
 
-export const Radio = styled.input.withConfig({ shouldForwardProp: (p) => !['selected'].includes(p as string) })`
+export const Radio = styled.input.withConfig({
+  shouldForwardProp: (p) => !['selected'].includes(p as string),
+})`
   opacity: 0;
   z-index: 2;
   position: absolute;
@@ -92,12 +102,16 @@ export const Radio = styled.input.withConfig({ shouldForwardProp: (p) => !['sele
   &:checked {
     & ~ ${Circle} {
       height: calc(100% - 8px);
-      transition: width 0.2s ease-out, height 0.2s ease-out;
+      transition:
+        width 0.2s ease-out,
+        height 0.2s ease-out;
     }
   }
 `;
 
-export const Label = styled.div.withConfig({ shouldForwardProp: (p) => !['selected'].includes(p as string) })<{ selected: boolean }>`
+export const Label = styled.div.withConfig({
+  shouldForwardProp: (p) => !['selected'].includes(p as string),
+})<{ selected: boolean }>`
   font-size: 14px;
   color: rgba(0, 0, 0, ${transparency.text.high});
   margin-left: 8px;

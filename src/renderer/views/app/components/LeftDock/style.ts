@@ -1,4 +1,3 @@
-
 import styled, { css } from 'styled-components';
 import { ITheme } from '~/interfaces';
 import { ToolbarButton } from '../ToolbarButton';
@@ -13,7 +12,7 @@ export const StyledLeftDock = styled.div`
   display: flex;
   flex-direction: column;
   min-width: 0;
-  border-right: 1px solid rgba(0,0,0,0.1);
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
   transition: width 0.2s ease;
   z-index: 50;
 
@@ -40,7 +39,6 @@ export const AddTabColumn = styled(ToolbarButton)`
   min-width: 32px;
   margin: 6px;
 `;
-
 
 /* --- LeftDock visibility/layout fixes ---
    - Position the dock below the toolbar/titlebar using VIEW_Y_OFFSET

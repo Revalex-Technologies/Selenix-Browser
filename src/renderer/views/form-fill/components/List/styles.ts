@@ -11,7 +11,9 @@ export const StyledList = styled.div`
   ${noButtons()};
 `;
 
-export const StyledItem = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'subtext' })<{ subtext?: boolean;}>`
+export const StyledItem = styled.div.withConfig({
+  shouldForwardProp: (p) => p !== 'subtext',
+})<{ subtext?: boolean }>`
   width: 100%;
   display: flex;
   flex-direction: column;

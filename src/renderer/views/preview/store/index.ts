@@ -9,36 +9,28 @@ export class Store extends DialogStore {
   private timeout1: any;
 
   @observable
-
   public title = '';
 
   @observable
-
   public memoryMB: number | null = null;
 
   @observable
   public hasSample: boolean = false;
 
-
   @observable
-
   public url = '';
 
   @observable
-
   public x = 0;
 
   @observable
-
   public xTransition = false;
 
   @computed
-
   public get domain() {
     let protocol: string | undefined;
     let hostname: string | undefined;
     try {
-
       const parsed = new URL(this.url);
       protocol = parsed.protocol;
       hostname = parsed.hostname;
@@ -67,17 +59,21 @@ export class Store extends DialogStore {
     makeObservable(this);
 
     ipcRenderer.on('memory', (_, { memoryMB }) => {
-  this.memoryMB = memoryMB ?? null;
-});
+      this.memoryMB = memoryMB ?? null;
+    });
 
-ipcRenderer.on('visible', (e, visible, tab) => {
-      if (tab && typeof (tab as any).memoryMB === 'number' && !Number.isNaN((tab as any).memoryMB)) {
+    ipcRenderer.on('visible', (e, visible, tab) => {
+      if (
+        tab &&
+        typeof (tab as any).memoryMB === 'number' &&
+        !Number.isNaN((tab as any).memoryMB)
+      ) {
         this.memoryMB = (tab as any).memoryMB;
         this.hasSample = true;
       }
       this.memoryMB = this.memoryMB ?? null;
       this.hasSample = false;
-clearTimeout(this.timeout);
+      clearTimeout(this.timeout);
       clearTimeout(this.timeout1);
 
       if (!visible) {
@@ -88,16 +84,16 @@ clearTimeout(this.timeout);
         this.timeout1 = setTimeout(() => {
           this.xTransition = true;
         }, 80);
-      
-    ipcRenderer.on('memory-update', (e, payload) => {
-      const { memoryMB } = payload || ({} as any);
-      if (typeof memoryMB === 'number') {
-        this.memoryMB = memoryMB;
-      } else if (this.memoryMB == null) {
-        this.memoryMB = null;
-      }
-    });
-  } else if (!visible) {
+
+        ipcRenderer.on('memory-update', (e, payload) => {
+          const { memoryMB } = payload || ({} as any);
+          if (typeof memoryMB === 'number') {
+            this.memoryMB = memoryMB;
+          } else if (this.memoryMB == null) {
+            this.memoryMB = null;
+          }
+        });
+      } else if (!visible) {
         this.timeout = setTimeout(() => {
           this.xTransition = false;
         }, 100);
@@ -113,7 +109,7 @@ clearTimeout(this.timeout);
         }
       }
     });
-  
+
     ipcRenderer.on('memory-update', (e, payload) => {
       const { memoryMB } = (payload || {}) as any;
       if (typeof memoryMB === 'number' && !Number.isNaN(memoryMB)) {
@@ -121,7 +117,7 @@ clearTimeout(this.timeout);
         this.hasSample = true;
       }
     });
-}
+  }
 }
 
 export default new Store();

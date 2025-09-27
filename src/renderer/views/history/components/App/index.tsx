@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite';
 
 import store, { QuickRange } from '../../store';
 import { NavigationDrawer } from '~/renderer/components/NavigationDrawer';
-import { ThemeProvider, StyleSheetManager  } from 'styled-components';
+import { ThemeProvider, StyleSheetManager } from 'styled-components';
 import { SelectionDialog } from '~/renderer/components/SelectionDialog';
 import { HistorySection } from '../HistorySection';
 import { Container, Content, LeftContent } from '~/renderer/components/Pages';
@@ -81,7 +81,6 @@ const onInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
 
 const onClearClick = () => {
   store.clear();
-
 };
 
 export default observer(() => {

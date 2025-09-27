@@ -31,7 +31,9 @@ export const Wrapper = styled.div`
   align-items: center;
 `;
 
-export const Icon = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'icon' })<{ icon?: string;}>`
+export const Icon = styled.div.withConfig({
+  shouldForwardProp: (p) => p !== 'icon',
+})<{ icon?: string }>`
   width: 16px;
   height: 16px;
   ${centerIcon('contain')};
@@ -41,7 +43,9 @@ export const Icon = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'ico
   `};
 `;
 
-export const PasswordIcon = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'toggled' })<{ toggled?: boolean;}>`
+export const PasswordIcon = styled.div.withConfig({
+  shouldForwardProp: (p) => p !== 'toggled',
+})<{ toggled?: boolean }>`
   width: 20px;
   height: 20px;
   margin-left: auto;

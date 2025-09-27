@@ -1,4 +1,11 @@
-import { BrowserWindow, app, dialog, nativeTheme, Menu, ipcMain } from 'electron';
+import {
+  BrowserWindow,
+  app,
+  dialog,
+  nativeTheme,
+  Menu,
+  ipcMain,
+} from 'electron';
 
 import { enable } from '@electron/remote/main';
 import { writeFileSync, promises } from 'fs';
@@ -26,9 +33,11 @@ export class AppWindow {
       height: 700,
       // this is commented out because i use it when taking screenshots
       // for the browser
-      // roundedCorners: false, 
+      // roundedCorners: false,
       titleBarStyle: 'hiddenInset',
-      backgroundColor: nativeTheme.shouldUseDarkColors ? '#939090ff' : '#ffffff',
+      backgroundColor: nativeTheme.shouldUseDarkColors
+        ? '#939090ff'
+        : '#ffffff',
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,
@@ -54,14 +63,26 @@ export class AppWindow {
     this.viewManager = new ViewManager(this, incognito);
 
     // Handle window control events from renderer.
-    try { ipcMain.removeHandler('window-control'); } catch {}
+    try {
+      ipcMain.removeHandler('window-control');
+    } catch {}
     ipcMain.handle('window-control', (_evt, action: string) => {
       switch (action) {
-        case 'minimize': this.win.minimize(); break;
-        case 'maximize': this.win.maximize(); break;
-        case 'unmaximize': this.win.unmaximize(); break;
-        case 'toggle-maximize': this.win.isMaximized() ? this.win.unmaximize() : this.win.maximize(); break;
-        case 'close': this.win.close(); break;
+        case 'minimize':
+          this.win.minimize();
+          break;
+        case 'maximize':
+          this.win.maximize();
+          break;
+        case 'unmaximize':
+          this.win.unmaximize();
+          break;
+        case 'toggle-maximize':
+          this.win.isMaximized() ? this.win.unmaximize() : this.win.maximize();
+          break;
+        case 'close':
+          this.win.close();
+          break;
       }
     });
 
@@ -75,8 +96,14 @@ export class AppWindow {
         });
       } catch {}
     };
-    ['maximize','unmaximize','enter-full-screen','leave-full-screen','focus','blur']
-      .forEach(evt => this.win.on(evt as any, emitPlatformAndState));
+    [
+      'maximize',
+      'unmaximize',
+      'enter-full-screen',
+      'leave-full-screen',
+      'focus',
+      'blur',
+    ].forEach((evt) => this.win.on(evt as any, emitPlatformAndState));
     this.win.webContents.on('did-finish-load', emitPlatformAndState);
 
     runMessagingService(this);
@@ -120,7 +147,8 @@ export class AppWindow {
             buttons: ['OK'],
             defaultId: 0,
             title: 'Incognito mode',
-            message: 'Since incognito is not persistant, extensions are disabled',
+            message:
+              'Since incognito is not persistant, extensions are disabled',
           });
         } catch {}
       }
@@ -211,9 +239,10 @@ export class AppWindow {
         Application.instance.sessions.unloadIncognitoExtensions();
       }
 
-      Application.instance.windows.list = Application.instance.windows.list.filter(
-        (x) => x.win.id !== this.win.id,
-      );
+      Application.instance.windows.list =
+        Application.instance.windows.list.filter(
+          (x) => x.win.id !== this.win.id,
+        );
     });
 
     // this.webContents.openDevTools({ mode: 'detach' });
@@ -268,7 +297,8 @@ export class AppWindow {
     try {
       if (!this.win || this.win.isDestroyed()) return null as any;
       const wc = this.win.webContents as any;
-      if (!wc || (typeof wc.isDestroyed === 'function' && wc.isDestroyed())) return null as any;
+      if (!wc || (typeof wc.isDestroyed === 'function' && wc.isDestroyed()))
+        return null as any;
       return wc;
     } catch {
       return null as any;
@@ -285,8 +315,12 @@ export class AppWindow {
 
   public send(channel: string, ...args: any[]) {
     const wc = this.webContents as any;
-    if (!wc) { return; }
-    try { wc.send(channel, ...args); } catch {}
+    if (!wc) {
+      return;
+    }
+    try {
+      wc.send(channel, ...args);
+    } catch {}
   }
 
   public updateTitle() {

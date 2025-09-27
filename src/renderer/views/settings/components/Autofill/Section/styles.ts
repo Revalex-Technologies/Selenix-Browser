@@ -23,7 +23,9 @@ export const Header = styled.div`
   cursor: pointer;
 `;
 
-export const Icon = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'icon' })<{ icon: string; theme?: ITheme;}>`
+export const Icon = styled.div.withConfig({
+  shouldForwardProp: (p) => p !== 'icon',
+})<{ icon: string; theme?: ITheme }>`
   width: 18px;
   height: 18px;
   opacity: ${transparency.icons.inactive};
@@ -41,7 +43,9 @@ export const Label = styled.div`
   font-size: 14px;
 `;
 
-export const DropIcon = styled.div.withConfig({ shouldForwardProp: (p) => p !== '$expanded' })<{ expanded?: boolean; theme?: ITheme;}>`
+export const DropIcon = styled.div.withConfig({
+  shouldForwardProp: (p) => p !== '$expanded',
+})<{ expanded?: boolean; theme?: ITheme }>`
   width: 20px;
   height: 20px;
   background-image: url(${ICON_DROPDOWN});
@@ -56,7 +60,9 @@ export const DropIcon = styled.div.withConfig({ shouldForwardProp: (p) => p !== 
   `}
 `;
 
-export const Container = styled.div.withConfig({ shouldForwardProp: (p) => p !== '$expanded' })<{ $expanded?: boolean }>`
+export const Container = styled.div.withConfig({
+  shouldForwardProp: (p) => p !== '$expanded',
+})<{ $expanded?: boolean }>`
   width: 100%;
   display: flex;
   padding: 16px;

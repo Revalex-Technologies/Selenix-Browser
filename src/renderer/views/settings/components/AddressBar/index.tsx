@@ -62,16 +62,15 @@ const onBackClick = () => {
   store.selectedSection = 'address-bar';
 };
 
-const onMoreClick = (data: ISearchEngine) => (
-  e: React.MouseEvent<HTMLDivElement>,
-) => {
-  const { top, left } = e.currentTarget.getBoundingClientRect();
-  store.menuInfo.left = left - store.menuRef.current.offsetWidth;
-  store.menuInfo.top = top;
+const onMoreClick =
+  (data: ISearchEngine) => (e: React.MouseEvent<HTMLDivElement>) => {
+    const { top, left } = e.currentTarget.getBoundingClientRect();
+    store.menuInfo.left = left - store.menuRef.current.offsetWidth;
+    store.menuInfo.top = top;
 
-  store.editedSearchEngine = data;
-  store.menuVisible = true;
-};
+    store.editedSearchEngine = data;
+    store.menuVisible = true;
+  };
 
 export const SearchEngine = observer(({ data }: { data: ISearchEngine }) => {
   const isDefault = store.searchEngine.keyword === data.keyword;

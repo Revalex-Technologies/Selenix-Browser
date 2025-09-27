@@ -10,12 +10,27 @@ interface CloseProps {
   theme?: ITheme;
 }
 
-export const StyledClose = styled.div.withConfig({ shouldForwardProp: (p) => !['visible'].includes(p as string) })<CloseProps>`
+export const StyledClose = styled.div.withConfig({
+  shouldForwardProp: (p) => !['visible'].includes(p as string),
+})<CloseProps>`
   height: 20px;
   width: 20px;
   margin-left: 2px;
   margin-right: 6px;
-  #left-dock & { display: block !important; visibility: visible !important; opacity: 1 !important; background-image: none !important; background: transparent !important; filter: none !important; margin-left: auto !important; cursor: pointer; flex: 0 0 20px; display: flex; align-items: center; justify-content: center;}
+  #left-dock & {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background-image: none !important;
+    background: transparent !important;
+    filter: none !important;
+    margin-left: auto !important;
+    cursor: pointer;
+    flex: 0 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
   border-radius: 2px;
   background-image: url('${ICON_CLOSE}');
   transition: 0.1s background-color;
@@ -36,28 +51,41 @@ export const StyledClose = styled.div.withConfig({ shouldForwardProp: (p) => !['
   }
 
   /* Fallback visual in case icon fails to load */
-  #left-dock &::before { content: '×'; font-size: 16px; line-height: 1; display: block; opacity: 0.9; -webkit-font-smoothing: antialiased; }
+  #left-dock &::before {
+    content: '×';
+    font-size: 16px;
+    line-height: 1;
+    display: block;
+    opacity: 0.9;
+    -webkit-font-smoothing: antialiased;
+  }
 
-
-    ${({ visible, theme }: CloseProps) => css`
-      opacity: ${visible ? transparency.icons.inactive : 0};
-      display: ${visible ? 'block' : 'none'};
-      filter: ${theme['toolbar.lightForeground'] ? 'invert(100%)' : 'none'}; #left-dock & { filter: none !important; }
-    `}
+  ${({ visible, theme }: CloseProps) => css`
+    opacity: ${visible ? transparency.icons.inactive : 0};
+    display: ${visible ? 'block' : 'none'};
+    filter: ${theme['toolbar.lightForeground'] ? 'invert(100%)' : 'none'};
+    #left-dock & {
+      filter: none !important;
+    }
+  `}
 
   &:hover {
     background-color: rgba(0, 0, 0, 0.1);
   }
 
   /* Left dock overrides: turn tabs into a vertical list when inside the left dock */
-  
 
-  ${ ({ theme }: { theme: ITheme }) => css`
+  ${({ theme }: { theme: ITheme }) => css`
     /* Left dock overrides */
-    #left-dock & { position: static; width: auto; height: auto; transform: none !important; flex: 0 0 auto; }
+    #left-dock & {
+      position: static;
+      width: auto;
+      height: auto;
+      transform: none !important;
+      flex: 0 0 auto;
+    }
   `};
 `;
-
 
 interface ActionProps {
   visible: boolean;
@@ -65,7 +93,9 @@ interface ActionProps {
   theme?: ITheme;
 }
 
-export const StyledAction = styled.div.withConfig({ shouldForwardProp: (p) => !['visible','icon'].includes(p as string) })<ActionProps>`
+export const StyledAction = styled.div.withConfig({
+  shouldForwardProp: (p) => !['visible', 'icon'].includes(p as string),
+})<ActionProps>`
   height: 20px;
   width: 20px;
   margin-left: 2px;
@@ -75,11 +105,14 @@ export const StyledAction = styled.div.withConfig({ shouldForwardProp: (p) => ![
   ${centerIcon(16)};
 
   ${({ visible, theme, icon }: ActionProps) => css`
-      opacity: ${visible ? transparency.icons.inactive : 0};
-      display: ${visible ? 'block' : 'none'};
-      filter: ${theme['toolbar.lightForeground'] ? 'invert(100%)' : 'none'}; #left-dock & { filter: none !important; }
-      background-image: url('${icon}');
-    `}
+    opacity: ${visible ? transparency.icons.inactive : 0};
+    display: ${visible ? 'block' : 'none'};
+    filter: ${theme['toolbar.lightForeground'] ? 'invert(100%)' : 'none'};
+    #left-dock & {
+      filter: none !important;
+    }
+    background-image: url('${icon}');
+  `}
 
   &:hover {
     background-color: rgba(0, 0, 0, 0.1);
@@ -92,7 +125,9 @@ interface PinActionProps {
   theme?: ITheme;
 }
 
-export const StyledPinAction = styled.div.withConfig({ shouldForwardProp: (p) => !['visible','icon'].includes(p as string) })<PinActionProps>`
+export const StyledPinAction = styled.div.withConfig({
+  shouldForwardProp: (p) => !['visible', 'icon'].includes(p as string),
+})<PinActionProps>`
   height: 12px;
   width: 12px;
   border-radius: 100%;
@@ -104,12 +139,12 @@ export const StyledPinAction = styled.div.withConfig({ shouldForwardProp: (p) =>
   ${centerIcon(10)};
 
   ${({ visible, theme, icon }: PinActionProps) => css`
-      display: ${visible ? 'block' : 'none'};
-      background-color: ${
-        theme['toolbar.lightForeground'] ? 'rgb(255, 255, 255)' : 'rgb(0, 0, 0)'
-      };
-      background-image: url('${icon}');
-    `}
+    display: ${visible ? 'block' : 'none'};
+    background-color: ${theme['toolbar.lightForeground']
+      ? 'rgb(255, 255, 255)'
+      : 'rgb(0, 0, 0)'};
+    background-image: url('${icon}');
+  `}
 
   &:hover {
     filter: invert(100%);
@@ -120,7 +155,9 @@ interface TabProps {
   selected: boolean;
 }
 
-export const StyledTab = styled.div.withConfig({ shouldForwardProp: (p) => !['selected'].includes(p as string) })<TabProps>`
+export const StyledTab = styled.div.withConfig({
+  shouldForwardProp: (p) => !['selected'].includes(p as string),
+})<TabProps>`
   position: absolute;
   height: 100%;
   width: 0;
@@ -135,12 +172,25 @@ export const StyledTab = styled.div.withConfig({ shouldForwardProp: (p) => !['se
   `};
 
   /* Left dock overrides: vertical-list mode */
-  #left-dock & { position: static; width: auto; height: auto; transform: none !important; flex: 0 0 auto; }
+  #left-dock & {
+    position: static;
+    width: auto;
+    height: auto;
+    transform: none !important;
+    flex: 0 0 auto;
+  }
 `;
 
-interface TitleProps { isIcon?: boolean; selected?: boolean; isIconSet?: boolean; theme?: ITheme; }
+interface TitleProps {
+  isIcon?: boolean;
+  selected?: boolean;
+  isIconSet?: boolean;
+  theme?: ITheme;
+}
 
-export const StyledTitle = styled.div.withConfig({ shouldForwardProp: (p) => !['isIcon','selected'].includes(p as string) })<TitleProps>`
+export const StyledTitle = styled.div.withConfig({
+  shouldForwardProp: (p) => !['isIcon', 'selected'].includes(p as string),
+})<TitleProps>`
   font-size: 12px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -159,16 +209,19 @@ export const StyledTitle = styled.div.withConfig({ shouldForwardProp: (p) => !['
   `};
 `;
 
-export const StyledIcon = styled.div.withConfig({ shouldForwardProp: (p) => !['isIcon','selected'].includes(p as string) })<TitleProps>`
+export const StyledIcon = styled.div.withConfig({
+  shouldForwardProp: (p) => !['isIcon', 'selected'].includes(p as string),
+})<TitleProps>`
   height: 16px;
   min-width: 16px;
-  transition: 0.2s opacity, 0.2s min-width;
+  transition:
+    0.2s opacity,
+    0.2s min-width;
   ${centerIcon()};
 
-
-#left-dock & {
-  margin-left: 0 !important;
-}
+  #left-dock & {
+    margin-left: 0 !important;
+  }
   ${({ isIconSet }: { isIconSet?: boolean }) => css`
     min-width: ${isIconSet ? 0 : 16},
     opacity: ${isIconSet ? 0 : 1};
@@ -177,7 +230,9 @@ export const StyledIcon = styled.div.withConfig({ shouldForwardProp: (p) => !['i
 
 export const StyledContent = styled.div`
   /* ensure the trailing buttons remain visible */
-  #left-dock & { overflow: visible !important; }
+  #left-dock & {
+    overflow: visible !important;
+  }
   gap: 0;
   overflow: hidden;
   z-index: 2;
@@ -195,9 +250,14 @@ interface TabContainerProps {
   selected?: boolean;
 }
 
-export const TabContainer = styled.div.withConfig({ shouldForwardProp: (p) => !['pinned','hasTabGroup','selected'].includes(p as string) })<TabContainerProps>`
+export const TabContainer = styled.div.withConfig({
+  shouldForwardProp: (p) =>
+    !['pinned', 'hasTabGroup', 'selected'].includes(p as string),
+})<TabContainerProps>`
   /* ensure nothing inside gets clipped in left dock */
-  #left-dock & { overflow: visible !important; }
+  #left-dock & {
+    overflow: visible !important;
+  }
   position: relative;
 
   width: 100%;
@@ -220,17 +280,27 @@ export const TabContainer = styled.div.withConfig({ shouldForwardProp: (p) => ![
     box-shadow: ${selected ? '0px 0px 6px 0px rgba(0,0,0,0.12)' : 'none'};
   `};
 
-  ${ ({ theme }: { theme: ITheme }) => css`
-    #left-dock & { max-width: 100% !important; margin-top: 0 !important; border: none !important; box-sizing: border-box; padding: 0; }
+  ${({ theme }: { theme: ITheme }) => css`
+    #left-dock & {
+      max-width: 100% !important;
+      margin-top: 0 !important;
+      border: none !important;
+      box-sizing: border-box;
+      padding: 0;
+    }
   `};
 
   /* Left dock overrides: list layout */
-  #left-dock & { max-width: 100% !important; margin-top: 0 !important; border: none !important; box-sizing: border-box; padding: 0; }
+  #left-dock & {
+    max-width: 100% !important;
+    margin-top: 0 !important;
+    border: none !important;
+    box-sizing: border-box;
+    padding: 0;
+  }
 `;
 
-
-  /* Left dock overrides: list layout */
-  
+/* Left dock overrides: list layout */
 
 export const EdgeMask = styled.div`
   position: absolute;
@@ -238,7 +308,8 @@ export const EdgeMask = styled.div`
   transform: translateY(-50%);
   width: 4px;
   height: 60%;
-  background: ${({ theme }: { theme: ITheme }) => theme['toolbar.backgroundColor']};
+  background: ${({ theme }: { theme: ITheme }) =>
+    theme['toolbar.backgroundColor']};
   left: -1px;
   pointer-events: none;
 `;

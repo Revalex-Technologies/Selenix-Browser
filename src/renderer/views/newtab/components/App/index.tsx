@@ -3,7 +3,7 @@ import * as React from 'react';
 import { observer } from 'mobx-react-lite';
 
 import store from '../../store';
-import { ThemeProvider, StyleSheetManager  } from 'styled-components';
+import { ThemeProvider, StyleSheetManager } from 'styled-components';
 import { Wrapper, Content, IconItem, Menu, Image, RightBar } from './style';
 import { TopSites } from '../TopSites';
 import { Clock } from '../Clock';
@@ -52,10 +52,14 @@ export default observer(() => {
         <Wrapper fullSize={store.fullSizeImage}>
           <Weather />
           <Image src={store.imageVisible ? store.image : ''}></Image>
-          <Content>{store.topSitesVisible && (<>
-            <Clock />
-            <TopSites />
-          </>)}</Content>
+          <Content>
+            {store.topSitesVisible && (
+              <>
+                <Clock />
+                <TopSites />
+              </>
+            )}
+          </Content>
 
           <RightBar>
             <IconItem
@@ -71,27 +75,31 @@ export default observer(() => {
               <IconItem
                 imageSet={store.imageVisible}
                 title="Settings"
-               
                 onClick={onIconClick('settings')}
-              >{ICON_SETTINGS}</IconItem>
+              >
+                {ICON_SETTINGS}
+              </IconItem>
               <IconItem
                 imageSet={store.imageVisible}
                 title="History"
-               
                 onClick={onIconClick('history')}
-              >{ICON_HISTORY}</IconItem>
+              >
+                {ICON_HISTORY}
+              </IconItem>
               <IconItem
                 imageSet={store.imageVisible}
                 title="Bookmarks"
-               
                 onClick={onIconClick('bookmarks')}
-              >{ICON_BOOKMARKS}</IconItem>
+              >
+                {ICON_BOOKMARKS}
+              </IconItem>
               <IconItem
                 imageSet={store.imageVisible}
                 title="Downloads"
-               
                 onClick={onIconClick('downloads')}
-              >{ICON_DOWNLOAD}</IconItem>
+              >
+                {ICON_DOWNLOAD}
+              </IconItem>
               {}
             </Menu>
           )}

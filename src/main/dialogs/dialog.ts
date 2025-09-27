@@ -47,7 +47,6 @@ export class PersistentDialog {
     hideTimeout,
     webPreferences,
   }: IOptions) {
-
     this.webContentsView = new WebContentsView({
       webPreferences: {
         nodeIntegration: true,
@@ -72,7 +71,6 @@ export class PersistentDialog {
     this.webContents.loadURL(transparentBoot);
 
     this.webContents.on('dom-ready', () => {
-
       try {
         this.webContents.insertCSS(`
           html, body, #app { background: transparent !important; }
@@ -100,7 +98,6 @@ export class PersistentDialog {
     });
 
     if (process.env.NODE_ENV === 'development') {
-
       this.webContents.loadURL(`http://localhost:4444/${this.name}.html`);
     } else {
       const filePath = join(app.getAppPath(), 'build', `${this.name}.html`);
@@ -227,7 +224,6 @@ export class PersistentDialog {
     } catch {}
 
     try {
-
       if (!this.webContents.isDestroyed()) {
         this.webContents.loadURL('about:blank');
       }

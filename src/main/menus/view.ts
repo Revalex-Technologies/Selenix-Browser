@@ -29,7 +29,9 @@ export const getViewMenu = (
             },
             true,
           );
-          try { if (view?.id != null) appWindow.viewManager.select(view.id, true); } catch {}
+          try {
+            if (view?.id != null) appWindow.viewManager.select(view.id, true);
+          } catch {}
         },
       },
       {
@@ -60,7 +62,9 @@ export const getViewMenu = (
             },
             true,
           );
-          try { if (view?.id != null) appWindow.viewManager.select(view.id, true); } catch {}
+          try {
+            if (view?.id != null) appWindow.viewManager.select(view.id, true);
+          } catch {}
         },
       },
       {
@@ -75,7 +79,6 @@ export const getViewMenu = (
         },
       },
       {
-        
         label: 'Save image as...',
         click: async () => {
           try {
@@ -84,15 +87,29 @@ export const getViewMenu = (
             const guessedName = (() => {
               try {
                 const u = new URL(url);
-                const last = (u.pathname.split('/').pop() || '').split('?')[0] || 'image';
+                const last =
+                  (u.pathname.split('/').pop() || '').split('?')[0] || 'image';
                 return last || 'image';
-              } catch (_err) { return 'image'; }
+              } catch (_err) {
+                return 'image';
+              }
             })();
 
             const res = await dialog.showSaveDialog({
               defaultPath: guessedName,
               filters: [
-                { name: 'Images', extensions: ['png','jpg','jpeg','gif','webp','bmp','svg'] },
+                {
+                  name: 'Images',
+                  extensions: [
+                    'png',
+                    'jpg',
+                    'jpeg',
+                    'gif',
+                    'webp',
+                    'bmp',
+                    'svg',
+                  ],
+                },
                 { name: 'All Files', extensions: ['*'] },
               ],
             });
@@ -102,7 +119,9 @@ export const getViewMenu = (
             const handler = (event: any, item: any) => {
               try {
                 if ((item.getURL && item.getURL()) === url) {
-                  try { item.setSavePath(res.filePath); } catch {}
+                  try {
+                    item.setSavePath(res.filePath);
+                  } catch {}
                   ses.removeListener('will-download', handler);
                 }
               } catch {}
@@ -114,13 +133,18 @@ export const getViewMenu = (
             try {
               // Prefer session.downloadURL with saveAs flag when available
               if (typeof (ses as any).downloadURL === 'function') {
-                try { (ses as any).downloadURL(url, { saveAs: true }); }
-                catch { appWindow.webContents.downloadURL(url); }
+                try {
+                  (ses as any).downloadURL(url, { saveAs: true });
+                } catch {
+                  appWindow.webContents.downloadURL(url);
+                }
               } else {
                 appWindow.webContents.downloadURL(url);
               }
             } catch {}
-          } catch (err) { console.error('Save image as failed:', err); }
+          } catch (err) {
+            console.error('Save image as failed:', err);
+          }
         },
       },
       {

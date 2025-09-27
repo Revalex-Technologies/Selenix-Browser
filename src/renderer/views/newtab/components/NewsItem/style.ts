@@ -1,14 +1,18 @@
 import styled, { css } from 'styled-components';
 import { centerIcon, overline, maxLines, shadows } from '~/renderer/mixins';
 
-export const Img = styled.div.withConfig({ shouldForwardProp: (p) => p !== '$src' })<{ $src?: string }>`
+export const Img = styled.div.withConfig({
+  shouldForwardProp: (p) => p !== '$src',
+})<{ $src?: string }>`
   transition: 0.5s opacity;
   position: relative;
   overflow: hidden;
   background-size: cover;
   background-position: center;
   height: 100%;
-  transition: 0.5s opacity, 0.2s transform;
+  transition:
+    0.5s opacity,
+    0.2s transform;
   will-change: opacity;
 
   ${({ $src = '' }) => css`
@@ -122,7 +126,9 @@ export const Source = styled.div`
   font-size: 12px;
 `;
 
-export const SourceIcon = styled.div.withConfig({ shouldForwardProp: (p) => p !== '$src' })<{ $src?: string }>`
+export const SourceIcon = styled.div.withConfig({
+  shouldForwardProp: (p) => p !== '$src',
+})<{ $src?: string }>`
   width: 16px;
   height: 16px;
   ${centerIcon()};
@@ -131,7 +137,9 @@ export const SourceIcon = styled.div.withConfig({ shouldForwardProp: (p) => p !=
   `};
 `;
 
-export const Info = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'fullSize' })<{ fullSize?: boolean }>`
+export const Info = styled.div.withConfig({
+  shouldForwardProp: (p) => p !== 'fullSize',
+})<{ fullSize?: boolean }>`
   padding: 24px;
   z-index: 2;
   display: flex;

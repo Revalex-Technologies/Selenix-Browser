@@ -54,32 +54,40 @@ export class ViewManager extends EventEmitter {
     });
 
     ipcMain.on('Print', (e, details) => {
-
       const selectedView = this.views.get(this.selectedId);
       if (selectedView?.webContents) {
-        try { selectedView.webContents.print(); } catch (err) { console.error('Print failed (selected view):', err); }
+        try {
+          selectedView.webContents.print();
+        } catch (err) {
+          console.error('Print failed (selected view):', err);
+        }
         return;
       }
       const sender = e?.sender;
       if (sender && typeof (sender as any).print === 'function') {
-        try { (sender as any).print(); } catch (err) { console.error('Print failed (sender):', err); }
+        try {
+          (sender as any).print();
+        } catch (err) {
+          console.error('Print failed (sender):', err);
+        }
         return;
       }
       console.warn('[Print] No active view/webContents available to print.');
     });
 
     ipcMain.handle(`view-select-${id}`, (e, tabId: number, focus: boolean) => {
-
       if (process.env.ENABLE_EXTENSIONS && Application.instance.extensions) {
-        const view = this.views.get(tabId)
+        const view = this.views.get(tabId);
         if (view) {
           try {
-            Application.instance.extensions.selectTab(view.webContentsView.webContents)
+            Application.instance.extensions.selectTab(
+              view.webContentsView.webContents,
+            );
           } catch {}
         }
-        this.select(tabId, focus)
+        this.select(tabId, focus);
       } else {
-        this.select(tabId, focus)
+        this.select(tabId, focus);
       }
     });
 
@@ -158,31 +166,30 @@ export class ViewManager extends EventEmitter {
     this.views.set(id, view);
 
     if (process.env.ENABLE_EXTENSIONS) {
-
       try {
-        Application.instance.extensions?.addTab(
-          webContents,
-          this.window.win,
-        )
+        Application.instance.extensions?.addTab(webContents, this.window.win);
       } catch {}
     }
 
     webContents.once('destroyed', () => {
-
       if (process.env.ENABLE_EXTENSIONS) {
         try {
-          Application.instance.extensions?.removeTab(webContents)
+          Application.instance.extensions?.removeTab(webContents);
         } catch {}
       }
       this.views.delete(id);
 
-    try {
-      const wc: any = (view as any)?.webContentsView?.webContents ?? view?.webContents;
-      const title = wc && typeof wc.getTitle === 'function' ? wc.getTitle() : 'Closed Tab';
-      const url = wc && typeof wc.getURL === 'function' ? wc.getURL() : '';
-      this.recentlyClosed.unshift({ title, url });
-      if (this.recentlyClosed.length > 25) this.recentlyClosed.pop();
-    } catch {}
+      try {
+        const wc: any =
+          (view as any)?.webContentsView?.webContents ?? view?.webContents;
+        const title =
+          wc && typeof wc.getTitle === 'function'
+            ? wc.getTitle()
+            : 'Closed Tab';
+        const url = wc && typeof wc.getURL === 'function' ? wc.getURL() : '';
+        this.recentlyClosed.unshift({ title, url });
+        if (this.recentlyClosed.length > 25) this.recentlyClosed.pop();
+      } catch {}
     });
 
     if (sendMessage) {
@@ -193,12 +200,10 @@ export class ViewManager extends EventEmitter {
 
   public clear() {
     try {
-
       const contentView = this.window.win?.contentView as any;
       if (contentView && typeof contentView.removeChildView === 'function') {
         for (const v of this.views.values()) {
           try {
-
             contentView.removeChildView(v.webContentsView);
           } catch {}
           try {
@@ -206,13 +211,13 @@ export class ViewManager extends EventEmitter {
           } catch {}
         }
       } else {
-
         for (const v of this.views.values()) {
-          try { v.destroy(); } catch {}
+          try {
+            v.destroy();
+          } catch {}
         }
       }
     } finally {
-
       if (typeof (this.views as any).clear === 'function') {
         (this.views as Map<number, any>).clear();
       }
@@ -239,7 +244,6 @@ export class ViewManager extends EventEmitter {
     this.window.win.contentView.addChildView(view.webContentsView);
 
     if (focus) {
-
       view.webContents.focus();
     } else {
       this.window.webContents.focus();
@@ -258,13 +262,12 @@ export class ViewManager extends EventEmitter {
   }
 
   public async fixBounds() {
-  const view = this.selected;
-  if (!view) return;
+    const view = this.selected;
+    if (!view) return;
 
-  const { width, height } = this.window.win.getContentBounds();
+    const { width, height } = this.window.win.getContentBounds();
 
-    
-const sizes: any = await this.window.win.webContents.executeJavaScript(`
+    const sizes: any = await this.window.win.webContents.executeJavaScript(`
   (() => {
     const app = document.getElementById('app');
     const dock = document.getElementById('left-dock');
@@ -274,32 +277,38 @@ const sizes: any = await this.window.win.webContents.executeJavaScript(`
   })()
 `);
 
-const left = (sizes && sizes.leftDockWidth) || 0;
-let top = this.fullscreen ? 0 : (((sizes && sizes.toolbarContentHeight) || 0));
+    const left = (sizes && sizes.leftDockWidth) || 0;
+    const top = this.fullscreen
+      ? 0
+      : (sizes && sizes.toolbarContentHeight) || 0;
 
-const newBounds = {x: left, y: Math.max(0, top),
-    width: Math.max(0, width - left),
-    height: this.fullscreen ? height : Math.max(0, height - top),
-  };
+    const newBounds = {
+      x: left,
+      y: Math.max(0, top),
+      width: Math.max(0, width - left),
+      height: this.fullscreen ? height : Math.max(0, height - top),
+    };
 
-  const prev = (view as any).bounds || {};
-  if (
-    prev.x !== newBounds.x ||
-    prev.y !== newBounds.y ||
-    prev.width !== newBounds.width ||
-    prev.height !== newBounds.height
-  ) {
-    try {
-      if ((view as any).webContentsView && typeof (view as any).webContentsView.setBounds === 'function') {
-        (view as any).webContentsView.setBounds(newBounds);
-      }
-    } catch {}
-    (view as any).bounds = newBounds as any;
+    const prev = (view as any).bounds || {};
+    if (
+      prev.x !== newBounds.x ||
+      prev.y !== newBounds.y ||
+      prev.width !== newBounds.width ||
+      prev.height !== newBounds.height
+    ) {
+      try {
+        if (
+          (view as any).webContentsView &&
+          typeof (view as any).webContentsView.setBounds === 'function'
+        ) {
+          (view as any).webContentsView.setBounds(newBounds);
+        }
+      } catch {}
+      (view as any).bounds = newBounds as any;
+    }
   }
-}
 
   private setBoundsListener() {
-
     this.window.webContents.executeJavaScript(`
         const {ipcRenderer} = require('electron');
         const resizeObserver = new ResizeObserver(([{ contentRect }]) => {
@@ -314,11 +323,14 @@ const newBounds = {x: left, y: Math.max(0, top),
         }
       `);
 
-    this.window.webContents.on('ipc-message', (_event: unknown, message: string, ..._args: unknown[]) => {
-      if (message === 'resize-height') {
-        this.fixBounds();
-      }
-    });
+    this.window.webContents.on(
+      'ipc-message',
+      (_event: unknown, message: string, ..._args: unknown[]) => {
+        if (message === 'resize-height') {
+          this.fixBounds();
+        }
+      },
+    );
   }
 
   public destroy(id: number) {
@@ -328,17 +340,24 @@ const newBounds = {x: left, y: Math.max(0, top),
     this.views.delete(id);
 
     try {
-      const wc: any = (view as any)?.webContentsView?.webContents ?? view?.webContents;
-      const title = wc && typeof wc.getTitle === 'function' ? wc.getTitle() : 'Closed Tab';
+      const wc: any =
+        (view as any)?.webContentsView?.webContents ?? view?.webContents;
+      const title =
+        wc && typeof wc.getTitle === 'function' ? wc.getTitle() : 'Closed Tab';
       const url = wc && typeof wc.getURL === 'function' ? wc.getURL() : '';
       this.recentlyClosed.unshift({ title, url });
       if (this.recentlyClosed.length > 25) this.recentlyClosed.pop();
     } catch {}
     try {
       const wc: any = (view as any)?.webContentsView?.webContents;
-      if (process.env.ENABLE_EXTENSIONS && wc && Application.instance.extensions) {
+      if (
+        process.env.ENABLE_EXTENSIONS &&
+        wc &&
+        Application.instance.extensions
+      ) {
         try {
-          const alive = typeof wc.isDestroyed === 'function' ? !wc.isDestroyed() : true;
+          const alive =
+            typeof wc.isDestroyed === 'function' ? !wc.isDestroyed() : true;
           if (alive) Application.instance.extensions.removeTab(wc);
         } catch {}
       }
@@ -348,13 +367,19 @@ const newBounds = {x: left, y: Math.max(0, top),
       const child: any = (view as any)?.webContentsView;
       const win = this.window?.win;
       if (child && win && !win.isDestroyed()) {
-        try { win.contentView.removeChildView(child); } catch {}
+        try {
+          win.contentView.removeChildView(child);
+        } catch {}
       }
     } catch {}
 
-    try { view.destroy(); } catch {}
+    try {
+      view.destroy();
+    } catch {}
 
-    try { this.emit('removed', id); } catch {}
+    try {
+      this.emit('removed', id);
+    } catch {}
   }
 
   public emitZoomUpdate(showDialog = true) {

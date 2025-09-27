@@ -1,6 +1,9 @@
-import { contextBridge, ipcRenderer as electronIpcRenderer, webFrame } from 'electron';
+import {
+  contextBridge,
+  ipcRenderer as electronIpcRenderer,
+  webFrame,
+} from 'electron';
 (window as any).ipcRenderer = electronIpcRenderer;
-
 
 export type IpcRendererLike = {
   send: (...args: any[]) => void;
@@ -23,26 +26,37 @@ declare global {
 }
 
 function pickIpc(): IpcRendererLike {
-  const api = window.__electronApi?.ipcRenderer
-    ?? window.electron?.ipcRenderer
-    ?? (window as any).ipcRenderer;
+  const api =
+    window.__electronApi?.ipcRenderer ??
+    window.electron?.ipcRenderer ??
+    (window as any).ipcRenderer;
   if (!api) {
-
     const no = () => {};
-    const noop: any = new Proxy(no, { get: () => noop, apply: () => undefined });
-    return Object.assign(noop, { on: no, once: no, removeListener: no, removeAllListeners: no });
+    const noop: any = new Proxy(no, {
+      get: () => noop,
+      apply: () => undefined,
+    });
+    return Object.assign(noop, {
+      on: no,
+      once: no,
+      removeListener: no,
+      removeAllListeners: no,
+    });
   }
   return api;
 }
 
 function pickRemote(): any {
-  return window.__electronApi?.remote ?? window.electron?.remote ?? (window as any).remote ?? {};
+  return (
+    window.__electronApi?.remote ??
+    window.electron?.remote ??
+    (window as any).remote ??
+    {}
+  );
 }
 
 export const ipcRenderer: IpcRendererLike = pickIpc();
 export const remote: any = pickRemote();
-
-
 
 import AutoComplete from './models/auto-complete';
 import { ERROR_PROTOCOL, WEBUI_BASE_URL } from '~/constants/files';
@@ -51,11 +65,17 @@ const tabId: number = ipcRenderer.sendSync('get-webcontents-id');
 export const windowId: number = ipcRenderer.sendSync('get-window-id');
 
 const goBack = () => {
-  ipcRenderer.invoke('web-contents-call', { webContentsId: tabId, method: 'navigationHistory.goBack' });
+  ipcRenderer.invoke('web-contents-call', {
+    webContentsId: tabId,
+    method: 'navigationHistory.goBack',
+  });
 };
 
 const goForward = () => {
-  ipcRenderer.invoke('web-contents-call', { webContentsId: tabId, method: 'navigationHistory.goForward' });
+  ipcRenderer.invoke('web-contents-call', {
+    webContentsId: tabId,
+    method: 'navigationHistory.goForward',
+  });
 };
 
 window.addEventListener('mouseup', (e: any) => {
@@ -148,10 +168,11 @@ const hostname = window.location.href.substr(WEBUI_BASE_URL.length);
 const settings = ipcRenderer.sendSync('get-settings-sync');
 
 contextBridge.exposeInMainWorld('electron', {
-
   ipc: {
-    invoke: (channel: string, ...args: any[]) => ipcRenderer.invoke(channel, ...args),
-    send: (channel: string, ...args: any[]) => ipcRenderer.send(channel, ...args),
+    invoke: (channel: string, ...args: any[]) =>
+      ipcRenderer.invoke(channel, ...args),
+    send: (channel: string, ...args: any[]) =>
+      ipcRenderer.send(channel, ...args),
     on: (channel: string, listener: (...args: any[]) => void) =>
       ipcRenderer.on(channel, (_e, ...rest) => listener(...rest)),
     once: (channel: string, listener: (...args: any[]) => void) =>
@@ -185,15 +206,18 @@ contextBridge.exposeInMainWorld('webui', {
   getErrorURL: async () => ipcRenderer.invoke(`get-error-url-${tabId}`),
   getHistory: async () => ipcRenderer.invoke('history-get'),
   removeHistory: (ids: string[]) => ipcRenderer.send('history-remove', ids),
-  getTopSites: async (count: number) => ipcRenderer.invoke('topsites-get', count),
+  getTopSites: async (count: number) =>
+    ipcRenderer.invoke('topsites-get', count),
 });
 
 contextBridge.exposeInMainWorld('require', (id: string) => {
   if (id === 'electron') {
     return {
       ipcRenderer: {
-        invoke: (channel: string, ...args: any[]) => ipcRenderer.invoke(channel, ...args),
-        send: (channel: string, ...args: any[]) => ipcRenderer.send(channel, ...args),
+        invoke: (channel: string, ...args: any[]) =>
+          ipcRenderer.invoke(channel, ...args),
+        send: (channel: string, ...args: any[]) =>
+          ipcRenderer.send(channel, ...args),
         on: (channel: string, listener: (...args: any[]) => void) =>
           ipcRenderer.on(channel, (_e, ...rest) => listener(...rest)),
         once: (channel: string, listener: (...args: any[]) => void) =>
@@ -234,7 +258,10 @@ if (window.location.href.startsWith(WEBUI_BASE_URL)) {
       });
       postMsg(data, res);
     } else if (data.type === 'credentials-get-password') {
-      const res = await ipcRenderer.invoke('credentials-get-password', data.data);
+      const res = await ipcRenderer.invoke(
+        'credentials-get-password',
+        data.data,
+      );
       postMsg(data, res);
     } else if (data.type === 'save-settings') {
       ipcRenderer.send('save-settings', { settings: data.data });

@@ -29,16 +29,12 @@ export class PreviewDialog extends PersistentDialog {
   public async show(browserWindow: BrowserWindow) {
     super.show(browserWindow, false);
 
-    const {
-      id,
-      url,
-      title,
-      errorURL,
-    } = Application.instance.windows
+    const { id, url, title, errorURL } = Application.instance.windows
       .fromBrowserWindow(browserWindow)
       .viewManager.views.get(this.tab.id);
 
-    const appWindow = Application.instance.windows.fromBrowserWindow(browserWindow);
+    const appWindow =
+      Application.instance.windows.fromBrowserWindow(browserWindow);
     const view = appWindow.viewManager.views.get(this.tab.id);
 
     let memoryMB: number | null = null;
@@ -55,13 +51,15 @@ export class PreviewDialog extends PersistentDialog {
           bytes = v < 10_000_000 ? v * 1024 : v;
         }
       }
-      memoryMB = bytes != null ? Math.max(1, Math.round(bytes / (1024 * 1024))) : null;
+      memoryMB =
+        bytes != null ? Math.max(1, Math.round(bytes / (1024 * 1024))) : null;
     } catch (e) {
       memoryMB = null;
     }
-    
+
     try {
-      const appWindow = Application.instance.windows.fromBrowserWindow(browserWindow);
+      const appWindow =
+        Application.instance.windows.fromBrowserWindow(browserWindow);
       const view = appWindow.viewManager.views.get(this.tab.id);
       if (view) {
         const pid = view.webContents.getOSProcessId();
@@ -72,7 +70,10 @@ export class PreviewDialog extends PersistentDialog {
             let memoryMB: number | null = null;
             if (proc?.memory?.workingSetSize) {
               const ws = proc.memory.workingSetSize;
-              memoryMB = ws > 1024 * 1024 ? Math.round(ws / 1024 / 1024) : Math.round(ws / 1024);
+              memoryMB =
+                ws > 1024 * 1024
+                  ? Math.round(ws / 1024 / 1024)
+                  : Math.round(ws / 1024);
             }
             this.send('memory-update', { memoryMB });
           } catch (e) {
@@ -83,7 +84,7 @@ export class PreviewDialog extends PersistentDialog {
     } catch (e) {
       // ignore
     }
-    
+
     const stopPolling = () => {
       if (this.memoryInterval) {
         clearInterval(this.memoryInterval);
@@ -93,7 +94,9 @@ export class PreviewDialog extends PersistentDialog {
     stopPolling();
     const readMemoryMB = () => {
       try {
-        const pid = (view.webContents as any).getProcessId?.() ?? view.webContents.getOSProcessId?.();
+        const pid =
+          (view.webContents as any).getProcessId?.() ??
+          view.webContents.getOSProcessId?.();
         const metrics = app.getAppMetrics?.() || [];
         const proc = metrics.find((m: any) => m.pid === pid);
         const mem = proc?.memory;
@@ -105,7 +108,8 @@ export class PreviewDialog extends PersistentDialog {
             bytes = v < 10_000_000 ? v * 1024 : v;
           }
         }
-        const mb = bytes != null ? Math.max(1, Math.round(bytes / (1024 * 1024))) : null;
+        const mb =
+          bytes != null ? Math.max(1, Math.round(bytes / (1024 * 1024))) : null;
         return mb;
       } catch {
         return null;
@@ -123,12 +127,17 @@ export class PreviewDialog extends PersistentDialog {
 
     this.memoryInterval = setInterval(() => {
       const mb = readMemoryMB();
-      if (mb != null) { this.send('memory-update', { memoryMB: mb }); }
+      if (mb != null) {
+        this.send('memory-update', { memoryMB: mb });
+      }
     }, 1000);
-    }
+  }
 
   public hide(bringToTop = true) {
-    if (this.memoryInterval) { clearInterval(this.memoryInterval); this.memoryInterval = null; }
+    if (this.memoryInterval) {
+      clearInterval(this.memoryInterval);
+      this.memoryInterval = null;
+    }
     super.hide(bringToTop);
   }
 }

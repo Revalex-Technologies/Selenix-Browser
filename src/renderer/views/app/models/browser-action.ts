@@ -9,7 +9,6 @@ interface Options {
 }
 
 export class IBrowserAction {
-
   public icon?: string = '';
 
   public _popup?: string = '';
@@ -32,13 +31,11 @@ export class IBrowserAction {
     } else if (url.startsWith(EXTENSIONS_PROTOCOL)) {
       this._popup = url;
     } else {
-
       try {
         const base = `${EXTENSIONS_PROTOCOL}//${this.extensionId}`;
         const constructed = new URL(url, base);
         this._popup = constructed.toString();
       } catch {
-
         const normalizedPath = url.startsWith('/') ? url : `/${url}`;
         this._popup = `${EXTENSIONS_PROTOCOL}//${this.extensionId}${normalizedPath}`;
       }

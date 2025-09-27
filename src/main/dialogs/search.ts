@@ -18,7 +18,14 @@ export class SearchDialog extends PersistentDialog {
   private yAdjust: number = 0;
   private isPreviewVisible = false;
 
-  public data = { text: '', cursorPos: 0, x: 0, y: 0, width: 200, isCompact: false };
+  public data = {
+    text: '',
+    cursorPos: 0,
+    x: 0,
+    y: 0,
+    width: 200,
+    isCompact: false,
+  };
 
   public constructor() {
     super({
@@ -49,14 +56,17 @@ export class SearchDialog extends PersistentDialog {
     const compact = !!this.data.isCompact;
     const yRaw = this.data.y - DIALOG_MARGIN_TOP - this.yAdjust;
     const chromeHeight = TOOLBAR_HEIGHT + COMPACT_TITLEBAR_HEIGHT;
-    const y = compact ? (-(TOOLBAR_HEIGHT + COMPACT_TITLEBAR_HEIGHT - DIALOG_TOP) + COMPACT_OMNIBOX_Y_OFFSET) : yRaw;
+    const y = compact
+      ? -(TOOLBAR_HEIGHT + COMPACT_TITLEBAR_HEIGHT - DIALOG_TOP) +
+        COMPACT_OMNIBOX_Y_OFFSET
+      : yRaw;
     super.rearrange({
       x: this.data.x - DIALOG_MARGIN,
       y,
       width: this.data.width + 2 * DIALOG_MARGIN,
     });
   }
-private onResize = () => {
+  private onResize = () => {
     this.hide();
   };
 
@@ -64,13 +74,15 @@ private onResize = () => {
     super.show(browserWindow, true, false);
     // /* NORMAL-MODE ALIGNMENT */
     try {
-      const flags: any = await browserWindow.webContents.executeJavaScript(`(() => {
+      const flags: any = await browserWindow.webContents
+        .executeJavaScript(`(() => {
         const hasLeftDock = !!document.getElementById('left-dock');
         const isCompact = !!document.querySelector('[data-compact="true"], .compact, .compact-mode');
         const hasAddressBar = !!document.querySelector('[data-addressbar-input="true"]');
         return { hasLeftDock, isCompact, hasAddressBar };
       })()`);
-      const isNormal = flags && flags.hasAddressBar && !flags.hasLeftDock && !flags.isCompact;
+      const isNormal =
+        flags && flags.hasAddressBar && !flags.hasLeftDock && !flags.isCompact;
       const isCompact = flags && flags.isCompact;
       // Persist a y-offset so rearrange() corrects for UI chrome in compact mode
       this.yAdjust = isCompact ? 1 : 0;
@@ -78,7 +90,7 @@ private onResize = () => {
       this.rearrange();
     } catch {}
 
-browserWindow.once('resize', this.onResize);
+    browserWindow.once('resize', this.onResize);
 
     this.send('visible', true, {
       id: Application.instance.windows.current.viewManager.selectedId,

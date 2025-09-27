@@ -13,7 +13,9 @@ interface StyledTextfieldProps {
   width?: number;
   dark: boolean;
 }
-export const StyledTextfield = styled.div.withConfig({ shouldForwardProp: (p) => !['width','dark'].includes(p as string) })<{ width?: number; dark?: boolean;}>`
+export const StyledTextfield = styled.div.withConfig({
+  shouldForwardProp: (p) => !['width', 'dark'].includes(p as string),
+})<{ width?: number; dark?: boolean }>`
   ${({ width, dark }: Partial<StyledTextfieldProps>) => css`
     width: ${width === undefined ? 280 : width}px;
     background-color: ${dark ? 'rgba(255, 255, 255, 0.06)' : '#f5f5f5'};
@@ -33,7 +35,10 @@ interface InputProps {
   dark: boolean;
 }
 
-export const Input = styled.input.withConfig({ shouldForwardProp: (p) => !['color','hasLabel','hasIcon','dark'].includes(p as string) })<{ color?: string; hasLabel?: boolean; hasIcon?: boolean; dark?: boolean;}>`
+export const Input = styled.input.withConfig({
+  shouldForwardProp: (p) =>
+    !['color', 'hasLabel', 'hasIcon', 'dark'].includes(p as string),
+})<{ color?: string; hasLabel?: boolean; hasIcon?: boolean; dark?: boolean }>`
   width: 100%;
   height: 55px;
   font-size: 16px;
@@ -72,10 +77,16 @@ interface LabelProps {
   dark: boolean;
 }
 
-export const Label = styled.div.withConfig({ shouldForwardProp: (p) => !['activated','focused','color','dark'].includes(p as string) })<{ activated?: boolean; focused?: boolean; color?: string; dark?: boolean;}>`
+export const Label = styled.div.withConfig({
+  shouldForwardProp: (p) =>
+    !['activated', 'focused', 'color', 'dark'].includes(p as string),
+})<{ activated?: boolean; focused?: boolean; color?: string; dark?: boolean }>`
   left: 12px;
   position: absolute;
-  transition: 0.2s font-size, 0.2s color, 0.2s margin-top;
+  transition:
+    0.2s font-size,
+    0.2s color,
+    0.2s margin-top;
   transition-timing-function: ${EASING_FUNCTION};
   -webkit-font-smoothing: antialiased;
   ${centerVertical()};
@@ -86,13 +97,15 @@ export const Label = styled.div.withConfig({ shouldForwardProp: (p) => !['activa
     color: ${focused
       ? color
       : dark
-      ? `rgba(255, 255, 255, ${transparency.text.medium})`
-      : `rgba(0, 0, 0, ${transparency.text.medium})`};
+        ? `rgba(255, 255, 255, ${transparency.text.medium})`
+        : `rgba(0, 0, 0, ${transparency.text.medium})`};
     ${activated ? robotoMedium() : robotoRegular()};
   `}
 `;
 
-export const Indicator = styled.div.withConfig({ shouldForwardProp: (p) => !['focused','color'].includes(p as string) })<{ focused?: boolean; color?: string;}>`
+export const Indicator = styled.div.withConfig({
+  shouldForwardProp: (p) => !['focused', 'color'].includes(p as string),
+})<{ focused?: boolean; color?: string }>`
   height: 2px;
   margin-left: auto;
   margin-right: auto;
@@ -108,7 +121,9 @@ export const Indicator = styled.div.withConfig({ shouldForwardProp: (p) => !['fo
   `}
 `;
 
-export const Icon = styled.div.withConfig({ shouldForwardProp: (p) => !['src','dark'].includes(p as string) })<{ src?: string; dark?: boolean;}>`
+export const Icon = styled.div.withConfig({
+  shouldForwardProp: (p) => !['src', 'dark'].includes(p as string),
+})<{ src?: string; dark?: boolean }>`
   width: 36px;
   height: 36px;
   position: absolute;

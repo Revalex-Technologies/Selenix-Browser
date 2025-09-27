@@ -7,7 +7,7 @@ const HEIGHT = 271;
 
 export class CredentialsDialog extends PersistentDialog {
   public appWindow: AppWindow;
-  public declare browserWindow: Electron.BrowserWindow;
+  declare public browserWindow: Electron.BrowserWindow;
 
   public constructor(appWindow: AppWindow) {
     super({

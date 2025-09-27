@@ -105,16 +105,18 @@ export class Application {
     this.storage.run();
     this.dialogs.run();
 
-    this.sessions = new SessionsService()
+    this.sessions = new SessionsService();
 
-    await setupExtensions(this)
+    await setupExtensions(this);
 
-    await setupChromeWebStore(this)
+    await setupChromeWebStore(this);
 
     const installedNow = await installOnNextLaunchIfPending();
-    if (installedNow) { return; }
+    if (installedNow) {
+      return;
+    }
 
-    this.windows.open()
+    this.windows.open();
 
     Menu.setApplicationMenu(getMainMenu());
     runAutoUpdaterService();

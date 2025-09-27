@@ -52,9 +52,11 @@ export const TabGroups = observer(() => {
   );
 });
 
-interface TabbarProps { hasDockButton?: boolean }
+interface TabbarProps {
+  hasDockButton?: boolean;
+}
 
-export const Tabbar = observer(({hasDockButton}: TabbarProps) => {
+export const Tabbar = observer(({ hasDockButton }: TabbarProps) => {
   return (
     <StyledTabbar hasDockButton={hasDockButton}>
       <TabsContainer

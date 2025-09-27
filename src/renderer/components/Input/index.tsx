@@ -31,7 +31,9 @@ export const Input = styled.input.attrs(() => ({
   ${Control}
 `;
 
-export const Dropdown = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'dark' })<{ dark?: boolean;}>`
+export const Dropdown = styled.div.withConfig({
+  shouldForwardProp: (p) => p !== 'dark',
+})<{ dark?: boolean }>`
   ${Control}
 
   &:after {

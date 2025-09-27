@@ -2,8 +2,10 @@ import styled from 'styled-components';
 import { ITheme } from '~/interfaces';
 
 export const Page = styled.div`
-  background-color: ${(props: { theme: ITheme }) => (props.theme.backgroundColor)};
-  color: ${(props: { theme: ITheme }) => (props.theme['pages.textColor'] ?? 'inherit')};
+  background-color: ${(props: { theme: ITheme }) =>
+    props.theme.backgroundColor};
+  color: ${(props: { theme: ITheme }) =>
+    props.theme['pages.textColor'] ?? 'inherit'};
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -26,7 +28,6 @@ export const List = styled.div`
   margin: 0 auto;
   padding: 0 64px 32px;
 `;
-
 
 export const Scroller = styled.div`
   flex: 1;

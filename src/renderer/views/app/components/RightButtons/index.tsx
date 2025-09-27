@@ -7,7 +7,6 @@ import { ipcRenderer } from 'electron';
 
 import { ToolbarButton } from '../ToolbarButton';
 
-
 import { RemovedActions as BrowserActionsExtensions } from '../BrowserAction/index';
 import {
   ICON_SHIELD,
@@ -17,7 +16,8 @@ import {
 } from '~/renderer/constants/icons';
 import { Buttons, Separator } from './style';
 
-const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
+const useIsomorphicLayoutEffect =
+  typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
 import store from '../../store';
 import { SiteButtons } from '../SiteButtons';
 
@@ -46,17 +46,26 @@ export const RightButtons = observer(() => {
   const buttonsRef = React.useRef<HTMLDivElement | null>(null);
   const [hasExtensionActions, setHasExtensionActions] = React.useState(false);
   React.useEffect(() => {
-
     const el = buttonsRef.current;
     if (!el) return;
     const w = el.offsetWidth;
-    document.documentElement.style.setProperty('--right-buttons-width', `${w}px`);
-  }, [hasExtensionActions, store.extensions.browserActions.length, store.tabs.selectedTabId]);
+    document.documentElement.style.setProperty(
+      '--right-buttons-width',
+      `${w}px`,
+    );
+  }, [
+    hasExtensionActions,
+    store.extensions.browserActions.length,
+    store.tabs.selectedTabId,
+  ]);
 
   useIsomorphicLayoutEffect(() => {
     const update = () => {
       const w = buttonsRef.current ? buttonsRef.current.offsetWidth : 0;
-      document.documentElement.style.setProperty('--right-buttons-width', `${w}px`);
+      document.documentElement.style.setProperty(
+        '--right-buttons-width',
+        `${w}px`,
+      );
     };
 
     update();
@@ -72,7 +81,11 @@ export const RightButtons = observer(() => {
 
     const mo = new MutationObserver(() => update());
     if (buttonsRef.current) {
-      mo.observe(buttonsRef.current, { childList: true, subtree: true, attributes: true });
+      mo.observe(buttonsRef.current, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+      });
       try {
         const ro = new (window as any).ResizeObserver(() => update());
         (ro as any).observe(buttonsRef.current);
@@ -129,7 +142,9 @@ export const RightButtons = observer(() => {
           icon={ICON_DOWNLOAD}
           badgeTop={9}
           badgeRight={9}
-          preloader={store.downloads.some((x: any) => !x.completed && !x.canceled)}
+          preloader={store.downloads.some(
+            (x: any) => !x.completed && !x.canceled,
+          )}
           value={store.downloadProgress}
         ></ToolbarButton>
       )}

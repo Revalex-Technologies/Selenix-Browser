@@ -4,13 +4,16 @@ import { Application } from '../application';
 import { join } from 'path';
 import { existsSync, writeFileSync, unlinkSync } from 'fs';
 
-const UPDATE_PENDING_MARKER = () => join(app.getPath('userData'), 'update-pending.marker');
+const UPDATE_PENDING_MARKER = () =>
+  join(app.getPath('userData'), 'update-pending.marker');
 
 export async function installOnNextLaunchIfPending(): Promise<boolean> {
   try {
     const marker = UPDATE_PENDING_MARKER();
     if (existsSync(marker)) {
-      try { unlinkSync(marker); } catch {}
+      try {
+        unlinkSync(marker);
+      } catch {}
       // Check & download if not already downloaded
       const res = await (autoUpdater as any).checkForUpdates();
       try {
@@ -26,17 +29,15 @@ export async function installOnNextLaunchIfPending(): Promise<boolean> {
 }
 
 export const runAutoUpdaterService = () => {
-
   const updater = autoUpdater as any;
 
-  let __updateAvailable = false;
-  let __updateDownloaded = false;
+  const __updateAvailable = false;
+  const __updateDownloaded = false;
 
   updater.autoDownload = false;
   updater.autoInstallOnAppQuit = false;
 
   if (!app.isPackaged) {
-
     try {
       updater.forceDevUpdateConfig = true;
     } catch {}
@@ -47,7 +48,6 @@ export const runAutoUpdaterService = () => {
   let installRequested = false;
 
   const broadcast = (channel: string, ...args: any[]) => {
-
     for (const w of Application.instance.windows.list) {
       try {
         w.send(channel, ...args);
@@ -94,7 +94,7 @@ export const runAutoUpdaterService = () => {
     if (installRequested) {
       installRequested = false;
       showError(
-        `No update available.\nYou're already on version ${app.getVersion()}.`
+        `No update available.\nYou're already on version ${app.getVersion()}.`,
       );
     }
   });
@@ -113,7 +113,7 @@ export const runAutoUpdaterService = () => {
           }
         } else {
           showError(
-            'Update downloaded (development build).\nInstall is only performed in packaged apps.'
+            'Update downloaded (development build).\nInstall is only performed in packaged apps.',
           );
         }
       });
@@ -134,9 +134,8 @@ export const runAutoUpdaterService = () => {
         const info = await updater.checkForUpdates();
         hasUpdate = !!info?.updateInfo?.version;
         if (!hasUpdate) {
-
           showError(
-            `No update available.\nYou're already on version ${app.getVersion()}.`
+            `No update available.\nYou're already on version ${app.getVersion()}.`,
           );
           installRequested = false;
           return;
@@ -144,7 +143,6 @@ export const runAutoUpdaterService = () => {
       }
 
       if (isDownloaded) {
-
         setImmediate(() => {
           if (app.isPackaged) {
             try {
@@ -154,7 +152,7 @@ export const runAutoUpdaterService = () => {
             }
           } else {
             showError(
-              'Update downloaded (development build).\nInstall is only performed in packaged apps.'
+              'Update downloaded (development build).\nInstall is only performed in packaged apps.',
             );
           }
         });
@@ -172,12 +170,14 @@ export const runAutoUpdaterService = () => {
   });
 
   app.on('before-quit', () => {
-try {
-  if (__updateAvailable) {
-    const marker = UPDATE_PENDING_MARKER();
-    try { writeFileSync(marker, '1'); } catch {}
-  }
-} catch {}
+    try {
+      if (__updateAvailable) {
+        const marker = UPDATE_PENDING_MARKER();
+        try {
+          writeFileSync(marker, '1');
+        } catch {}
+      }
+    } catch {}
   });
 
   setTimeout(() => {

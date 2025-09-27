@@ -1,7 +1,7 @@
 import isPropValid from '@emotion/is-prop-valid';
 import * as React from 'react';
 import { observer } from 'mobx-react-lite';
-import { ThemeProvider, StyleSheetManager  } from 'styled-components';
+import { ThemeProvider, StyleSheetManager } from 'styled-components';
 
 import { StyledApp, Input, CurrentIcon, SearchBox } from './style';
 import store from '../../store';
@@ -18,7 +18,6 @@ import {
 
 const onKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
   if (e.which === 13) {
-
     e.preventDefault();
 
     const text = e.currentTarget.value;
@@ -82,7 +81,6 @@ const onInput = (e: any) => {
   }
 
   store.suggest();
-
 };
 
 export const App = observer(() => {

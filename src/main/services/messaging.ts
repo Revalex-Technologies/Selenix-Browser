@@ -13,18 +13,19 @@ let passwordStore: PasswordStore;
 
 void (async () => {
   try {
-
     const electronStoreMod = await import('electron-store');
-    const Store = (electronStoreMod as any).default as typeof import('electron-store').default;
+    const Store = (electronStoreMod as any)
+      .default as typeof import('electron-store').default;
     /* removed version log that imported electron-store/package.json to fix webpack export error */
-const store = new (Store as any)({
+    const store = new (Store as any)({
       name: 'credentials',
 
       encryptionKey: process.env.ELECTRON_STORE_KEY || undefined,
       clearInvalidConfig: true,
     });
 
-    const makeKey = (service: string, account: string) => `${service}:${account}`;
+    const makeKey = (service: string, account: string) =>
+      `${service}:${account}`;
 
     passwordStore = {
       async get(service, account) {
@@ -39,12 +40,12 @@ const store = new (Store as any)({
       },
     };
   } catch (err) {
-
     console.warn(
       '[credentials] electron-store not found; falling back to in-memory storage (passwords will not persist).',
     );
     const mem = new Map<string, string>();
-    const makeKey = (service: string, account: string) => `${service}:${account}`;
+    const makeKey = (service: string, account: string) =>
+      `${service}:${account}`;
 
     passwordStore = {
       async get(service, account) {
@@ -84,7 +85,7 @@ import { showZoomDialog } from '../dialogs/zoom';
 import { showTabGroupDialog } from '../dialogs/tabgroup';
 
 export const runMessagingService = (appWindow: AppWindow) => {
-    ipcMain.handle('get-app-icon-path', async () => {
+  ipcMain.handle('get-app-icon-path', async () => {
     try {
       // Try to get the current process's icon (native app executable)
       const exePath = process.execPath;
@@ -99,17 +100,30 @@ export const runMessagingService = (appWindow: AppWindow) => {
     try {
       const candidates = [
         require('path').join(app.getAppPath(), 'static', 'icons', 'icon.png'),
-        require('path').join(app.getAppPath(), 'static', 'nightly-icons', 'icon.png'),
-        process.resourcesPath ? require('path').join(process.resourcesPath, 'static', 'icons', 'icon.png') : null,
+        require('path').join(
+          app.getAppPath(),
+          'static',
+          'nightly-icons',
+          'icon.png',
+        ),
+        process.resourcesPath
+          ? require('path').join(
+              process.resourcesPath,
+              'static',
+              'icons',
+              'icon.png',
+            )
+          : null,
       ].filter(Boolean) as string[];
 
       const fs_ = require('fs');
-      const found = (candidates as string[]).find(p => fs_.existsSync(p));
+      const found = (candidates as string[]).find((p) => fs_.existsSync(p));
       if (!found) return null;
 
-      const normalized = process.platform === 'win32'
-        ? 'file:///' + found.replace(/\\/g, '/')
-        : 'file://' + found;
+      const normalized =
+        process.platform === 'win32'
+          ? 'file:///' + found.replace(/\\/g, '/')
+          : 'file://' + found;
 
       return normalized;
     } catch {
@@ -188,7 +202,6 @@ export const runMessagingService = (appWindow: AppWindow) => {
   });
 
   if (process.env.ENABLE_EXTENSIONS) {
-
   }
 
   ipcMain.on(`show-downloads-dialog-${id}`, (e, left, top) => {
@@ -212,7 +225,6 @@ export const runMessagingService = (appWindow: AppWindow) => {
   });
 
   if (process.env.ENABLE_AUTOFILL) {
-
     ipcMain.on(
       `form-fill-update-${id}`,
       async (e, _id: string, persistent = false) => {

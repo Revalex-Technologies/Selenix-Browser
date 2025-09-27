@@ -21,8 +21,12 @@ const getBgColor = (imageSet: boolean, dark: boolean, hover: boolean) => {
   }
 };
 
-export const Item = styled(ItemBase).withConfig({ shouldForwardProp: (p) => p !== 'imageSet' })<{ imageSet?: boolean; theme?: ITheme;}>`
-  transition: 0.2s box-shadow, 0.2s background-color;
+export const Item = styled(ItemBase).withConfig({
+  shouldForwardProp: (p) => p !== 'imageSet',
+})<{ imageSet?: boolean; theme?: ITheme }>`
+  transition:
+    0.2s box-shadow,
+    0.2s background-color;
   cursor: pointer;
   display: flex;
   flex-flow: column;
@@ -33,7 +37,13 @@ export const Item = styled(ItemBase).withConfig({ shouldForwardProp: (p) => p !=
   position: relative;
   z-index: 1;
 
-  ${({ theme, imageSet = false }: { theme?: ITheme; imageSet?: boolean }) => css`
+  ${({
+    theme,
+    imageSet = false,
+  }: {
+    theme?: ITheme;
+    imageSet?: boolean;
+  }) => css`
     background-color: ${getBgColor(
       imageSet,
       theme['pages.lightForeground'],
@@ -51,12 +61,30 @@ export const Item = styled(ItemBase).withConfig({ shouldForwardProp: (p) => p !=
   `};
 `;
 
-export const AddItem = styled(Item).withConfig({ shouldForwardProp: (p) => !['add','icon','custom','imageSet'].includes(p as string) })<{ add?: boolean; icon?: string; custom?: boolean; imageSet?: boolean; theme?: ITheme; }>`
+export const AddItem = styled(Item).withConfig({
+  shouldForwardProp: (p) =>
+    !['add', 'icon', 'custom', 'imageSet'].includes(p as string),
+})<{
+  add?: boolean;
+  icon?: string;
+  custom?: boolean;
+  imageSet?: boolean;
+  theme?: ITheme;
+}>`
   ${centerIcon(36)};
   background-image: url(${ICON_ADD});
 `;
 
-export const Icon = styled.div.withConfig({ shouldForwardProp: (p) => !['add','icon','custom','imageSet'].includes(p as string) })<{ add?: boolean; icon?: string; custom?: boolean; imageSet: boolean; theme?: ITheme;}>`
+export const Icon = styled.div.withConfig({
+  shouldForwardProp: (p) =>
+    !['add', 'icon', 'custom', 'imageSet'].includes(p as string),
+})<{
+  add?: boolean;
+  icon?: string;
+  custom?: boolean;
+  imageSet: boolean;
+  theme?: ITheme;
+}>`
   ${centerIcon()};
   position: relative;
 

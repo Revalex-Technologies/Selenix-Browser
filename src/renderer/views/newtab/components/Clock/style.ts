@@ -1,4 +1,3 @@
-
 import styled from 'styled-components';
 
 export const ClockWrap = styled.div`
@@ -13,6 +12,6 @@ export const ClockWrap = styled.div`
     line-height: 1;
     font-weight: 600;
     letter-spacing: 1px;
-    text-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
   }
 `;

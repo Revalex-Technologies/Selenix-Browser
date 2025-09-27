@@ -11,4 +11,7 @@ export interface NetworkService {
 }
 
 let _networkMainChannel: RendererToMainChannel<NetworkService> | undefined;
-export const getNetworkMainChannel = () => (_networkMainChannel ??= new RendererToMainChannel<NetworkService>('NetworkService'));
+export const getNetworkMainChannel = () =>
+  (_networkMainChannel ??= new RendererToMainChannel<NetworkService>(
+    'NetworkService',
+  ));

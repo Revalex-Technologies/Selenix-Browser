@@ -14,7 +14,9 @@ export const Line = styled.div`
   `};
 `;
 
-export const MenuItem = styled.div.withConfig({ shouldForwardProp: (p) => !['arrow','disabled'].includes(p as string) })<{ arrow?: boolean; disabled?: boolean; theme?: ITheme;}>`
+export const MenuItem = styled.div.withConfig({
+  shouldForwardProp: (p) => !['arrow', 'disabled'].includes(p as string),
+})<{ arrow?: boolean; disabled?: boolean; theme?: ITheme }>`
   height: 36px;
   align-items: center;
   display: flex;
@@ -40,11 +42,10 @@ export const MenuItem = styled.div.withConfig({ shouldForwardProp: (p) => !['arr
       }
     `};
 
-  ${({ disabled }: { arrow?: boolean; disabled?: boolean }) =>
-    css`
-      pointer-events: ${disabled ? 'none' : 'inherit'};
-      opacity: ${disabled ? 0.54 : 1};
-    `};
+  ${({ disabled }: { arrow?: boolean; disabled?: boolean }) => css`
+    pointer-events: ${disabled ? 'none' : 'inherit'};
+    opacity: ${disabled ? 0.54 : 1};
+  `};
 
   &:hover {
     ${({ theme }) => css`
@@ -77,7 +78,9 @@ export const Content = styled.div`
   position: relative;
 `;
 
-export const Icon = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'icon' })<{ icon?: string;}>`
+export const Icon = styled.div.withConfig({
+  shouldForwardProp: (p) => p !== 'icon',
+})<{ icon?: string }>`
   margin-right: 12px;
   width: 20px;
   height: 20px;

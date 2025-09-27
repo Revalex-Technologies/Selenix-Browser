@@ -3,10 +3,8 @@ import { dialog } from 'electron';
 import { Application } from '../application';
 
 export const saveAs = async () => {
-  const {
-    title,
-    webContents,
-  } = Application.instance.windows.current.viewManager.selected;
+  const { title, webContents } =
+    Application.instance.windows.current.viewManager.selected;
 
   const { canceled, filePath } = await dialog.showSaveDialog({
     defaultPath: title,
@@ -42,7 +40,11 @@ export const printPage = () => {
   const wc = selectedView?.webContents || currentWindow?.win?.webContents;
 
   if (wc && typeof (wc as any).print === 'function') {
-    try { (wc as any).print(); } catch (err) { console.error('Print failed:', err); }
+    try {
+      (wc as any).print();
+    } catch (err) {
+      console.error('Print failed:', err);
+    }
   } else {
     console.warn('[printPage] No active webContents to print.');
   }

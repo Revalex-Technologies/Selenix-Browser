@@ -32,41 +32,29 @@ export class ITab {
 
   public marginLeft = 0;
 
-@observable
-
+  @observable
   public isDragging = false;
-@observable
-
+  @observable
   public isPinned = false;
-@observable
-
+  @observable
   public isMuted = false;
-@observable
-
+  @observable
   public isPlaying = false;
-@observable
-
+  @observable
   public title = 'New tab';
-@observable
-
+  @observable
   public loading = true;
-@observable
-
+  @observable
   public favicon = '';
-@observable
-
+  @observable
   public tabGroupId = -1;
-@observable
-
+  @observable
   public addressbarValue: string = null;
-@observable
-
+  @observable
   public url = '';
-@observable
-
+  @observable
   public blockedAds = 0;
-@observable
-
+  @observable
   public hasCredentials = false;
 
   @computed
@@ -75,19 +63,16 @@ export class ITab {
   }
 
   @computed
-
   public get isHovered() {
     return store.tabs.hoveredTabId === this.id;
   }
 
   @computed
-
   public get isExpanded() {
     return this.isHovered || this.isSelected || !store.tabs.scrollable;
   }
 
   @computed
-
   public get isIconSet() {
     return this.favicon !== '' || this.loading;
   }

@@ -15,17 +15,42 @@ import {
 } from './style';
 import { IDownloadItem } from '~/interfaces';
 
-
-const showDownloadContextMenu = (item: IDownloadItem, ev?: React.MouseEvent) => {
-  if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+const showDownloadContextMenu = (
+  item: IDownloadItem,
+  ev?: React.MouseEvent,
+) => {
+  if (ev) {
+    ev.preventDefault();
+    ev.stopPropagation();
+  }
   const menu = Menu.buildFromTemplate([
-    { label: 'Pause', enabled: !item.completed, click: () => ipcRenderer.invoke('pause-download', item.id) },
-    { label: 'Resume', enabled: !item.completed, click: () => ipcRenderer.invoke('resume-download', item.id) },
+    {
+      label: 'Pause',
+      enabled: !item.completed,
+      click: () => ipcRenderer.invoke('pause-download', item.id),
+    },
+    {
+      label: 'Resume',
+      enabled: !item.completed,
+      click: () => ipcRenderer.invoke('resume-download', item.id),
+    },
     { type: 'separator' },
-    { label: 'Cancel', enabled: !item.completed, click: () => ipcRenderer.invoke('cancel-download', item.id) },
+    {
+      label: 'Cancel',
+      enabled: !item.completed,
+      click: () => ipcRenderer.invoke('cancel-download', item.id),
+    },
     { type: 'separator' },
-    { label: 'Open file', enabled: !!item.savePath && !!item.completed, click: () => item.savePath && shell.openPath(item.savePath) },
-    { label: 'View in file manager', enabled: !!item.savePath, click: () => item.savePath && shell.showItemInFolder(item.savePath) },
+    {
+      label: 'Open file',
+      enabled: !!item.savePath && !!item.completed,
+      click: () => item.savePath && shell.openPath(item.savePath),
+    },
+    {
+      label: 'View in file manager',
+      enabled: !!item.savePath,
+      click: () => item.savePath && shell.showItemInFolder(item.savePath),
+    },
   ]);
   menu.popup({ window: getCurrentWindow() });
 };
@@ -36,7 +61,7 @@ import { Menu, getCurrentWindow } from '@electron/remote';
 const prettyBytes = (input: number): string => {
   if (typeof input !== 'number' || !isFinite(input)) return '0 B';
   const neg = input < 0;
-  let num = Math.abs(input);
+  const num = Math.abs(input);
   if (num < 1) return `${neg ? '-' : ''}${num} B`;
   const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
   const exponent = Math.min(Math.floor(Math.log10(num) / 3), units.length - 1);
@@ -50,11 +75,10 @@ const onClick = (item: IDownloadItem) => () => {
   }
 };
 
-const onMoreClick = (item: IDownloadItem) => (
-  e: React.MouseEvent<HTMLDivElement>,
-) => {
-  e.stopPropagation();
-};
+const onMoreClick =
+  (item: IDownloadItem) => (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+  };
 
 export const DownloadItem = observer(({ item }: { item: IDownloadItem }) => {
   let received = prettyBytes(item.receivedBytes);
@@ -68,15 +92,21 @@ export const DownloadItem = observer(({ item }: { item: IDownloadItem }) => {
 
   const totalBytes = Number(item.totalBytes) || 0;
   const receivedBytes = Number(item.receivedBytes) || 0;
-  const progressPercent = totalBytes > 0
-    ? Math.max(0, Math.min(1, receivedBytes / totalBytes)) * 100
-    : 100;
+  const progressPercent =
+    totalBytes > 0
+      ? Math.max(0, Math.min(1, receivedBytes / totalBytes)) * 100
+      : 100;
 
   return (
     <StyledDownloadItem onClick={onClick(item)}>
       <Icon></Icon>
       <Info>
-        <Title>{item.fileName}</Title>{(item as any).canceled ? <SecondaryText>Canceled</SecondaryText> : (item.completed ? <SecondaryText>Completed</SecondaryText> : null)}
+        <Title>{item.fileName}</Title>
+        {(item as any).canceled ? (
+          <SecondaryText>Canceled</SecondaryText>
+        ) : item.completed ? (
+          <SecondaryText>Completed</SecondaryText>
+        ) : null}
         {!item.completed && !(item as any).canceled && (
           <>
             <ProgressBackground>
@@ -87,7 +117,10 @@ export const DownloadItem = observer(({ item }: { item: IDownloadItem }) => {
         )}
       </Info>
       <Separator></Separator>
-      <MoreButton onClick={(e: any) => showDownloadContextMenu(item, e)} onContextMenu={(e: any) => showDownloadContextMenu(item, e)}></MoreButton>
+      <MoreButton
+        onClick={(e: any) => showDownloadContextMenu(item, e)}
+        onContextMenu={(e: any) => showDownloadContextMenu(item, e)}
+      ></MoreButton>
     </StyledDownloadItem>
   );
 });

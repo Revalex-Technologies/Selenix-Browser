@@ -19,15 +19,12 @@ export class Store extends DialogStore {
   public findInputRef = React.createRef<HTMLInputElement>();
 
   @observable
-
   public tabId = -1;
 
   @observable
-
   public tabsFindInfo = new Map<number, IFindInfo>();
 
   @observable
-
   public findInfo = defaultFindInfo;
 
   public constructor() {

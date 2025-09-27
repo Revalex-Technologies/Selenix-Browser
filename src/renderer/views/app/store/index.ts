@@ -82,23 +82,26 @@ export class Store {
     'downloads-dialog': false,
   };
 
-  
-public get downloadProgress() {
-  const active = this.downloads.filter((x: any) => !x.completed && !x.canceled);
-  if (active.length === 0) return 0;
+  public get downloadProgress() {
+    const active = this.downloads.filter(
+      (x: any) => !x.completed && !x.canceled,
+    );
+    if (active.length === 0) return 0;
 
-  const { totalBytes } = active.reduce(
-    (prev, cur) => ({ totalBytes: prev.totalBytes + (cur.totalBytes || 0) }),
-    { totalBytes: 0 },
-  );
+    const { totalBytes } = active.reduce(
+      (prev, cur) => ({ totalBytes: prev.totalBytes + (cur.totalBytes || 0) }),
+      { totalBytes: 0 },
+    );
 
-  const { receivedBytes } = active.reduce(
-    (prev, cur) => ({ receivedBytes: prev.receivedBytes + (cur.receivedBytes || 0) }),
-    { receivedBytes: 0 },
-  );
+    const { receivedBytes } = active.reduce(
+      (prev, cur) => ({
+        receivedBytes: prev.receivedBytes + (cur.receivedBytes || 0),
+      }),
+      { receivedBytes: 0 },
+    );
 
-  return totalBytes > 0 ? receivedBytes / totalBytes : 0;
-}
+    return totalBytes > 0 ? receivedBytes / totalBytes : 0;
+  }
   public get isCompact() {
     return this.settings.object.topBarVariant === 'compact';
   }
@@ -221,10 +224,10 @@ public get downloadProgress() {
     ipcRenderer.on('download-progress', (e, item: IDownloadItem) => {
       const i = this.downloads.find((x) => x.id === item.id);
 
-    ipcRenderer.on('download-cancelled', (e, id: string) => {
-      const i = this.downloads.find((x) => x.id === id) as any;
-      if (i) i.canceled = true;
-    });
+      ipcRenderer.on('download-cancelled', (e, id: string) => {
+        const i = this.downloads.find((x) => x.id === id) as any;
+        if (i) i.canceled = true;
+      });
       i.receivedBytes = item.receivedBytes;
     });
 

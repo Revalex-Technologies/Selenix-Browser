@@ -36,7 +36,6 @@ import {
 import { getWebUIURL } from '~/common/webui';
 
 const __useInsertion: typeof React.useLayoutEffect =
-
   (React as any).useInsertionEffect || React.useLayoutEffect;
 
 function __primeHidden(el: HTMLElement) {
@@ -60,7 +59,8 @@ function __animateIn(el: HTMLElement) {
 function __waitStableLayout(el: HTMLElement, timeoutMs = 350): Promise<void> {
   return new Promise((resolve) => {
     const start = performance.now();
-    let prevW = -1, prevH = -1;
+    let prevW = -1,
+      prevH = -1;
     let stableFrames = 0;
     function tick() {
       if (!el.isConnected) {
@@ -74,7 +74,8 @@ function __waitStableLayout(el: HTMLElement, timeoutMs = 350): Promise<void> {
         stableFrames += 1;
       } else {
         stableFrames = 0;
-        prevW = w; prevH = h;
+        prevW = w;
+        prevH = h;
       }
       if (stableFrames >= 2) {
         return resolve();
@@ -88,7 +89,10 @@ function __waitStableLayout(el: HTMLElement, timeoutMs = 350): Promise<void> {
   });
 }
 
-async function __readyThenAnimate(el: HTMLElement, didRef: { current: boolean }) {
+async function __readyThenAnimate(
+  el: HTMLElement,
+  didRef: { current: boolean },
+) {
   if (didRef.current) return;
   didRef.current = true;
   try {
@@ -100,12 +104,9 @@ async function __readyThenAnimate(el: HTMLElement, didRef: { current: boolean })
   __animateIn(el);
 }
 
-const onFindClick = () => {
-
-};
+const onFindClick = () => {};
 
 const onDarkClick = () => {
-
   store.settings.darkContents = !store.settings.darkContents;
   store.save();
 };
@@ -123,7 +124,9 @@ const onFindInPageClick = () => {
 const onAlwaysClick = () => {
   store.alwaysOnTop = !store.alwaysOnTop;
   const current = remote.getCurrentWindow();
-  const parent = (current as any).getParentWindow ? (current as any).getParentWindow() : null;
+  const parent = (current as any).getParentWindow
+    ? (current as any).getParentWindow()
+    : null;
   const target = parent || current;
   target.setAlwaysOnTop(store.alwaysOnTop);
 };
@@ -173,7 +176,8 @@ export const QuickMenu = observer(() => {
   }, []);
 
   return (
-    <div ref={__qmRef}
+    <div
+      ref={__qmRef}
       style={{
         display: 'flex',
         flexFlow: 'column',
@@ -186,9 +190,7 @@ export const QuickMenu = observer(() => {
             <>
               <MenuItem onClick={onUpdateClick}>
                 <Icon icon={ICON_FIRE}></Icon>
-                <MenuItemTitle>
-                  {`Update ${remote.app.name}`}
-                </MenuItemTitle>
+                <MenuItemTitle>{`Update ${remote.app.name}`}</MenuItemTitle>
               </MenuItem>
               <Line />
             </>

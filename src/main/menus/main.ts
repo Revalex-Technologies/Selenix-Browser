@@ -197,7 +197,8 @@ export const getMainMenu = () => {
           ['CmdOrCtrl+Shift+H'],
           () => {
             // Open the browser's Home / New Tab page in the CURRENT tab
-            const { selected } = Application.instance.windows.current.viewManager;
+            const { selected } =
+              Application.instance.windows.current.viewManager;
             if (selected && selected.webContents) {
               try {
                 selected.webContents.loadURL(getWebUIURL('newtab'));
@@ -221,11 +222,10 @@ export const getMainMenu = () => {
         ...createMenuItem(
           isMac ? ['Cmd+[', 'Cmd+Left'] : ['Alt+Left'],
           () => {
-            const {
-              selected,
-            } = Application.instance.windows.current.viewManager;
+            const { selected } =
+              Application.instance.windows.current.viewManager;
             if (selected) {
-              selected.webContents.navigationHistory.goBack(); 
+              selected.webContents.navigationHistory.goBack();
             }
           },
           'Go back',
@@ -233,9 +233,8 @@ export const getMainMenu = () => {
         ...createMenuItem(
           isMac ? ['Cmd+]', 'Cmd+Right'] : ['Alt+Right'],
           () => {
-            const {
-              selected,
-            } = Application.instance.windows.current.viewManager;
+            const { selected } =
+              Application.instance.windows.current.viewManager;
             if (selected) {
               selected.webContents.navigationHistory.goForward();
             }
@@ -251,7 +250,8 @@ export const getMainMenu = () => {
             const items = vm.recentlyClosed.slice(0, 10);
             return items.length
               ? items.map(({ title, url }) => ({
-                  label: (title && title.trim()) ? title.trim() : (url || '(untitled)'),
+                  label:
+                    title && title.trim() ? title.trim() : url || '(untitled)',
                   click: () => {
                     if (url) vm.create({ url, active: true });
                   },
@@ -268,10 +268,15 @@ export const getMainMenu = () => {
               const items = (history || []).slice(-10).reverse();
               return items.length
                 ? items.map((h) => ({
-                    label: (h.title && h.title.trim()) ? h.title.trim() : (h.url || '(untitled)'),
+                    label:
+                      h.title && h.title.trim()
+                        ? h.title.trim()
+                        : h.url || '(untitled)',
                     click: () => {
                       if (h?.url) {
-                        Application.instance.windows.current.viewManager.create({ url: h.url, active: true });
+                        Application.instance.windows.current.viewManager.create(
+                          { url: h.url, active: true },
+                        );
                       }
                     },
                   }))
@@ -335,9 +340,15 @@ export const getMainMenu = () => {
               const appWindow = Application.instance.windows.current;
               const all = Application.instance.storage.bookmarks || [];
               const bar = all.find((x: any) => x.static === 'main');
-              return bar ? createDropdown(appWindow, bar._id, all) : Menu.buildFromTemplate([{ label: '(empty)', enabled: false }]);
+              return bar
+                ? createDropdown(appWindow, bar._id, all)
+                : Menu.buildFromTemplate([
+                    { label: '(empty)', enabled: false },
+                  ]);
             } catch {
-              return Menu.buildFromTemplate([{ label: '(unavailable)', enabled: false }]);
+              return Menu.buildFromTemplate([
+                { label: '(unavailable)', enabled: false },
+              ]);
             }
           })() as any,
         },
@@ -348,12 +359,18 @@ export const getMainMenu = () => {
               const appWindow = Application.instance.windows.current;
               const all = Application.instance.storage.bookmarks || [];
               const other = all.find((x: any) => x.static === 'other');
-              return other ? createDropdown(appWindow, other._id, all) : Menu.buildFromTemplate([{ label: '(empty)', enabled: false }]);
+              return other
+                ? createDropdown(appWindow, other._id, all)
+                : Menu.buildFromTemplate([
+                    { label: '(empty)', enabled: false },
+                  ]);
             } catch {
-              return Menu.buildFromTemplate([{ label: '(unavailable)', enabled: false }]);
+              return Menu.buildFromTemplate([
+                { label: '(unavailable)', enabled: false },
+              ]);
             }
           })() as any,
-        }
+        },
       ],
     },
     {

@@ -9,11 +9,9 @@ import { DialogStore } from '~/models/dialog-store';
 
 export class Store extends DialogStore {
   @observable
-
   public content: 'save' | 'update' | 'list';
 
   @observable
-
   public list: IFormFillData[] = [];
 
   public usernameRef = React.createRef<Textfield>();
@@ -43,7 +41,6 @@ export class Store extends DialogStore {
   }
 
   @action
-
   public remove(data: IFormFillData) {
     this.list = this.list.filter((r) => r._id !== data._id);
     ipcRenderer.send(`credentials-remove-${this.windowId}`, data);

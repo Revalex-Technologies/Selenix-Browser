@@ -19,11 +19,15 @@ export const DockLeftButton = observer(() => {
     // trigger bounds recompute
     ipcRenderer.send('resize-height');
     // also trigger a renderer resize so tab layout updates immediately
-    try { window.dispatchEvent(new Event('resize')); } catch {}
+    try {
+      window.dispatchEvent(new Event('resize'));
+    } catch {}
   };
 
   return (
-    <ToolbarButton size={22} style={{ marginLeft: 6 }}
+    <ToolbarButton
+      size={22}
+      style={{ marginLeft: 6 }}
       icon={ICON_DOCKLEFT}
       onClick={onClick}
       toggled={toggled}

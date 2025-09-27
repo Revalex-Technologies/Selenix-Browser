@@ -2,7 +2,7 @@ import isPropValid from '@emotion/is-prop-valid';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { ThemeProvider, StyleSheetManager  } from 'styled-components';
+import { ThemeProvider, StyleSheetManager } from 'styled-components';
 
 import { StyledApp, Title, Domain, Divider, MemoryRow } from './style';
 import store from '../../store';
@@ -33,7 +33,13 @@ export const App = observer(() => {
         <Divider />
         <MemoryRow>
           <span>Memory</span>
-          <strong>{calcState && !store.hasSample ? 'Calculating…' : (store.hasSample && store.memoryMB != null ? `${store.memoryMB} MB` : 'N/A')}</strong>
+          <strong>
+            {calcState && !store.hasSample
+              ? 'Calculating…'
+              : store.hasSample && store.memoryMB != null
+                ? `${store.memoryMB} MB`
+                : 'N/A'}
+          </strong>
         </MemoryRow>
       </StyledApp>
     </ThemeProvider>

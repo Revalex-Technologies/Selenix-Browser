@@ -16,12 +16,9 @@ export const getPath = (...relativePaths: string[]) => {
 
   if (typeof process !== 'undefined' && process.type === 'renderer') {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const remote = require('@electron/remote');
       basePath = remote.app.getPath('userData');
-    } catch (e) {
-
-    }
+    } catch (e) {}
   }
 
   if (!basePath && app) {

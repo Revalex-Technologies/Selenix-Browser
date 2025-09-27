@@ -6,11 +6,9 @@ import { DialogStore } from '~/models/dialog-store';
 
 export class Store extends DialogStore {
   @observable
-
   public permissions: string[] = [];
 
   @observable
-
   public domain = '';
 
   public constructor() {

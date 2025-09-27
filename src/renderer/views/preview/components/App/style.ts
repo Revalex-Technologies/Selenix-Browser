@@ -4,7 +4,9 @@ import { maxLines } from '~/renderer/mixins';
 import { TAB_MAX_WIDTH } from '~/renderer/views/app/constants/tabs';
 import { PersistentDialogStyle } from '~/renderer/mixins/dialogs';
 
-export const StyledApp = styled(PersistentDialogStyle).withConfig({ shouldForwardProp: (p) => p !== 'xTransition' })<{ xTransition: boolean; theme?: ITheme;}>`
+export const StyledApp = styled(PersistentDialogStyle).withConfig({
+  shouldForwardProp: (p) => p !== 'xTransition',
+})<{ xTransition: boolean; theme?: ITheme }>`
   margin: 0;
   padding: 12px;
   font-size: 13px;
@@ -32,7 +34,8 @@ export const Domain = styled.div`
 
 export const Divider = styled.div`
   height: 1px;
-  background: ${({ theme }: { theme?: ITheme }) => theme['dialog.separator.color']};
+  background: ${({ theme }: { theme?: ITheme }) =>
+    theme['dialog.separator.color']};
   margin: 8px 0 10px 0;
   opacity: 0.75;
 `;

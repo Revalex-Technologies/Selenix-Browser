@@ -67,14 +67,12 @@ export class Store {
     } catch {}
 
     if (value) {
-
       const todayKey = this.getTodayKey();
       const currentImg = this.image || '';
       const custom = this.getStoredCustomImage();
       const isUsingCustomNow = !!custom && currentImg === custom;
 
       if (isUsingCustomNow) {
-
         try {
           localStorage.removeItem('imageURL');
           localStorage.removeItem('imageData');
@@ -83,7 +81,6 @@ export class Store {
         this.image = '';
         if (this.imageVisible) this.loadImage();
       } else {
-
         try {
           if (currentImg) {
             if (currentImg.startsWith('data:')) {
@@ -94,15 +91,11 @@ export class Store {
             }
             localStorage.setItem('imageDate', todayKey);
           } else if (this.imageVisible) {
-
             this.loadImage();
           }
-        } catch {
-
-        }
+        } catch {}
       }
     } else {
-
       if (this._preset === 'custom') {
         const custom = this.getStoredCustomImage();
         if (custom) this.image = custom;
@@ -185,7 +178,6 @@ export class Store {
     if (value !== 'custom') {
       if (this.imageVisible && this.image === '') this.loadImage();
     } else {
-
       if (!this._changeImageDaily) {
         const custom = this.getStoredCustomImage();
         if (custom) this.image = custom;
@@ -246,9 +238,7 @@ export class Store {
       try {
         localStorage.setItem('customImageData', img);
         localStorage.setItem('imageDate', this.getTodayKey());
-      } catch {
-
-      }
+      } catch {}
     });
   }
 
@@ -284,16 +274,15 @@ export class Store {
     };
 
     if (this._changeImageDaily) {
-
       let storedData: string | null = null;
       let storedDate: string | null = null;
       try {
-        storedData = localStorage.getItem('imageData') || localStorage.getItem('imageURL');
+        storedData =
+          localStorage.getItem('imageData') || localStorage.getItem('imageURL');
         storedDate = normKey(localStorage.getItem('imageDate'));
       } catch {}
 
       if (storedDate === todayKey && storedData) {
-
         this.image = storedData;
         return;
       }
@@ -314,7 +303,6 @@ export class Store {
         this.image = dataUrl;
 
         try {
-
           localStorage.setItem('imageURL', dataUrl);
           localStorage.setItem('imageData', dataUrl);
           localStorage.setItem('imageDate', todayKey);
@@ -339,12 +327,12 @@ export class Store {
 
     let storedData: string | null = null;
     try {
-      storedData = localStorage.getItem('imageData') || localStorage.getItem('imageURL');
+      storedData =
+        localStorage.getItem('imageData') || localStorage.getItem('imageURL');
     } catch {}
     if (storedData) {
       this.image = storedData;
     } else {
-
       const url = 'https://picsum.photos/1920/1080';
       try {
         const resp = await fetch(url);

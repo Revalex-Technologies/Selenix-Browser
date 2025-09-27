@@ -1,9 +1,13 @@
 import { RpcMainEvent, RpcMainHandler } from '@wexond/rpc-electron';
-import { getExtensionMainChannel, ExtensionMainService } from '~/common/rpc/extensions';
+import {
+  getExtensionMainChannel,
+  ExtensionMainService,
+} from '~/common/rpc/extensions';
 import { Application } from './application';
 
 export class ExtensionServiceHandler
-  implements RpcMainHandler<ExtensionMainService> {
+  implements RpcMainHandler<ExtensionMainService>
+{
   constructor() {
     getExtensionMainChannel().getReceiver().handler = this;
   }

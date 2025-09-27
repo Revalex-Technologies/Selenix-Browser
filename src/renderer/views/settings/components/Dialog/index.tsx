@@ -20,7 +20,9 @@ export const CloseButton = () => {
   );
 };
 
-export const Dialog = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'visible' })<{ visible?: boolean;}>`
+export const Dialog = styled.div.withConfig({
+  shouldForwardProp: (p) => p !== 'visible',
+})<{ visible?: boolean }>`
   width: 100%;
   max-width: 512px;
   height: fit-content;

@@ -12,7 +12,6 @@ export const StyledToolbar = styled.div<{ docked?: boolean }>`
   color: rgba(0, 0, 0, 0.8);
   width: 100%;
   height: ${TOOLBAR_HEIGHT}px;
-  
 
   ${({ theme }: { theme: ITheme }) => css`
     background-color: ${theme['toolbar.backgroundColor']};

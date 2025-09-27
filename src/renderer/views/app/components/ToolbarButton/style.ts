@@ -7,7 +7,19 @@ import {
 } from '~/constants/design';
 import { ITheme } from '~/interfaces';
 
-export const Icon = styled.div.withConfig({ shouldForwardProp: (p) => !['size','disabled','opacity','autoInvert','dense'].includes(p as string) })<{ size: number; disabled: boolean; opacity: number; autoInvert?: boolean; dense?: boolean; theme?: ITheme;}>`
+export const Icon = styled.div.withConfig({
+  shouldForwardProp: (p) =>
+    !['size', 'disabled', 'opacity', 'autoInvert', 'dense'].includes(
+      p as string,
+    ),
+})<{
+  size: number;
+  disabled: boolean;
+  opacity: number;
+  autoInvert?: boolean;
+  dense?: boolean;
+  theme?: ITheme;
+}>`
   width: 100%;
   height: 100%;
   will-change: background-image;
@@ -37,7 +49,10 @@ export const Icon = styled.div.withConfig({ shouldForwardProp: (p) => !['size','
   `};
 `;
 
-export const Button = styled.div.withConfig({ shouldForwardProp: (p) => !['toggled','disabled','dense'].includes(p as string) })<{ theme?: ITheme; toggled: boolean; disabled: boolean; dense: boolean;}>`
+export const Button = styled.div.withConfig({
+  shouldForwardProp: (p) =>
+    !['toggled', 'disabled', 'dense'].includes(p as string),
+})<{ theme?: ITheme; toggled: boolean; disabled: boolean; dense: boolean }>`
   border-radius: 2px;
   position: relative;
   transition: 0.2s background-color;
@@ -91,7 +106,10 @@ interface BadgeProps {
   top: number;
 }
 
-export const Badge = styled.div.withConfig({ shouldForwardProp: (p) => !['background','color','top','right'].includes(p as string) })<BadgeProps>`
+export const Badge = styled.div.withConfig({
+  shouldForwardProp: (p) =>
+    !['background', 'color', 'top', 'right'].includes(p as string),
+})<BadgeProps>`
   position: absolute;
   padding: 1px 3px;
   line-height: 1;

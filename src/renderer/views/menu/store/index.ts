@@ -5,14 +5,11 @@ import { DialogStore } from '~/models/dialog-store';
 
 export class Store extends DialogStore {
   @observable
-
   public alwaysOnTop = false;
 
   @observable
-
   public updateAvailable = false;
   @observable
-
   public updateError: string | null = null;
 
   constructor() {
@@ -20,7 +17,9 @@ export class Store extends DialogStore {
 
     makeObservable(this);
 
-    try { this.alwaysOnTop = remote.getCurrentWindow().isAlwaysOnTop(); } catch (e) {}
+    try {
+      this.alwaysOnTop = remote.getCurrentWindow().isAlwaysOnTop();
+    } catch (e) {}
     this.registerIpcHandlers();
   }
 
@@ -39,9 +38,7 @@ export class Store extends DialogStore {
     });
 
     ipcRenderer.on('update-error', (_e, message: string) => {
-
       this.setUpdateError(message || 'Update failed');
-
     });
 
     ipcRenderer.send('update-check');

@@ -50,7 +50,11 @@ export const SwitchItem = observer(
     disabled?: boolean;
   }) => {
     return (
-      <ContextMenuItem $bigger disabled={disabled} onClick={onSwitchClick(name)}>
+      <ContextMenuItem
+        $bigger
+        disabled={disabled}
+        onClick={onSwitchClick(name)}
+      >
         <div style={{ flex: 1 }}>{children}</div>
         <Switch value={(store as any)[name]}></Switch>
       </ContextMenuItem>
@@ -66,20 +70,19 @@ export const Preferences = observer(() => {
     fileInputRef.current?.click();
   };
 
-  const onCustomFileChange: React.ChangeEventHandler<HTMLInputElement> = async (e: any) => {
+  const onCustomFileChange: React.ChangeEventHandler<HTMLInputElement> = async (
+    e: any,
+  ) => {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
     try {
-
       const reader = new FileReader();
       reader.onload = () => {
         const dataUrl = String(reader.result || '');
         try {
           localStorage.setItem('imageURL', dataUrl);
           localStorage.setItem('imageDate', new Date().toString());
-        } catch (err) {
-
-        }
+        } catch (err) {}
 
         store.image = dataUrl;
         store.preset = 'custom';
@@ -88,7 +91,6 @@ export const Preferences = observer(() => {
     } catch (err) {
       console.error(err);
     } finally {
-
       e.currentTarget.value = '';
     }
   };
@@ -188,7 +190,12 @@ export const Preferences = observer(() => {
             onClick={onPickCustomImage}
           >
             Choose custom image
-            <input ref={fileInputRef} type="file" accept="image/*" onChange={onCustomFileChange} />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={onCustomFileChange}
+            />
           </ContextMenuItem>
         </div>
       </div>

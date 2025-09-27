@@ -16,7 +16,9 @@ export const Line = styled.div`
   border-radius: 4px;
 `;
 
-export const Placeholder = styled.div.withConfig({ shouldForwardProp: (p) => !['hasName'].includes(p as string) })<{ hasName: boolean }>`
+export const Placeholder = styled.div.withConfig({
+  shouldForwardProp: (p) => !['hasName'].includes(p as string),
+})<{ hasName: boolean }>`
   -webkit-app-region: no-drag;
   overflow: hidden;
   position: relative;

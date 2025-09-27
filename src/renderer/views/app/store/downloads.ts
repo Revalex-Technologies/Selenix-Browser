@@ -16,9 +16,7 @@ export class DownloadsStore {
         body: 'Open Overlay to see the downloads.',
       });
 
-      not.onclick = () => {
-
-      };
+      not.onclick = () => {};
     });
 
     ipcRenderer.on('download-progress', (e, item: IDownloadItem) => {

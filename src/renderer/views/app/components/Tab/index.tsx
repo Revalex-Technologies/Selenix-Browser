@@ -279,7 +279,11 @@ const Close = observer(({ tab }: { tab: ITab }) => {
     <StyledClose
       onMouseDown={onCloseMouseDown}
       onClick={removeTab(tab)}
-      visible={(store.settings.object.leftDockTabs ? !tab.isPinned : (tab.isExpanded && !tab.isPinned))}
+      visible={
+        store.settings.object.leftDockTabs
+          ? !tab.isPinned
+          : tab.isExpanded && !tab.isPinned
+      }
     />
   );
 });
@@ -295,7 +299,6 @@ export default observer(({ tab }: { tab: ITab }) => {
     ? '#393939'
     : '#fcfcfc';
 
-  
   // Divider line between inactive tabs (subtle, theme-aware)
   const dividerColor = store.theme['toolbar.lightForeground']
     ? 'rgba(255, 255, 255, 0.18)'
@@ -303,11 +306,15 @@ export default observer(({ tab }: { tab: ITab }) => {
   // Determine if the previous tab is selected to suppress divider next to active tab
   const tabsList = store.tabs.list;
   const currentIndex = tabsList.findIndex((t) => t.id === tab.id);
-  const prevSelected = currentIndex > 0 ? tabsList[currentIndex - 1].isSelected : false;
-  const nextSelected = currentIndex < tabsList.length - 1 ? tabsList[currentIndex + 1].isSelected : false;
+  const prevSelected =
+    currentIndex > 0 ? tabsList[currentIndex - 1].isSelected : false;
+  const nextSelected =
+    currentIndex < tabsList.length - 1
+      ? tabsList[currentIndex + 1].isSelected
+      : false;
   // Hide divider only if this tab or the tab to its right is selected
   const showDivider = !tab.isSelected && !nextSelected;
-return (
+  return (
     <StyledTab
       selected={tab.isSelected}
       onMouseDown={onMouseDown(tab)}
@@ -329,20 +336,22 @@ return (
               ? defaultSelectedHoverColor
               : store.theme['toolbar.backgroundColor']
             : tab.isHovered
-            ? defaultHoverColor
-            : defaultColor,
+              ? defaultHoverColor
+              : defaultColor,
           borderColor:
             tab.isSelected && tab.tabGroupId !== -1 && !store.isCompact
               ? tab.tabGroup.color
               : 'transparent',
-        
+
           /* smart divider injected */
-          backgroundImage: showDivider ? `linear-gradient(${dividerColor}, ${dividerColor})` : 'none',
+          backgroundImage: showDivider
+            ? `linear-gradient(${dividerColor}, ${dividerColor})`
+            : 'none',
           backgroundRepeat: 'no-repeat',
           backgroundSize: '2px 42%',
           backgroundPosition: 'right center',
           borderRight: 'none',
-}}
+        }}
       >
         {tab.isSelected && <EdgeMask />}
         <Content tab={tab} />

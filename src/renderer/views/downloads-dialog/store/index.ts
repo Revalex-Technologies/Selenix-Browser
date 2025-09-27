@@ -5,11 +5,9 @@ import { DialogStore } from '~/models/dialog-store';
 
 export class Store extends DialogStore {
   @observable
-
   public downloads: IDownloadItem[] = [];
 
   @observable
-
   public maxHeight = 0;
 
   public constructor() {

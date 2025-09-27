@@ -18,9 +18,11 @@ import { SiteButtons } from '../SiteButtons';
 
 const onCloseClick = () => ipcRenderer.send(`window-close-${store.windowId}`);
 
-const onMaximizeClick = () => ipcRenderer.send(`window-toggle-maximize-${store.windowId}`);
+const onMaximizeClick = () =>
+  ipcRenderer.send(`window-toggle-maximize-${store.windowId}`);
 
-const onMinimizeClick = () => ipcRenderer.send(`window-minimize-${store.windowId}`);
+const onMinimizeClick = () =>
+  ipcRenderer.send(`window-minimize-${store.windowId}`);
 
 const onMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
   if (store.addressbarFocused) {
@@ -39,10 +41,17 @@ export const Titlebar = observer(() => {
       isFullscreen={store.isFullscreen}
       isHTMLFullscreen={store.isHTMLFullscreen}
     >
-            {store.isCompact && <NavigationButtons />}
+      {store.isCompact && <NavigationButtons />}
       {!store.settings.object.leftDockTabs && (
         <>
-          <div style={{display:'flex',alignItems:'center',paddingLeft:0,paddingRight:0}}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              paddingLeft: 0,
+              paddingRight: 0,
+            }}
+          >
             <DockLeftButton />
           </div>
           <Tabbar hasDockButton />
@@ -50,16 +59,17 @@ export const Titlebar = observer(() => {
       )}
       {store.isCompact && <RightButtons />}
 
-      {platform() !== 'darwin' && (
-        store.isFullscreen
-          ? <FullscreenExitButton
+      {platform() !== 'darwin' &&
+        (store.isFullscreen ? (
+          <FullscreenExitButton
             style={{
               height: store.isCompact ? '100%' : 32,
             }}
             onMouseUp={onFullscreenExit}
             theme={store.theme}
           />
-          : <WindowsControls
+        ) : (
+          <WindowsControls
             style={{
               height: store.isCompact ? '100%' : 32,
               WebkitAppRegion: 'no-drag',
@@ -70,7 +80,7 @@ export const Titlebar = observer(() => {
             onMaximize={onMaximizeClick}
             dark={store.theme['toolbar.lightForeground']}
           />
-      )}
+        ))}
     </StyledTitlebar>
   );
 });

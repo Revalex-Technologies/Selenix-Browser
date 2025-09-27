@@ -50,9 +50,8 @@ export class ExtensionsStore {
       let icon1 = default_icon;
 
       if (typeof icon1 === 'object') {
-        icon1 = Object.values(default_icon)[
-          Object.keys(default_icon).length - 1
-        ];
+        icon1 =
+          Object.values(default_icon)[Object.keys(default_icon).length - 1];
       }
 
       const data = await promises.readFile(
@@ -72,8 +71,8 @@ export class ExtensionsStore {
         icon,
         title: default_title,
         popup:
-        (extension.manifest as any)?.browser_action?.default_popup ??
-        (extension.manifest as any)?.action?.default_popup,
+          (extension.manifest as any)?.browser_action?.default_popup ??
+          (extension.manifest as any)?.action?.default_popup,
       });
 
       this.defaultBrowserActions.push(browserAction);
@@ -87,9 +86,8 @@ export class ExtensionsStore {
   public async load() {
     if (!process.env.ENABLE_EXTENSIONS) return;
 
-    const extensions: Electron.Extension[] = await ipcRenderer.invoke(
-      'get-extensions',
-    );
+    const extensions: Electron.Extension[] =
+      await ipcRenderer.invoke('get-extensions');
 
     await Promise.all(extensions.map((x) => this.loadExtension(x)));
   }

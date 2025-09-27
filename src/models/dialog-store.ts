@@ -14,11 +14,9 @@ export declare interface DialogStore {
 
 export class DialogStore {
   @observable
-
   public settings: ISettings = DEFAULT_SETTINGS;
 
   @computed
-
   public get theme() {
     return getTheme(this.settings.theme);
   }
@@ -28,7 +26,6 @@ export class DialogStore {
   private persistent = false;
 
   @observable
-
   public visible = false;
 
   public firstTime = false;

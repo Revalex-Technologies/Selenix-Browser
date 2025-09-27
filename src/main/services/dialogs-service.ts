@@ -120,9 +120,8 @@ export class DialogsService {
       webContentsView = this.createContentView();
     }
 
-    const appWindow = Application.instance.windows.fromBrowserWindow(
-      browserWindow,
-    );
+    const appWindow =
+      Application.instance.windows.fromBrowserWindow(browserWindow);
 
     if (foundDialog && tabAssociation) {
       foundDialog.tabIds.push(tabAssociation.tabId!);
@@ -134,7 +133,6 @@ export class DialogsService {
     this.contentViewDetails.set(webContentsView.webContents.id, true);
 
     if (foundDialog) {
-
       if ((foundDialog.webContentsView.webContents as any).isLoading?.()) {
         foundDialog.webContentsView.webContents.once('dom-ready', () => {
           browserWindow.contentView.addChildView(webContentsView!);
@@ -217,12 +215,12 @@ export class DialogsService {
               Application.instance.windows.list.forEach((window) => {
                 try {
                   try {
-              if (window.win && !window.win.isDestroyed()) {
-                window.win.contentView.removeChildView(viewToRemove);
-              }
-            } catch (e) {
-              console.error('Error removing browser view:', e);
-            }
+                    if (window.win && !window.win.isDestroyed()) {
+                      window.win.contentView.removeChildView(viewToRemove);
+                    }
+                  } catch (e) {
+                    console.error('Error removing browser view:', e);
+                  }
                 } catch (e) {
                   console.error('Error removing browser view:', e);
                 }
@@ -232,7 +230,6 @@ export class DialogsService {
               this.childViews.splice(index, 1);
 
               try {
-
                 if (!viewToRemove.webContents.isDestroyed()) {
                   viewToRemove.webContents.loadURL('about:blank');
                 }
@@ -243,7 +240,6 @@ export class DialogsService {
             }
           }
         } else {
-
           webContentsView.webContents.loadURL('about:blank');
           (webContentsView as any).setBackgroundColor?.('#00000000');
           (webContentsView.webContents as any).setBackgroundColor?.(
@@ -368,7 +364,6 @@ export class DialogsService {
     return this.childViews.concat(
       Array.from(this.persistentDialogs).map((x) => x.webContentsView),
     );
-
   };
 
   public destroy = () => {
@@ -377,12 +372,12 @@ export class DialogsService {
         Application.instance.windows.list.forEach((window) => {
           try {
             try {
-            if (window.win && !window.win.isDestroyed()) {
-              window.win.contentView.removeChildView(view);
+              if (window.win && !window.win.isDestroyed()) {
+                window.win.contentView.removeChildView(view);
+              }
+            } catch (e) {
+              console.error('Error removing browser view:', e);
             }
-          } catch (e) {
-            console.error('Error removing browser view:', e);
-          }
           } catch {}
         });
         try {

@@ -12,7 +12,6 @@ const COMPONENTS_TO_REMOVE = [
 ];
 
 const getChromeVersion = () => {
-
   const chromeVersion = process.versions.chrome;
   const versionParts = chromeVersion.split('.');
 
@@ -42,7 +41,6 @@ export const getUserAgentForURL = (userAgent: string, url: string) => {
   }
 
   [
-
     ...componentsToRemove.map((x): [string | RegExp, string] => [x, '']),
     ...COMPONENTS_TO_REPLACE,
   ].forEach((x) => (userAgent = userAgent.replace(x[0], x[1])));

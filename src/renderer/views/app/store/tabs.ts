@@ -22,17 +22,14 @@ import { TOOLBAR_HEIGHT } from '~/constants/design';
 import { TabEvent } from '~/interfaces/tabs';
 
 export class TabsStore {
-@observable
+  @observable
   public isDragging = false;
   public tearOffInProgress = false;
-@observable
-
+  @observable
   public hoveredTabId = -1;
-@observable
-
+  @observable
   public list: ITab[] = [];
-@observable
-
+  @observable
   public selectedTabId = -1;
 
   public removedTabs = 0;
@@ -56,13 +53,11 @@ export class TabsStore {
   public leftMargins = 0;
 
   @computed
-
   public get selectedTab() {
     return this.getTabById(this.selectedTabId);
   }
 
   @computed
-
   public get hoveredTab() {
     return this.getTabById(this.hoveredTabId);
   }
@@ -134,7 +129,6 @@ export class TabsStore {
     });
 
     ipcRenderer.on('select-tab', (e, id: number) => {
-
       const tab = this.getTabById(id);
       if (!tab) return;
       this.selectedTabId = id;
@@ -250,7 +244,8 @@ export class TabsStore {
     requestAnimationFrame(() => {
       this.updateTabsBounds(false);
       if (this.scrollable) {
-        this.containerRef.current.scrollLeft = this.containerRef.current.scrollWidth;
+        this.containerRef.current.scrollLeft =
+          this.containerRef.current.scrollWidth;
       }
     });
 
@@ -262,7 +257,8 @@ export class TabsStore {
 
     const frame = () => {
       if (!this.scrollingToEnd) return;
-      this.containerRef.current.scrollLeft = this.containerRef.current.scrollWidth;
+      this.containerRef.current.scrollLeft =
+        this.containerRef.current.scrollWidth;
       requestAnimationFrame(frame);
     };
 
@@ -630,12 +626,17 @@ export class TabsStore {
             // Stop dragging in the current window UI
             selectedTab.isDragging = false;
             this.isDragging = false;
-            ipcRenderer.invoke('tear-off-tab', { tabId: selectedTab.id, screenX: sx, screenY: sy });
+            ipcRenderer.invoke('tear-off-tab', {
+              tabId: selectedTab.id,
+              screenX: sx,
+              screenY: sy,
+            });
           } finally {
             setTimeout(() => (this.tearOffInProgress = false), 150);
           }
         }
-      }this.getTabsToReplace(
+      }
+      this.getTabsToReplace(
         selectedTab,
         lastMouseX - e.pageX >= 1 ? 'left' : 'right',
       );

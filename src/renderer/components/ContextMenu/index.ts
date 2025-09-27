@@ -4,7 +4,15 @@ import { shadows, centerIcon } from '~/renderer/mixins';
 import { ITheme } from '~/interfaces';
 import { DIALOG_EASING } from '~/renderer/constants';
 
-export const ContextMenu = styled.div.withConfig({ shouldForwardProp: (p) => !['visible','$bigger','translucent'].includes(p as string) })<{ visible: boolean; $bigger?: boolean; translucent?: boolean; theme?: ITheme;}>`
+export const ContextMenu = styled.div.withConfig({
+  shouldForwardProp: (p) =>
+    !['visible', '$bigger', 'translucent'].includes(p as string),
+})<{
+  visible: boolean;
+  $bigger?: boolean;
+  translucent?: boolean;
+  theme?: ITheme;
+}>`
   outline: none;
   position: absolute;
   backface-visibility: hidden;
@@ -40,7 +48,9 @@ export const ContextMenu = styled.div.withConfig({ shouldForwardProp: (p) => !['
   `}
 `;
 
-export const ContextMenuSeparator = styled.div.withConfig({ shouldForwardProp: (p) => p !== '$bigger' })<{ $bigger?: boolean }>`
+export const ContextMenuSeparator = styled.div.withConfig({
+  shouldForwardProp: (p) => p !== '$bigger',
+})<{ $bigger?: boolean }>`
   height: 1px;
   width: 100%;
 
@@ -66,7 +76,17 @@ export interface ContextMenuItemProps {
   disabled?: boolean;
 }
 
-export const ContextMenuItem = styled.div.withConfig({ shouldForwardProp: (p) => !['icon','selected','$bigger','visible','iconSize','disabled'].includes(p as string) })<ContextMenuItemProps>`
+export const ContextMenuItem = styled.div.withConfig({
+  shouldForwardProp: (p) =>
+    ![
+      'icon',
+      'selected',
+      '$bigger',
+      'visible',
+      'iconSize',
+      'disabled',
+    ].includes(p as string),
+})<ContextMenuItemProps>`
   padding: 12px 24px;
   font-weight: 400;
   position: relative;

@@ -20,7 +20,10 @@ export const SecurityChipDialog: React.FC = () => {
   return (
     <div style={{ padding: 16 }}>
       <h3>Security Chip Settings (TODO)</h3>
-      <p>Configure the dynamic security button for Internal / Extension / Not Secure states.</p>
+      <p>
+        Configure the dynamic security button for Internal / Extension / Not
+        Secure states.
+      </p>
       <ul>
         <li>TODO: custom label</li>
         <li>TODO: custom icon</li>

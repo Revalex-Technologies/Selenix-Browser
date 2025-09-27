@@ -43,11 +43,9 @@ const onZoomClick = (e: React.MouseEvent<HTMLDivElement>) => {
 const onKeyClick = () => {
   let hostname = '';
   try {
-
     const parsed = new URL(store.tabs.selectedTab.url);
     hostname = parsed.hostname;
   } catch (err) {
-
     hostname = '';
   }
   const list = store.autoFill.credentials.filter(
@@ -76,7 +74,6 @@ ipcRenderer.on('zoom-factor-updated', (e, zoomFactor, showDialog) => {
 });
 
 const onShieldMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-
   if (e.button === 0) {
     e.preventDefault();
     return onShieldContextMenu(e);
@@ -94,13 +91,26 @@ const onShieldContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
         const next = !store.settings.object.shield;
         store.settings.object.shield = next;
         store.settings.save();
-        try { ipcRenderer.send('shield:set-enabled', next); } catch {}
-        try { window.dispatchEvent(new CustomEvent('shield:enabled-updated', { detail: next })); } catch {}
+        try {
+          ipcRenderer.send('shield:set-enabled', next);
+        } catch {}
+        try {
+          window.dispatchEvent(
+            new CustomEvent('shield:enabled-updated', { detail: next }),
+          );
+        } catch {}
 
-    try { window.dispatchEvent(new CustomEvent('shield:enabled-updated', { detail: next })); } catch {}},
+        try {
+          window.dispatchEvent(
+            new CustomEvent('shield:enabled-updated', { detail: next }),
+          );
+        } catch {}
+      },
     },
   ]);
-  try { menu.popup({ window: remote.getCurrentWindow() }); } catch {}
+  try {
+    menu.popup({ window: remote.getCurrentWindow() });
+  } catch {}
 };
 
 export const SiteButtons = observer(() => {

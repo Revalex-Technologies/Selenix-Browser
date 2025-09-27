@@ -9,7 +9,7 @@ import { Privacy } from '../Privacy';
 import store from '../../store';
 import { NavigationDrawer } from '~/renderer/components/NavigationDrawer';
 import { Button } from '~/renderer/components/Button';
-import { ThemeProvider, StyleSheetManager  } from 'styled-components';
+import { ThemeProvider, StyleSheetManager } from 'styled-components';
 import { Autofill } from '../Autofill';
 import { OnStartup } from '../Startup';
 import { Content, LeftContent, Container } from '~/renderer/components/Pages';
@@ -269,7 +269,7 @@ export default observer(() => {
         </NavigationDrawer>
         <Content>
           <LeftContent style={{ maxWidth: 800, marginTop: 56 }}>
-                        {selectedSection === 'about' && <About />}
+            {selectedSection === 'about' && <About />}
             {selectedSection === 'appearance' && <Appearance />}
             {selectedSection === 'autofill' && process.env.ENABLE_AUTOFILL && (
               <Autofill />

@@ -4,7 +4,9 @@ import { EASING_FUNCTION, BLUE_500 } from '~/renderer/constants';
 import { ICON_CHECK } from '~/renderer/constants/icons';
 import { centerIcon, centerBoth } from '~/renderer/mixins';
 
-export const Container = styled.div.withConfig({ shouldForwardProp: (p) => !['toggled'].includes(p as string) })`
+export const Container = styled.div.withConfig({
+  shouldForwardProp: (p) => !['toggled'].includes(p as string),
+})`
   height: 40px;
   display: flex;
   align-items: center;
@@ -18,7 +20,9 @@ export const Container = styled.div.withConfig({ shouldForwardProp: (p) => !['to
   }
 `;
 
-export const StyledCheckbox = styled.div.withConfig({ shouldForwardProp: (p) => !['toggled'].includes(p as string) })< { toggled: boolean } >`
+export const StyledCheckbox = styled.div.withConfig({
+  shouldForwardProp: (p) => !['toggled'].includes(p as string),
+})<{ toggled: boolean }>`
   width: 18px;
   height: 18px;
   box-sizing: border-box;
@@ -26,7 +30,9 @@ export const StyledCheckbox = styled.div.withConfig({ shouldForwardProp: (p) => 
   border-radius: 3px;
   border-width: 2px;
   border-style: solid;
-  transition: 0.15s background-color, 0.15s border-color;
+  transition:
+    0.15s background-color,
+    0.15s border-color;
 
   ${({ toggled = false }: { toggled?: boolean }) => css`
     background-color: ${toggled ? BLUE_500 : 'transparent'};
@@ -46,13 +52,18 @@ export const StyledCheckbox = styled.div.withConfig({ shouldForwardProp: (p) => 
     position: absolute;
     pointer-events: none;
     opacity: 0;
-    transition: 0.1s width ${EASING_FUNCTION}, 0.1s height ${EASING_FUNCTION},
-      0.15s opacity, 0.15s background-color;
+    transition:
+      0.1s width ${EASING_FUNCTION},
+      0.1s height ${EASING_FUNCTION},
+      0.15s opacity,
+      0.15s background-color;
     ${centerBoth()};
   }
 `;
 
-export const Icon = styled.div.withConfig({ shouldForwardProp: (p) => !['toggled'].includes(p as string) })< { toggled: boolean } >`
+export const Icon = styled.div.withConfig({
+  shouldForwardProp: (p) => !['toggled'].includes(p as string),
+})<{ toggled: boolean }>`
   width: 100%;
   height: 100%;
   position: absolute;

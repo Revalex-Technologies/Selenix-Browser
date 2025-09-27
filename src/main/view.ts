@@ -19,7 +19,8 @@ import { Application } from './application';
 import { getUserAgentForURL } from './user-agent';
 
 interface IAuthInfo {
-  url: string;}
+  url: string;
+}
 export class View {
   public webContentsView: WebContentsView;
 
@@ -59,7 +60,6 @@ export class View {
     const path = require('path');
     this.webContentsView = new WebContentsView({
       webPreferences: {
-
         preload: path.join(app.getAppPath(), 'build', 'view-preload.bundle.js'),
         nodeIntegration: false,
         contextIsolation: true,
@@ -71,11 +71,9 @@ export class View {
     });
 
     try {
-
       const { enable } = require('@electron/remote/main');
       enable(this.webContentsView.webContents);
     } catch (err) {
-
       console.warn('Failed to enable remote for browser view:', err);
     }
 
@@ -162,28 +160,31 @@ export class View {
         try {
           if (disposition === 'background-tab') {
             this.window.viewManager.create({ url, active: false }, true);
-          } else if (disposition === 'foreground-tab' || disposition === 'new-window') {
+          } else if (
+            disposition === 'foreground-tab' ||
+            disposition === 'new-window'
+          ) {
             this.window.viewManager.create({ url, active: true }, true);
           } else if (frameName === '_self') {
             this.window.viewManager.selected.webContents.loadURL(url);
           } else {
-
             this.window.viewManager.create({ url, active: true }, true);
           }
-        } catch (err) {
-
-        }
+        } catch (err) {}
         return { action: 'deny' };
       });
     } catch {}
-this.webContents.addListener('did-start-navigation', async (e: any, ...args: any[]) => {
-      this.updateNavigationState();
+    this.webContents.addListener(
+      'did-start-navigation',
+      async (e: any, ...args: any[]) => {
+        this.updateNavigationState();
 
-      this.favicon = '';
+        this.favicon = '';
 
-      this.emitEvent('load-commit', ...args);
-      this.updateURL(this.webContents.getURL());
-    });
+        this.emitEvent('load-commit', ...args);
+        this.updateURL(this.webContents.getURL());
+      },
+    );
 
     this.webContents.on(
       'did-start-navigation',
@@ -195,21 +196,30 @@ this.webContents.addListener('did-start-navigation', async (e: any, ...args: any
         }
       },
     );
-this.webContents.addListener(
+    this.webContents.addListener(
       'did-fail-load',
-      (e: any, errorCode: any, errorDescription: any, validatedURL: any, isMainFrame: any) => {
-
+      (
+        e: any,
+        errorCode: any,
+        errorDescription: any,
+        validatedURL: any,
+        isMainFrame: any,
+      ) => {
         if (isMainFrame && errorCode !== -3) {
           this.errorURL = validatedURL;
 
           this.hasError = true;
 
-          try { this.webContents.stop(); } catch {}
+          try {
+            this.webContents.stop();
+          } catch {}
           // Avoid loops if the error page itself fails
           if (!validatedURL?.startsWith(`${ERROR_PROTOCOL}://`)) {
             setTimeout(() => {
               if (!this.webContents.isDestroyed()) {
-                this.webContents.loadURL(`${ERROR_PROTOCOL}://${NETWORK_ERROR_HOST}/#${errorCode}|${encodeURIComponent(validatedURL || '')}`);
+                this.webContents.loadURL(
+                  `${ERROR_PROTOCOL}://${NETWORK_ERROR_HOST}/#${errorCode}|${encodeURIComponent(validatedURL || '')}`,
+                );
               }
             }, 0);
           }
@@ -218,19 +228,24 @@ this.webContents.addListener(
     );
 
     // Extra safety: show our internal error page on renderer crash
-    this.webContents.addListener('render-process-gone', (event: any, details: any) => {
-      try {
-        if (!this.webContents.isDestroyed()) {
-          this.webContents.loadURL(`${ERROR_PROTOCOL}://${NETWORK_ERROR_HOST}/#render-process-gone|${encodeURIComponent(this.webContents.getURL() || '')}`);
-        }
-      } catch {}
-    });
-
+    this.webContents.addListener(
+      'render-process-gone',
+      (event: any, details: any) => {
+        try {
+          if (!this.webContents.isDestroyed()) {
+            this.webContents.loadURL(
+              `${ERROR_PROTOCOL}://${NETWORK_ERROR_HOST}/#render-process-gone|${encodeURIComponent(this.webContents.getURL() || '')}`,
+            );
+          }
+        } catch {}
+      },
+    );
 
     this.webContents.addListener(
       'page-favicon-updated',
       async (e: any, favicons: any) => {
-        let iconUrl = Array.isArray(favicons) && favicons.length > 0 ? favicons[0] : '';
+        let iconUrl =
+          Array.isArray(favicons) && favicons.length > 0 ? favicons[0] : '';
 
         if (!iconUrl && this.url) {
           try {
@@ -258,7 +273,8 @@ this.webContents.addListener(
             const origin = new URL(this.url).origin;
             const fallback = origin + '/favicon.ico';
             if (fallback !== this.favicon) {
-              const fav = await Application.instance.storage.addFavicon(fallback);
+              const fav =
+                await Application.instance.storage.addFavicon(fallback);
               this.emitEvent('favicon-updated', fav);
             }
           } catch {}
@@ -267,24 +283,27 @@ this.webContents.addListener(
       },
     );
 
-    this.webContents.addListener('zoom-changed', (e: any, zoomDirection: any) => {
-      const newZoomFactor =
-        this.webContents.zoomFactor +
-        (zoomDirection === 'in'
-          ? ZOOM_FACTOR_INCREMENT
-          : -ZOOM_FACTOR_INCREMENT);
+    this.webContents.addListener(
+      'zoom-changed',
+      (e: any, zoomDirection: any) => {
+        const newZoomFactor =
+          this.webContents.zoomFactor +
+          (zoomDirection === 'in'
+            ? ZOOM_FACTOR_INCREMENT
+            : -ZOOM_FACTOR_INCREMENT);
 
-      if (
-        newZoomFactor <= ZOOM_FACTOR_MAX &&
-        newZoomFactor >= ZOOM_FACTOR_MIN
-      ) {
-        this.webContents.zoomFactor = newZoomFactor;
-        this.emitEvent('zoom-updated', this.webContents.zoomFactor);
-        window.viewManager.emitZoomUpdate();
-      } else {
-        e.preventDefault();
-      }
-    });
+        if (
+          newZoomFactor <= ZOOM_FACTOR_MAX &&
+          newZoomFactor >= ZOOM_FACTOR_MIN
+        ) {
+          this.webContents.zoomFactor = newZoomFactor;
+          this.emitEvent('zoom-updated', this.webContents.zoomFactor);
+          window.viewManager.emitZoomUpdate();
+        } else {
+          e.preventDefault();
+        }
+      },
+    );
 
     this.webContents.addListener(
       'certificate-error',
@@ -302,10 +321,8 @@ this.webContents.addListener(
           (this.incognito && process.env.ALLOW_INSECURE_IN_INCOGNITO === '1');
 
         if (allowInsecure) {
-
         } else {
           try {
-            
           } catch {}
           event.preventDefault();
           callback(false);
@@ -335,11 +352,17 @@ this.webContents.addListener(
 
         const w = Math.max(0, width ?? 0);
         const h = Math.max(0, height ?? 0);
-        const __curB = (this.webContentsView as any).getBounds?.() || { x: 0, y: 0 };
-      (this.webContentsView as any).setBounds?.({ x: __curB.x ?? 0, y: __curB.y ?? 0, width: w, height: Math.max(0, h - (__curB.y ?? 0)) });
-      } catch (err) {
-
-      }
+        const __curB = (this.webContentsView as any).getBounds?.() || {
+          x: 0,
+          y: 0,
+        };
+        (this.webContentsView as any).setBounds?.({
+          x: __curB.x ?? 0,
+          y: __curB.y ?? 0,
+          width: w,
+          height: Math.max(0, h - (__curB.y ?? 0)),
+        });
+      } catch (err) {}
     };
 
     const winRef = this.window.win;
@@ -360,7 +383,9 @@ this.webContents.addListener(
 
   public get webContents() {
     const wc = (this as any)?.webContentsView?.webContents;
-    if (!wc) { throw new Error('WebContents is unavailable (view destroyed)'); }
+    if (!wc) {
+      throw new Error('WebContents is unavailable (view destroyed)');
+    }
     return wc;
   }
 
@@ -392,16 +417,25 @@ this.webContents.addListener(
   }
 
   public destroy() {
-
     try {
       if ((this as any)._isDestroyed) return;
     } catch {}
 
     try {
-      if (this._boundUpdateBounds && this.window?.win && !this.window.win.isDestroyed()) {
+      if (
+        this._boundUpdateBounds &&
+        this.window?.win &&
+        !this.window.win.isDestroyed()
+      ) {
         this.window.win.removeListener('resize', this._boundUpdateBounds);
-        this.window.win.removeListener('enter-full-screen', this._boundUpdateBounds);
-        this.window.win.removeListener('leave-full-screen', this._boundUpdateBounds);
+        this.window.win.removeListener(
+          'enter-full-screen',
+          this._boundUpdateBounds,
+        );
+        this.window.win.removeListener(
+          'leave-full-screen',
+          this._boundUpdateBounds,
+        );
         this.window.win.removeListener('maximize', this._boundUpdateBounds);
         this.window.win.removeListener('unmaximize', this._boundUpdateBounds);
       }
@@ -413,28 +447,43 @@ this.webContents.addListener(
       const child: any = (this as any)?.webContentsView;
       const win = this.window?.win;
       if (child && win && !win.isDestroyed()) {
-        try { win.contentView.removeChildView(child); } catch {}
+        try {
+          win.contentView.removeChildView(child);
+        } catch {}
       }
     } catch {}
 
     try {
       const wc: any = (this as any)?.webContentsView?.webContents;
       if (wc) {
-        try { wc.removeAllListeners?.(); } catch {}
-        const isDestroyed = typeof wc.isDestroyed === 'function' ? wc.isDestroyed() : false;
-        if (!isDestroyed) { try { wc.destroy?.(); } catch {} }
+        try {
+          wc.removeAllListeners?.();
+        } catch {}
+        const isDestroyed =
+          typeof wc.isDestroyed === 'function' ? wc.isDestroyed() : false;
+        if (!isDestroyed) {
+          try {
+            wc.destroy?.();
+          } catch {}
+        }
       }
     } catch {}
 
     try {
       const wcId = (this as any)?.webContentsView?.webContents?.id;
       if (wcId != null) {
-        try { ipcMain.removeHandler(`get-error-url-${wcId}`); } catch {}
+        try {
+          ipcMain.removeHandler(`get-error-url-${wcId}`);
+        } catch {}
       }
     } catch {}
 
-    try { (this as any).webContentsView = null as any; } catch {}
-    try { (this as any)._isDestroyed = true; } catch {}
+    try {
+      (this as any).webContentsView = null as any;
+    } catch {}
+    try {
+      (this as any)._isDestroyed = true;
+    } catch {}
   }
 
   public async updateCredentials() {
@@ -559,7 +608,6 @@ this.webContents.addListener(
     this.window.send('tab-event', event, this.id, args);
   }
 
-
   public reparent(newWindow: AppWindow): void {
     // Detach from old window
     try {
@@ -572,13 +620,17 @@ this.webContents.addListener(
         oldWin.removeListener('unmaximize', this._boundUpdateBounds);
       }
       if (oldWin && !oldWin.isDestroyed()) {
-        try { (oldWin as any).contentView?.removeChildView?.(this.webContentsView); } catch {}
+        try {
+          (oldWin as any).contentView?.removeChildView?.(this.webContentsView);
+        } catch {}
       }
     } catch {}
 
     // Point to new window
     this.window = newWindow;
-    try { (this.webContents as any).windowId = newWindow.win.id; } catch {}
+    try {
+      (this.webContents as any).windowId = newWindow.win.id;
+    } catch {}
 
     // Attach to new window
     try {
@@ -601,6 +653,8 @@ this.webContents.addListener(
       }
     } catch {}
 
-    try { this.webContents.focus(); } catch {}
+    try {
+      this.webContents.focus();
+    } catch {}
   }
 }

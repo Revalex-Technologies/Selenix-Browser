@@ -4,7 +4,9 @@ import { robotoRegular } from '~/renderer/mixins';
 import { ITheme } from '~/interfaces';
 import { DialogStyle } from '~/renderer/mixins/dialogs';
 
-export const StyledApp = styled(DialogStyle).withConfig({ shouldForwardProp: (p) => p !== 'visible' })<{ visible?: boolean; theme?: ITheme;}>`
+export const StyledApp = styled(DialogStyle).withConfig({
+  shouldForwardProp: (p) => p !== 'visible',
+})<{ visible?: boolean; theme?: ITheme }>`
   padding: 16px;
   overflow: visible;
 

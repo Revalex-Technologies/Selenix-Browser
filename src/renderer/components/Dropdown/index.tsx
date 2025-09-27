@@ -108,7 +108,8 @@ export class Dropdown extends React.PureComponent<Props, State> {
     const { expanded, label, value } = this.state;
 
     return (
-      <StyledDropdown expanded={expanded} 
+      <StyledDropdown
+        expanded={expanded}
         className="dropdown"
         onMouseDown={this.onMouseDown}
         style={style}

@@ -6,5 +6,5 @@ export const searchElements = <T>(
   el: Document | HTMLElement,
   query: string,
 ) => {
-  return (Array.from(el.querySelectorAll(query)) as unknown) as T[];
+  return Array.from(el.querySelectorAll(query)) as unknown as T[];
 };

@@ -4,7 +4,9 @@ import { centerIcon } from '~/renderer/mixins';
 import { ContextMenuRow } from '~/renderer/components/ContextMenu';
 import { ITheme } from '~/interfaces';
 
-export const Image = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'src' })<{ src?: string;}>`
+export const Image = styled.div.withConfig({
+  shouldForwardProp: (p) => p !== 'src',
+})<{ src?: string }>`
   position: absolute;
   z-index: 1;
   background-size: cover;
@@ -14,7 +16,9 @@ export const Image = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'sr
   top: 0;
   right: 0;
   bottom: 0;
-  transition: 0.3s opacity, 1s transform;
+  transition:
+    0.3s opacity,
+    1s transform;
 
   ${({ src }: { src?: string }) => css`
     opacity: ${src === '' ? 0 : 1};
@@ -30,16 +34,16 @@ export const Image = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'sr
       bottom: 0;
       right: 0;
       z-index: 2;
-      background-image: radial-gradient(
-          rgba(0, 0, 0, 0) 0%,
-          rgba(0, 0, 0, 0.5) 100%
-        ),
+      background-image:
+        radial-gradient(rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%),
         radial-gradient(rgba(0, 0, 0, 0) 33%, rgba(0, 0, 0, 0.3) 166%);
     }
   `};
 `;
 
-export const Wrapper = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'fullSize' })<{ fullSize?: boolean;}>`
+export const Wrapper = styled.div.withConfig({
+  shouldForwardProp: (p) => p !== 'fullSize',
+})<{ fullSize?: boolean }>`
   display: flex;
   align-items: center;
   position: relative;
@@ -79,7 +83,9 @@ export const Menu = styled.div`
   bottom: 32px;
 `;
 
-export const IconItem = styled.div.withConfig({ shouldForwardProp: (p) => p !== 'imageSet' })<{ imageSet?: boolean;}>`
+export const IconItem = styled.div.withConfig({
+  shouldForwardProp: (p) => p !== 'imageSet',
+})<{ imageSet?: boolean }>`
   width: 34px;
   height: 34px;
   margin-left: 16px;

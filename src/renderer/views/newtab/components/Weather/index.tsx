@@ -27,7 +27,12 @@ type LocationInfo = {
 function isUSLocale(): boolean {
   try {
     const lang = navigator.language || '';
-    return /(^en-US|\bUS\b)/i.test(lang) || (Intl.DateTimeFormat().resolvedOptions().timeZone || '').includes('America/');
+    return (
+      /(^en-US|\bUS\b)/i.test(lang) ||
+      (Intl.DateTimeFormat().resolvedOptions().timeZone || '').includes(
+        'America/',
+      )
+    );
   } catch {
     return false;
   }
@@ -36,13 +41,13 @@ function isUSLocale(): boolean {
 function codeToEmoji(code?: number) {
   if (code === undefined) return '❓';
   if (code === 0) return '☀️';
-  if ([1,2].includes(code)) return '🌤️';
+  if ([1, 2].includes(code)) return '🌤️';
   if (code === 3) return '☁️';
-  if ([45,48].includes(code)) return '🌫️';
-  if ([51,53,55,56,57].includes(code)) return '🌦️';
-  if ([61,63,65,66,67,80,81,82].includes(code)) return '🌧️';
-  if ([71,73,75,77,85,86].includes(code)) return '❄️';
-  if ([95,96,99].includes(code)) return '⛈️';
+  if ([45, 48].includes(code)) return '🌫️';
+  if ([51, 53, 55, 56, 57].includes(code)) return '🌦️';
+  if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return '🌧️';
+  if ([71, 73, 75, 77, 85, 86].includes(code)) return '❄️';
+  if ([95, 96, 99].includes(code)) return '⛈️';
   return '☁️';
 }
 
@@ -83,7 +88,9 @@ export const Weather = observer(() => {
   const [fahrenheit, setFahrenheit] = React.useState<boolean>(isUSLocale());
 
   const persistLoc = (l: LocationInfo): void => {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(l)); } catch {}
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(l));
+    } catch {}
   };
   const loadStored = (): LocationInfo | null => {
     try {
@@ -93,22 +100,25 @@ export const Weather = observer(() => {
     return null;
   };
 
-  const loadWeather = React.useCallback((l: LocationInfo): void => {
-    setLoading(true);
-    setError(null);
-    setLoc(l);
-    persistLoc(l);
-    getWeather(l.latitude, l.longitude, fahrenheit)
-      .then((data) => {
-        setCurrent(data.current_weather);
-        setDaily(data.daily);
-        setLoading(false);
-      })
-      .catch((e: any) => {
-        setError(String(e));
-        setLoading(false);
-      });
-  }, [fahrenheit]);
+  const loadWeather = React.useCallback(
+    (l: LocationInfo): void => {
+      setLoading(true);
+      setError(null);
+      setLoc(l);
+      persistLoc(l);
+      getWeather(l.latitude, l.longitude, fahrenheit)
+        .then((data) => {
+          setCurrent(data.current_weather);
+          setDaily(data.daily);
+          setLoading(false);
+        })
+        .catch((e: any) => {
+          setError(String(e));
+          setLoading(false);
+        });
+    },
+    [fahrenheit],
+  );
 
   // Initial location: stored -> geolocation -> fallback (no cleanup return).
   React.useEffect(() => {
@@ -117,12 +127,22 @@ export const Weather = observer(() => {
       loadWeather(stored);
       return;
     }
-    const fallback = () => loadWeather({ name: 'New York, US', latitude: 40.7128, longitude: -74.0060 });
+    const fallback = () =>
+      loadWeather({
+        name: 'New York, US',
+        latitude: 40.7128,
+        longitude: -74.006,
+      });
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => loadWeather({ name: 'My Location', latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
+        (pos) =>
+          loadWeather({
+            name: 'My Location',
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+          }),
         () => fallback(),
-        { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 },
       );
     } else {
       fallback();
@@ -137,8 +157,13 @@ export const Weather = observer(() => {
   // Debounced city search, always returns cleanup.
   React.useEffect(() => {
     const id = window.setTimeout(() => {
-      if (query.trim().length < 2) { setResults([]); return; }
-      searchCity(query).then(setResults).catch(() => setResults([]));
+      if (query.trim().length < 2) {
+        setResults([]);
+        return;
+      }
+      searchCity(query)
+        .then(setResults)
+        .catch(() => setResults([]));
     }, 300);
     return () => window.clearTimeout(id);
   }, [query]);
@@ -147,9 +172,14 @@ export const Weather = observer(() => {
     setError(null);
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
-      (pos) => loadWeather({ name: 'My Location', latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
+      (pos) =>
+        loadWeather({
+          name: 'My Location',
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+        }),
       (e: any) => setError(e.message || 'Location unavailable'),
-      { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 },
     );
   };
 
@@ -157,9 +187,21 @@ export const Weather = observer(() => {
 
   if (error) {
     return (
-      <WeatherWrap aria-label="Weather error" title={error} onClick={toggle} data-clickable>
+      <WeatherWrap
+        aria-label="Weather error"
+        title={error}
+        onClick={toggle}
+        data-clickable
+      >
         ⚠️ Weather • Click to open
-        <button className="retry" onClick={(e: any) => { e.stopPropagation(); setError(null); useMyLocation(); }}>
+        <button
+          className="retry"
+          onClick={(e: any) => {
+            e.stopPropagation();
+            setError(null);
+            useMyLocation();
+          }}
+        >
           Use My Location
         </button>
       </WeatherWrap>
@@ -190,9 +232,15 @@ export const Weather = observer(() => {
         <ForecastPanel role="dialog" aria-label="7 day forecast">
           <div className="controls">
             <div className="loc">{loc ? loc.name : 'Unknown location'}</div>
-            <button onClick={useMyLocation} className="small">Use My Location</button>
+            <button onClick={useMyLocation} className="small">
+              Use My Location
+            </button>
             <label className="toggle">
-              <input type="checkbox" checked={fahrenheit} onChange={(e: any) => setFahrenheit(e.target.checked)} />
+              <input
+                type="checkbox"
+                checked={fahrenheit}
+                onChange={(e: any) => setFahrenheit(e.target.checked)}
+              />
               <span>{fahrenheit ? '°F' : '°C'}</span>
             </label>
           </div>
@@ -210,7 +258,11 @@ export const Weather = observer(() => {
                   <div
                     key={`${r.latitude},${r.longitude}`}
                     className="result"
-                    onClick={() => { setQuery(''); setResults([]); loadWeather(r); }}
+                    onClick={() => {
+                      setQuery('');
+                      setResults([]);
+                      loadWeather(r);
+                    }}
                   >
                     {r.name}
                   </div>
@@ -219,13 +271,21 @@ export const Weather = observer(() => {
             )}
           </div>
 
-          {daily.time.slice(0,7).map((d, i) => (
+          {daily.time.slice(0, 7).map((d, i) => (
             <div className="row" key={d}>
-              <div className="day">{new Date(d).toLocaleDateString(undefined, { weekday: 'short' })}</div>
+              <div className="day">
+                {new Date(d).toLocaleDateString(undefined, {
+                  weekday: 'short',
+                })}
+              </div>
               <div className="icon">{codeToEmoji(daily.weathercode[i])}</div>
               <div className="temps">
-                <span className="max">{Math.round(daily.temperature_2m_max[i])}°</span>
-                <span className="min">{Math.round(daily.temperature_2m_min[i])}°</span>
+                <span className="max">
+                  {Math.round(daily.temperature_2m_max[i])}°
+                </span>
+                <span className="min">
+                  {Math.round(daily.temperature_2m_min[i])}°
+                </span>
               </div>
             </div>
           ))}

@@ -28,20 +28,32 @@ const formatBytes = (bytes: number) => {
   return `${v.toFixed(v < 10 && i > 0 ? 1 : 0)} ${units[i]}`;
 };
 
-const showDownloadContextMenu = (item: IDownloadItem, ev?: React.MouseEvent) => {
-  if (ev) { ev.preventDefault(); ev.stopPropagation(); }
-  try { ipcRenderer.invoke('show-download-context-menu', item.id); } catch {}
+const showDownloadContextMenu = (
+  item: IDownloadItem,
+  ev?: React.MouseEvent,
+) => {
+  if (ev) {
+    ev.preventDefault();
+    ev.stopPropagation();
+  }
+  try {
+    ipcRenderer.invoke('show-download-context-menu', item.id);
+  } catch {}
 };
 
 const DownloadRow = observer(({ item }: { item: IDownloadItem }) => {
   const progressPercent =
-    item.totalBytes > 0 ? Math.round((item.receivedBytes / item.totalBytes) * 100) : 0;
+    item.totalBytes > 0
+      ? Math.round((item.receivedBytes / item.totalBytes) * 100)
+      : 0;
 
   const total = formatBytes(item.totalBytes);
   const received = formatBytes(item.receivedBytes);
 
   return (
-    <StyledDownloadItem onContextMenu={(e: any) => showDownloadContextMenu(item, e)}>
+    <StyledDownloadItem
+      onContextMenu={(e: any) => showDownloadContextMenu(item, e)}
+    >
       <Icon />
       <Info>
         <Title>{item.fileName}</Title>
