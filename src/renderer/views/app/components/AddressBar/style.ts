@@ -56,10 +56,10 @@ export const Text = styled.div.withConfig({
   pointer-events: none;
   position: absolute;
   top: 50%;
-  transform: translateY(calc(-50%));
+  transform: translateY(calc(-50% + 0.1px));
   flex: 1;
   color: inherit;
-  margin-top: -1px;
+  margin-top: 0px;
   flex-wrap: nowrap;
   white-space: nowrap;
   overflow: hidden;
@@ -80,8 +80,9 @@ export const Input = styled.input.withConfig({
   background-color: transparent;
   border: none;
   padding: 0;
-  padding-top: 1px;
+  padding-top: 0px;
   margin: 0;
+  transform: translateY(0.5px);
   color: black;
   font-family: inherit;
   word-spacing: inherit;
