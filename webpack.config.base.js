@@ -51,7 +51,6 @@ const rules = [
     },
   },
 
-  // Fonts (also through asset modules)
   {
     test: /\.(woff2?|eot|ttf|otf)$/i,
     type: 'asset/resource',
@@ -60,13 +59,11 @@ const rules = [
     },
   },
 
-  // TypeScript / TSX
   {
     test: /\.(tsx?|ts)$/,
     include: INCLUDE,
     use: dev
       ? [
-          // put babel first in dev so react-refresh works
           {
             loader: 'babel-loader',
             options: { plugins: ['react-refresh/babel'] },
@@ -86,7 +83,7 @@ const config = {
     path: resolve(__dirname, 'build'),
     devtoolModuleFilenameTemplate: info => `file:///${info.absoluteResourcePath.replace(/\\/g, '/')}`,
     filename: '[name].bundle.js',
-    // Use a non-MD4 hash to avoid OpenSSL 3 errors
+    // Use a non-MD4 hash to avoid OpenSSL complications.
     hashFunction: 'xxhash64',
     assetModuleFilename: 'res/[name].[contenthash:8][ext]',
   },
@@ -107,7 +104,6 @@ const config = {
 
   plugins: [
     new webpack.EnvironmentPlugin(['NODE_ENV', ...Object.keys(BUILD_FLAGS)]),
-    // keep fast TS typechecking separate if you want (optional, safe to keep)
     new ForkTsCheckerWebpackPlugin({
       async: dev,
       typescript: {
@@ -165,6 +161,25 @@ const applyEntries = (cfg, entries) => {
 
 const getBaseConfig = (name) => {
   const cfg = {
+    stats: {
+      warningsFilter: [
+        /Critical dependency: require function is used in a way in which dependencies cannot be statically extracted/,
+        /electron-chrome-extensions/,
+      ],
+    },
+    module: {
+      exprContextCritical: false,
+      unknownContextCritical: false,
+    },
+    ignoreWarnings: [
+      (w) => /Critical dependency: require function/.test(w.message || '') &&
+              /electron-chrome-extensions/.test((w.module && w.module.resource) || ''),
+    ],
+    performance: {
+      maxAssetSize: 400000,
+      maxEntrypointSize: 450000,
+      hints: 'warning'
+    },
     plugins: [],
 
     output: {},

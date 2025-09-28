@@ -36,33 +36,9 @@ const mainConfig = getConfig({
   ],
 });
 
-const preloadConfig = getConfig({
-  target: 'web',
 
-  devtool: dev ? 'eval-cheap-module-source-map' : 'source-map',
-
-  watch: dev,
-
-  entry: {
-    'view-preload': './src/preloads/view-preload',
-  },
-
-  plugins: [
-    new ForkTsCheckerWebpackPlugin({
-      async: dev,
-      typescript: {
-        memoryLimit: 4096,
-        mode: 'readonly',
-        configFile: 'tsconfig.json',
-        typescriptPath: require.resolve('typescript'),
-      },
-    }),
-    ...(process.env.ANALYZE ? [new BundleAnalyzerPlugin()] : []),
-  ],
-});
 
 if (process.env.ENABLE_EXTENSIONS) {
-  preloadConfig.entry['extensions-preload'] = './src/preloads/extensions-preload';
 }
 
 if (process.env.START === '1') {
@@ -106,5 +82,48 @@ mainConfig.plugins.push(new CopyPlugin({
     { from: 'static/pages/network-error.html', to: 'network-error.html' }
   ]
 }));
+
+const preloadConfig = getConfig({
+  target: 'web',
+
+  devtool: dev ? 'eval-cheap-module-source-map' : 'source-map',
+
+  watch: dev,
+
+  entry: {
+    'view-preload': './src/preloads/view-preload',
+    'extensions-preload': './src/preloads/extensions-preload',
+  },
+
+  module: {
+  noParse: /electron-chrome-extensions[\\/](dist|lib)[\\/]chrome-extension-api\.preload\.js$/,
+  rules: [
+    {
+      test: /electron-chrome-extensions[\\/](dist|lib)[\\/]chrome-extension-api\.preload\.js$/,
+      parser: { requireContext: false, requireInclude: false, requireEnsure: false }
+    }
+  ]
+},
+plugins: [new ForkTsCheckerWebpackPlugin({
+      async: dev,
+      typescript: {
+        memoryLimit: 4096,
+        mode: 'readonly',
+        configFile: 'tsconfig.json',
+        typescriptPath: require.resolve('typescript'),
+      },
+    }),
+    ...(process.env.ANALYZE ? [new BundleAnalyzerPlugin(),
+
+    // Narrow dynamic require context for electron-chrome-extensions (preload only)
+    new (require('webpack')).ContextReplacementPlugin(
+      /electron-chrome-extensions[\\/](dist|lib)/,
+      require('path').resolve(__dirname, 'node_modules/electron-chrome-extensions/dist'),
+      true,
+      /^(chrome-extension-api\.preload\.js|index\.js)$/
+    )
+] : []),
+  ],
+});
 
 module.exports = [mainConfig, preloadConfig];
