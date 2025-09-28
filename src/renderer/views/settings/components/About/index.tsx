@@ -10,12 +10,6 @@ const Wrapper = styled.div`
   line-height: 1.6;
 `;
 
-const Banner = styled.img`
-  width: 360px;
-  height: auto;
-  align-self: center;
-`;
-
 const Versions = styled.div`
   margin-top: 8px;
   padding-top: 12px;
@@ -63,7 +57,7 @@ export const About: React.FC = () => {
   const versions = getSafeVersions();
   return (
     <Wrapper>
-      <Banner src={require('./selenix-banner.png')} alt="Selenix" />
+      {' '}
       <div>
         <p>
           The Wexond team discontinued and later sold their project some time
