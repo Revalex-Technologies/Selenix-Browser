@@ -1,5 +1,5 @@
 import { ipcMain, dialog, nativeImage } from 'electron';
-import * as Datastore from 'nedb';
+import Datastore from './file-datastore';
 import { fileTypeFromBuffer } from 'file-type/core';
 import { getPath } from '~/utils';
 import {
