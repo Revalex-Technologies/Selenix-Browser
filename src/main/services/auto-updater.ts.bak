@@ -31,11 +31,11 @@ export async function installOnNextLaunchIfPending(): Promise<boolean> {
 export const runAutoUpdaterService = () => {
   const updater = autoUpdater as any;
 
-  let __updateAvailable = false;
-  let __updateDownloaded = false;
+  const __updateAvailable = false;
+  const __updateDownloaded = false;
 
-  updater.autoDownload = true;
-  updater.autoInstallOnAppQuit = true;
+  updater.autoDownload = false;
+  updater.autoInstallOnAppQuit = false;
 
   if (!app.isPackaged) {
     try {
@@ -81,7 +81,6 @@ export const runAutoUpdaterService = () => {
   });
 
   updater.on('update-available', () => {
-    __updateAvailable = true;
     hasUpdate = true;
     isDownloaded = false;
     broadcast('update-available');
@@ -108,8 +107,6 @@ export const runAutoUpdaterService = () => {
       setImmediate(() => {
         if (app.isPackaged) {
           try {
-            __updateDownloaded = true;
-            __updateAvailable = true;
             updater.quitAndInstall(true, true);
           } catch (e) {
             reportError(e, 'Failed to quit and install');
