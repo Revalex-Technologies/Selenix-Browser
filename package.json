@@ -1,9 +1,9 @@
 {
   "name": "selenix",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "packageManager": "yarn@4.10.3",
   "sideEffects": false,
-  "description": "Extensible, fast and innovative web browser with material UI.",
+  "description": "Extensible, fast and innovative web browser with material UI built from a legally licensed version of Wexond.",
   "keywords": [
     "web-browser",
     "material",
