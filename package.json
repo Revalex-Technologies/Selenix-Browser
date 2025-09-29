@@ -76,7 +76,7 @@
     "mobx-react-lite": "4.1.1",
     "node-bookmarks-parser": "^2.0.0",
     "prettier": "3.6.2",
-    "pretty-bytes": "7.0.1",
+    "pretty-bytes": "7.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-is": "^18.0.0",
@@ -91,9 +91,9 @@
     "ts-loader": "^9.5.2",
     "tsconfig-paths-webpack-plugin": "^4.2.0",
     "typescript": "^5.9.2",
-    "typescript-eslint": "^8.44.1",
+    "typescript-eslint": "^8.45.0",
     "typescript-plugin-styled-components": "^3.0.0",
-    "webpack": "^5.101.3",
+    "webpack": "^5.102.0",
     "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^6.0.1",
     "webpack-dev-server": "^5.2.2",
@@ -104,7 +104,7 @@
     "@ghostery/adblocker-electron-preload": "^2.11.6",
     "electron-chrome-extensions": "^4.9.0",
     "electron-chrome-web-store": "^0.13.0",
-    "electron-store": "^10.1.0"
+    "electron-store": "^11.0.0"
   },
   "resolutions": {
     "@types/react": "18.2.74",
