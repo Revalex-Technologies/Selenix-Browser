@@ -6,16 +6,19 @@ const renderLeftDockChildren = () => {
   const tabs = store.tabs.list;
   let i = 0;
 
-  const openGroupEditor = (groupId: number, anchor: {x:number,y:number}) => {
-  const group = store.tabGroups.getGroupById(groupId);
-  if (!group) return;
-  ipcRenderer.send(`show-tabgroup-dialog-${store.windowId}`, {
-    name: group.name,
-    id: group.id,
-    x: Math.floor(anchor.x),
-    y: Math.floor(anchor.y),
-  });
-};
+  const openGroupEditor = (
+    groupId: number,
+    anchor: { x: number; y: number },
+  ) => {
+    const group = store.tabGroups.getGroupById(groupId);
+    if (!group) return;
+    ipcRenderer.send(`show-tabgroup-dialog-${store.windowId}`, {
+      name: group.name,
+      id: group.id,
+      x: Math.floor(anchor.x),
+      y: Math.floor(anchor.y),
+    });
+  };
 
   while (i < tabs.length) {
     const t = tabs[i];
@@ -42,16 +45,21 @@ const renderLeftDockChildren = () => {
             aria-label="Edit group color"
             onClick={(e) => {
               e.stopPropagation();
-              openGroupEditor(gid, { x: (e as any).clientX, y: (e as any).clientY });
+              openGroupEditor(gid, {
+                x: (e as any).clientX,
+                y: (e as any).clientY,
+              });
             }}
             style={{ backgroundColor: color }}
           />
           <span className="title">{name}</span>
         </GroupHeader>
         <GroupContent>
-          {run.map(rt => <Tab key={rt.id} tab={rt} />)}
+          {run.map((rt) => (
+            <Tab key={rt.id} tab={rt} />
+          ))}
         </GroupContent>
-      </GroupBox>
+      </GroupBox>,
     );
   }
 
@@ -64,7 +72,6 @@ import store from '../../store';
 import { StyledLeftDock, TabsColumn, AddTabColumn } from './style';
 import Tab from '../Tab';
 import { GroupBox, GroupHeader, GroupDot, GroupContent } from './style';
-
 
 import { ICON_ADD } from '~/renderer/constants/icons';
 import { ipcRenderer } from 'electron';
@@ -85,13 +92,15 @@ const onAddTabClick = () => {
 export const LeftDock = observer(() => {
   if (store.isCompact || !store.settings.object.leftDockTabs) return null;
   return (
-    <StyledLeftDock id="left-dock" bookmarkBarVisible={store.settings.object.bookmarksBar}>
+    <StyledLeftDock
+      id="left-dock"
+      bookmarkBarVisible={store.settings.object.bookmarksBar}
+    >
       <TabsColumn
         id="left-dock-tabs"
         ref={store.tabs.containerRef}
         style={{ display: 'flex', flexDirection: 'column', overflow: 'auto' }}
       >
-        
         {renderLeftDockChildren()}
       </TabsColumn>
       <AddTabColumn icon={ICON_ADD} onClick={onAddTabClick} />

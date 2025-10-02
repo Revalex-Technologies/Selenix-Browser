@@ -1,4 +1,3 @@
-
 import { ISuggestion } from '~/interfaces';
 
 export const getQuickActionSuggestions = (filter: string): ISuggestion[] => {
@@ -11,7 +10,7 @@ export const getQuickActionSuggestions = (filter: string): ISuggestion[] => {
   if (/^[\d\s+\-*/().]+$/.test(trimmed) && /\d/.test(trimmed)) {
     try {
       // Evaluate safely by whitelisting characters and using Function in a sandboxed manner
-      // eslint-disable-next-line no-new-func
+
       const result = Function(`"use strict"; return (${trimmed})`)();
       if (typeof result === 'number' && isFinite(result)) {
         list.push({

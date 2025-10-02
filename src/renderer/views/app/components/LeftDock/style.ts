@@ -6,7 +6,7 @@ import { ToolbarButton } from '../ToolbarButton';
 export const StyledLeftDock = styled.div<{ bookmarkBarVisible?: boolean }>`
   position: absolute;
   top: ${({ bookmarkBarVisible }) =>
-    (TOOLBAR_HEIGHT + (bookmarkBarVisible ? BOOKMARK_BAR_HEIGHT - 3 : 0))}px;
+    TOOLBAR_HEIGHT + (bookmarkBarVisible ? BOOKMARK_BAR_HEIGHT - 3 : 0)}px;
   left: 0;
   bottom: 0;
   width: 300px;
@@ -55,14 +55,13 @@ export const LeftDockFixes = styled.div`
   }
 `;
 
-
 export const GroupBox = styled.div`
   border-radius: 12px;
   margin: 6px 8px;
-  border: 1px solid rgba(0,0,0,0.12);
+  border: 1px solid rgba(0, 0, 0, 0.12);
   overflow: hidden;
   ${({ theme }: { theme: ITheme }) => css`
-    background-color: rgba(0,0,0,0.04);
+    background-color: rgba(0, 0, 0, 0.04);
   `}
 `;
 
@@ -71,7 +70,7 @@ export const GroupHeader = styled.div`
   align-items: center;
   gap: 8px;
   padding: 6px 8px;
-  border-bottom: 1px solid rgba(0,0,0,0.08);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 `;
 
 export const GroupDot = styled.button`

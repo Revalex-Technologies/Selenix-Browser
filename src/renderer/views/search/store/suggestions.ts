@@ -96,11 +96,14 @@ export class SuggestionsStore {
       }
 
       // Prepend quick actions (e.g., calculator)
-          const quick = getQuickActionSuggestions(store.inputText);
-          if (quick.length) {
-            suggestions = [...quick, ...suggestions].slice(0, MAX_SUGGESTIONS_COUNT);
-          }
-          this.list = suggestions;
+      const quick = getQuickActionSuggestions(store.inputText);
+      if (quick.length) {
+        suggestions = [...quick, ...suggestions].slice(
+          0,
+          MAX_SUGGESTIONS_COUNT,
+        );
+      }
+      this.list = suggestions;
 
       if (historySuggestions.length > 0 && historySuggestions[0].canSuggest) {
         resolve(historySuggestions[0].url);
@@ -133,7 +136,10 @@ export class SuggestionsStore {
           // Prepend quick actions (e.g., calculator)
           const quick = getQuickActionSuggestions(store.inputText);
           if (quick.length) {
-            suggestions = [...quick, ...suggestions].slice(0, MAX_SUGGESTIONS_COUNT);
+            suggestions = [...quick, ...suggestions].slice(
+              0,
+              MAX_SUGGESTIONS_COUNT,
+            );
           }
           this.list = suggestions;
         }
