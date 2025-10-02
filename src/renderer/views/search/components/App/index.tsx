@@ -35,6 +35,15 @@ const onKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
 
     e.currentTarget.value = url;
 
+    // Handle calculator quick action: copy result to clipboard and close
+    if (url && url.startsWith('calc:')) {
+      const value = decodeURIComponent(url.slice(5));
+      if (navigator && navigator.clipboard) {
+        navigator.clipboard.writeText(value).catch(() => {});
+      }
+      store.hide();
+      return;
+    }
     callViewMethod(store.tabId, 'loadURL', url);
 
     store.hide();

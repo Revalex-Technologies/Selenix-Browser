@@ -6,15 +6,17 @@ import {
 } from '../utils/suggestions';
 import { isURL } from '~/utils';
 import { ISuggestion } from '~/interfaces';
-import { Store } from '.';
+import store from '.';
+import type { Store as StoreType } from '.';
 import { ICON_SEARCH, ICON_PAGE } from '~/renderer/constants';
+import { getQuickActionSuggestions } from '../utils/quickActions';
 
 let searchSuggestions: ISuggestion[] = [];
 
 const MAX_SUGGESTIONS_COUNT = 8;
 
 export class SuggestionsStore {
-  private store: Store;
+  private store: StoreType;
 
   public list: ISuggestion[] = [];
 
@@ -26,7 +28,7 @@ export class SuggestionsStore {
     return this.list.find((x) => x.id === this.selected);
   }
 
-  constructor(store: Store) {
+  constructor(store: StoreType) {
     makeObservable(this, {
       list: observable,
       selected: observable,
@@ -93,7 +95,12 @@ export class SuggestionsStore {
         suggestions[i].id = i;
       }
 
-      this.list = suggestions;
+      // Prepend quick actions (e.g., calculator)
+          const quick = getQuickActionSuggestions(store.inputText);
+          if (quick.length) {
+            suggestions = [...quick, ...suggestions].slice(0, MAX_SUGGESTIONS_COUNT);
+          }
+          this.list = suggestions;
 
       if (historySuggestions.length > 0 && historySuggestions[0].canSuggest) {
         resolve(historySuggestions[0].url);
@@ -123,6 +130,11 @@ export class SuggestionsStore {
             suggestions[i].id = i;
           }
 
+          // Prepend quick actions (e.g., calculator)
+          const quick = getQuickActionSuggestions(store.inputText);
+          if (quick.length) {
+            suggestions = [...quick, ...suggestions].slice(0, MAX_SUGGESTIONS_COUNT);
+          }
           this.list = suggestions;
         }
       } catch (e) {
