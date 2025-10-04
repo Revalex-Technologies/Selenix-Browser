@@ -72,7 +72,8 @@ export default observer(() => {
           </RightBar>
           {store.quickMenuVisible && (
             <Menu>
-              <IconItem imageSet={store.imageVisible}
+              <IconItem
+                imageSet={store.imageVisible}
                 title="Settings"
                 onClick={onIconClick('settings')}
               >
