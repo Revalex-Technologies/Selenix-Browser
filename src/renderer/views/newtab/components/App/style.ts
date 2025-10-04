@@ -47,6 +47,13 @@ export const Wrapper = styled.div.withConfig({
   display: flex;
   align-items: center;
   position: relative;
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  line-height: 0;
+  color: inherit;
+  pointer-events: auto;
   overflow: hidden;
 
   ${({ fullSize = false }: { fullSize?: boolean }) => css`
@@ -61,6 +68,13 @@ export const Content = styled.div`
   margin: 0 auto;
   max-width: 1366px;
   position: relative;
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  line-height: 0;
+  color: inherit;
+  pointer-events: auto;
   min-height: 97px;
   z-index: 3;
 `;
@@ -83,9 +97,9 @@ export const Menu = styled.div`
   bottom: 32px;
 `;
 
-export const IconItem = styled.div.withConfig({
-  shouldForwardProp: (p) => p !== 'imageSet',
-})<{ imageSet?: boolean }>`
+export const IconItem = styled.button.attrs({ type: 'button' }).withConfig({
+  shouldForwardProp: (p) => p !== 'imageSet' && p !== 'icon',
+})<{ imageSet?: boolean; icon?: string }>`
   width: 34px;
   height: 34px;
   margin-left: 16px;
@@ -94,6 +108,13 @@ export const IconItem = styled.div.withConfig({
   cursor: pointer;
   border-radius: 4px;
   position: relative;
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  line-height: 0;
+  color: inherit;
+  pointer-events: auto;
 
   &:first-child {
     margin-top: 0;
@@ -137,4 +158,5 @@ export const Refresh = styled(IconItem)`
   top: 32px;
   right: 32px;
   margin-top: 0;
+  z-index: 1000;
 `;
