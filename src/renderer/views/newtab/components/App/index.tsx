@@ -61,40 +61,44 @@ export default observer(() => {
             )}
           </Content>
 
-          <RightBar onMouseDown={(e) => e.stopPropagation()}>
+          <RightBar>
             <IconItem
               imageSet={store.imageVisible}
               title="Dashboard settings"
-              onClick={onTuneClick}
-              icon={ICON_TUNE}
-            />
+              onMouseDown={onTuneClick}
+            >
+              {ICON_TUNE}
+            </IconItem>
           </RightBar>
           {store.quickMenuVisible && (
             <Menu>
-              <IconItem
-                imageSet={store.imageVisible}
+              <IconItem imageSet={store.imageVisible}
                 title="Settings"
                 onClick={onIconClick('settings')}
-                icon={ICON_SETTINGS}
-              />
+              >
+                {ICON_SETTINGS}
+              </IconItem>
               <IconItem
                 imageSet={store.imageVisible}
                 title="History"
                 onClick={onIconClick('history')}
-                icon={ICON_HISTORY}
-              />
+              >
+                {ICON_HISTORY}
+              </IconItem>
               <IconItem
                 imageSet={store.imageVisible}
                 title="Bookmarks"
                 onClick={onIconClick('bookmarks')}
-                icon={ICON_BOOKMARKS}
-              />
+              >
+                {ICON_BOOKMARKS}
+              </IconItem>
               <IconItem
                 imageSet={store.imageVisible}
                 title="Downloads"
                 onClick={onIconClick('downloads')}
-                icon={ICON_DOWNLOAD}
-              />
+              >
+                {ICON_DOWNLOAD}
+              </IconItem>
               {}
             </Menu>
           )}
