@@ -64,23 +64,44 @@ export const SwitchItem = observer(
 
 export const Preferences = observer(() => {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const pickingRef = React.useRef<boolean>(false);
+
+  React.useEffect(() => {
+    const handleFocus = () => {
+      // reset guard when the native dialog closes (focus returns)
+      pickingRef.current = false;
+    };
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
 
   const onPickCustomImage = () => {
     if (!store.imageVisible || store.changeImageDaily) return;
-    fileInputRef.current?.click();
+    if (pickingRef.current) return;
+    pickingRef.current = true;
+    if (fileInputRef.current) {
+      try {
+        (fileInputRef.current as any).value = '';
+      } catch {}
+      fileInputRef.current.click();
+    }
   };
 
   const onCustomFileChange: React.ChangeEventHandler<HTMLInputElement> = async (
     e: any,
   ) => {
     const file = e.target.files && e.target.files[0];
-    if (!file) return;
+    if (!file) {
+      pickingRef.current = false;
+      return;
+    }
     try {
       const reader = new FileReader();
       reader.onload = () => {
         const dataUrl = String(reader.result || '');
         try {
           localStorage.setItem('imageURL', dataUrl);
+          pickingRef.current = false;
           localStorage.setItem('imageDate', new Date().toString());
         } catch (err) {}
 
