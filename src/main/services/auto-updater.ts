@@ -29,13 +29,15 @@ export async function installOnNextLaunchIfPending(): Promise<boolean> {
 }
 
 export const runAutoUpdaterService = () => {
+
   const updater = autoUpdater as any;
 
-  let __updateAvailable = false;
-  let __updateDownloaded = false;
+  let updateAvailable = false;
+  let updateDownloaded = false;
+  let installRequested = false;
 
   updater.autoDownload = true;
-  updater.autoInstallOnAppQuit = true;
+  updater.autoInstallOnAppQuit = false;
 
   if (!app.isPackaged) {
     try {
@@ -43,17 +45,12 @@ export const runAutoUpdaterService = () => {
     } catch {}
   }
 
-  let hasUpdate = false;
-  let isDownloaded = false;
-  let installRequested = false;
-
   const broadcast = (channel: string, ...args: any[]) => {
     for (const w of Application.instance.windows.list) {
       try {
         w.send(channel, ...args);
       } catch {}
     }
-
     try {
       Application.instance.dialogs
         .getDynamic('menu')
@@ -75,23 +72,22 @@ export const runAutoUpdaterService = () => {
   };
 
   updater.on('error', (err: unknown) => {
-    hasUpdate = false;
-    isDownloaded = false;
+    updateAvailable = false;
+    updateDownloaded = false;
+    installRequested = false;
     reportError(err, 'Updater emitted an error');
   });
 
   updater.on('update-available', () => {
-    __updateAvailable = true;
-    hasUpdate = true;
-    isDownloaded = false;
+    updateAvailable = true;
+    updateDownloaded = false;
     broadcast('update-available');
   });
 
   updater.on('update-not-available', () => {
-    hasUpdate = false;
-    isDownloaded = false;
+    updateAvailable = false;
+    updateDownloaded = false;
     broadcast('update-not-available');
-
     if (installRequested) {
       installRequested = false;
       showError(
@@ -101,16 +97,20 @@ export const runAutoUpdaterService = () => {
   });
 
   updater.on('update-downloaded', () => {
-    isDownloaded = true;
+    updateDownloaded = true;
     if (installRequested) {
       installRequested = false;
 
       setImmediate(() => {
+        try {
+          const marker = UPDATE_PENDING_MARKER();
+          if (existsSync(marker)) {
+            unlinkSync(marker);
+          }
+        } catch {}
         if (app.isPackaged) {
           try {
-            __updateDownloaded = true;
-            __updateAvailable = true;
-            updater.quitAndInstall(true, true);
+            updater.quitAndInstall(false, true);
           } catch (e) {
             reportError(e, 'Failed to quit and install');
           }
@@ -120,23 +120,28 @@ export const runAutoUpdaterService = () => {
           );
         }
       });
+    } else {
+      try {
+        const marker = UPDATE_PENDING_MARKER();
+        writeFileSync(marker, '1');
+      } catch {}
     }
   });
 
   ipcMain.on('update-check', () => {
-    updater.checkForUpdates().catch((err: unknown) => {
-      reportError(err, 'Failed to check for updates');
-    });
+    updater
+      .checkForUpdates()
+      .catch((err: unknown) => reportError(err, 'Failed to check for updates'));
   });
 
   ipcMain.on('update-download-and-install', async () => {
     try {
       installRequested = true;
-
-      if (!hasUpdate) {
+      // If we don't yet know about an update, perform a fresh check.
+      if (!updateAvailable) {
         const info = await updater.checkForUpdates();
-        hasUpdate = !!info?.updateInfo?.version;
-        if (!hasUpdate) {
+        updateAvailable = !!info?.updateInfo?.version;
+        if (!updateAvailable) {
           showError(
             `No update available.\nYou're already on version ${app.getVersion()}.`,
           );
@@ -144,12 +149,17 @@ export const runAutoUpdaterService = () => {
           return;
         }
       }
-
-      if (isDownloaded) {
+      if (updateDownloaded) {
         setImmediate(() => {
+          try {
+            const marker = UPDATE_PENDING_MARKER();
+            if (existsSync(marker)) {
+              unlinkSync(marker);
+            }
+          } catch {}
           if (app.isPackaged) {
             try {
-              updater.quitAndInstall(true, true);
+              updater.quitAndInstall(false, true);
             } catch (e) {
               reportError(e, 'Failed to quit and install');
             }
@@ -161,28 +171,18 @@ export const runAutoUpdaterService = () => {
         });
         return;
       }
-
-      updater.downloadUpdate().catch((err: unknown) => {
-        reportError(err, 'Failed to download the update');
-        installRequested = false;
-      });
+      updater
+        .downloadUpdate()
+        .catch((err: unknown) => {
+          reportError(err, 'Failed to download the update');
+          installRequested = false;
+        });
     } catch (err: unknown) {
       reportError(err, 'Update initiation failed');
       installRequested = false;
     }
   });
-
-  app.on('before-quit', () => {
-    try {
-      if (__updateAvailable) {
-        const marker = UPDATE_PENDING_MARKER();
-        try {
-          writeFileSync(marker, '1');
-        } catch {}
-      }
-    } catch {}
-  });
-
+  
   setTimeout(() => {
     updater.checkForUpdates().catch(() => {});
   }, 1500);
