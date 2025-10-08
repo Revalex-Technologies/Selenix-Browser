@@ -9,7 +9,7 @@ export const StyledLeftDock = styled.div<{ bookmarkBarVisible?: boolean }>`
     TOOLBAR_HEIGHT + (bookmarkBarVisible ? BOOKMARK_BAR_HEIGHT - 3 : 0)}px;
   left: 0;
   bottom: 0;
-  width: 300px;
+  width: 240px;
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -17,7 +17,6 @@ export const StyledLeftDock = styled.div<{ bookmarkBarVisible?: boolean }>`
   transition: width 0.2s ease;
   z-index: 200;
 
-  /* overlap any hairline under the bookmarks bar */
   margin-top: ${({ bookmarkBarVisible }) => (bookmarkBarVisible ? -2 : 0)}px;
 
   ${({ theme }: { theme: ITheme }) => css`
@@ -45,7 +44,6 @@ export const AddTabColumn = styled(ToolbarButton)`
 `;
 
 export const LeftDockFixes = styled.div`
-  /* This selector isn't rendered; it only injects CSS for the ids/classes we own */
   #left-dock-tabs {
     min-height: 0; /* allow child overflow container to shrink; fixes first-tab clipping */
     overflow-y: auto;
