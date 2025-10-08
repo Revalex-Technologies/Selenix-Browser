@@ -17,6 +17,7 @@ export const NavigationDrawer = ({
   onSearchInput,
   style,
   dense,
+  hideLabels,
 }: {
   children?: any;
   title?: string;
@@ -25,9 +26,17 @@ export const NavigationDrawer = ({
   onBackClick?: (e?: React.MouseEvent<HTMLDivElement>) => void;
   style?: any;
   dense?: boolean;
+  hideLabels?: boolean;
 }) => {
+  const clonedChildren = React.Children.map(children, (child: any) => {
+    if (React.isValidElement(child) && child.type === NavigationDrawerItem) {
+      return React.cloneElement(child as any, { dense, hideLabels } as any);
+    }
+    return child;
+  });
+
   return (
-    <StyledNavigationDrawer style={style} dense={dense}>
+    <StyledNavigationDrawer style={style} dense={dense} hideLabels={hideLabels}>
       {title !== '' && (
         <Header>
           <Title>{title}</Title>
@@ -38,7 +47,7 @@ export const NavigationDrawer = ({
           <Input placeholder="Search" onInput={onSearchInput} />
         </Search>
       )}
-      <MenuItems>{children}</MenuItems>
+      <MenuItems>{clonedChildren}</MenuItems>
     </StyledNavigationDrawer>
   );
 };

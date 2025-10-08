@@ -33,15 +33,21 @@ const RangeItem = observer(
     range,
     children,
     icon,
+    dense,
+    hideLabels,
   }: {
     range: QuickRange;
     children: any;
     icon: string;
+    dense?: boolean;
+    hideLabels?: boolean;
   }) => (
     <NavigationDrawer.Item
       onClick={() => (store.selectedRange = range)}
       selected={store.selectedRange === range}
       icon={icon}
+      dense={dense}
+      hideLabels={hideLabels}
     >
       {children}
     </NavigationDrawer.Item>
@@ -89,7 +95,13 @@ export default observer(() => {
       <Container>
         <WebUIStyle />
         <GlobalNavigationDrawer></GlobalNavigationDrawer>
-        <NavigationDrawer title="History" search onSearchInput={onInput}>
+        <NavigationDrawer
+          title={store.settings.leftDockTabs ? '' : 'History'}
+          search={!store.settings.leftDockTabs}
+          onSearchInput={onInput}
+          dense={store.settings.leftDockTabs}
+          hideLabels={store.settings.leftDockTabs}
+        >
           <RangeItem icon={ICON_ALL} range="all">
             All
           </RangeItem>

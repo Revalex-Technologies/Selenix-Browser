@@ -5,21 +5,35 @@ import { ITheme } from '~/interfaces';
 import { centerIcon, noButtons } from '~/renderer/mixins';
 
 export const StyledNavigationDrawer = styled.div.withConfig({
-  shouldForwardProp: (p) => !['dense'].includes(p as string),
-})<{ dense?: boolean }>`
+  shouldForwardProp: (p) => !['dense', 'hideLabels'].includes(p as string),
+})<{
+  dense?: boolean;
+  hideLabels?: boolean;
+}>`
   height: 100%;
   left: 0;
   display: flex;
   flex-flow: column;
   transition: 0.2s width;
 
-  ${({ theme, dense }: { theme?: ITheme; dense?: boolean }) => css`
+  ${({
+    theme,
+    dense,
+    hideLabels,
+  }: {
+    theme?: ITheme;
+    dense?: boolean;
+    hideLabels?: boolean;
+  }) => css`
+    /* Remove horizontal padding in compact mode; keep it otherwise */
     padding: ${dense ? 0 : '0 32px'};
 
     width: ${dense ? 56 : 320}px;
 
     background-color: ${dense
-      ? theme['pages.navigationDrawer1.backgroundColor']
+      ? hideLabels
+        ? theme['pages.navigationDrawer2.backgroundColor']
+        : theme['pages.navigationDrawer1.backgroundColor']
       : theme['pages.navigationDrawer2.backgroundColor']};
   `}
 `;

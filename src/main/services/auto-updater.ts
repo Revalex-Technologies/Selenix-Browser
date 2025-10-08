@@ -29,7 +29,6 @@ export async function installOnNextLaunchIfPending(): Promise<boolean> {
 }
 
 export const runAutoUpdaterService = () => {
-
   const updater = autoUpdater as any;
 
   let updateAvailable = false;
@@ -171,18 +170,16 @@ export const runAutoUpdaterService = () => {
         });
         return;
       }
-      updater
-        .downloadUpdate()
-        .catch((err: unknown) => {
-          reportError(err, 'Failed to download the update');
-          installRequested = false;
-        });
+      updater.downloadUpdate().catch((err: unknown) => {
+        reportError(err, 'Failed to download the update');
+        installRequested = false;
+      });
     } catch (err: unknown) {
       reportError(err, 'Update initiation failed');
       installRequested = false;
     }
   });
-  
+
   setTimeout(() => {
     updater.checkForUpdates().catch(() => {});
   }, 1500);

@@ -172,7 +172,13 @@ export default observer(() => {
       >
         <WebUIStyle />
         <GlobalNavigationDrawer></GlobalNavigationDrawer>
-        <NavigationDrawer title="Bookmarks" search onSearchInput={onInput}>
+        <NavigationDrawer
+          title={store.settings.leftDockTabs ? '' : 'Bookmarks'}
+          search={!store.settings.leftDockTabs}
+          onSearchInput={onInput}
+          dense={store.settings.leftDockTabs}
+          hideLabels={store.settings.leftDockTabs}
+        >
           <Tree />
           <div style={{ flex: 1 }} />
           <NavigationDrawer.Item

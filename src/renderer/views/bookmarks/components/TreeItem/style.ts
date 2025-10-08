@@ -9,7 +9,7 @@ export const StyledTreeItem = styled.div.withConfig({
   shouldForwardProp: (p) => !['selected'].includes(p as string),
 })<{ theme?: ITheme; selected: boolean }>`
   width: 100%;
-  height: 32px;
+  height: 40px;
   display: flex;
   margin-top: 4px;
   align-items: center;

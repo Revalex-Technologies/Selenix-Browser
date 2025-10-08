@@ -34,17 +34,26 @@ const TreeItem = observer(
     return (
       <>
         <StyledTreeItem
+          title={getBookmarkTitle(data)}
           selected={store.currentFolder === data._id}
           onClick={onClick(data)}
-          style={{ paddingLeft: depth * 30 }}
+          style={{
+            paddingLeft: store.settings.leftDockTabs
+              ? 16 + depth * 16
+              : depth * 30,
+          }}
         >
-          <DropIcon
-            visible={c.length !== 0}
-            expanded={data.expanded}
-            onClick={onDropClick(data)}
-          />
+          {!store.settings.leftDockTabs && (
+            <DropIcon
+              visible={c.length !== 0}
+              expanded={data.expanded}
+              onClick={onDropClick(data)}
+            />
+          )}
           <FolderIcon />
-          <Label>{getBookmarkTitle(data)}</Label>
+          {!store.settings.leftDockTabs && (
+            <Label>{getBookmarkTitle(data)}</Label>
+          )}
         </StyledTreeItem>
         {data.expanded &&
           c.map((item) => (

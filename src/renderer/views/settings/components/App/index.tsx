@@ -66,11 +66,15 @@ const MenuItem = observer(
     subSections,
     children,
     icon,
+    dense,
+    hideLabels,
   }: {
     section: SettingsSection;
     subSections?: SettingsSection[];
     children: any;
     icon?: string;
+    dense?: boolean;
+    hideLabels?: boolean;
   }) => (
     <NavigationDrawer.Item
       onClick={() => (store.selectedSection = section)}
@@ -79,6 +83,8 @@ const MenuItem = observer(
         (subSections && subSections.includes(store.selectedSection))
       }
       icon={icon}
+      dense={dense}
+      hideLabels={hideLabels}
     >
       {children}
     </NavigationDrawer.Item>
@@ -233,7 +239,12 @@ export default observer(() => {
           </DialogButtons>
           <div style={{ clear: 'both' }}></div>
         </Dialog>
-        <NavigationDrawer title="Settings" search>
+        <NavigationDrawer
+          title={store.settings.leftDockTabs ? '' : 'Settings'}
+          search={!store.settings.leftDockTabs}
+          dense={store.settings.leftDockTabs}
+          hideLabels={store.settings.leftDockTabs}
+        >
           <MenuItem icon={ICON_PALETTE} section="appearance">
             Appearance
           </MenuItem>

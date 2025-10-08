@@ -5,8 +5,11 @@ import { ITheme } from '~/interfaces';
 import { transparency } from '~/renderer/constants';
 
 export const StyledNavigationDrawerItem = styled.div.withConfig({
-  shouldForwardProp: (p) => !['selected'].includes(p as string),
-})<{ selected: boolean }>`
+  shouldForwardProp: (p) => !['selected', 'hideLabels'].includes(p as string),
+})<{
+  selected: boolean;
+  hideLabels?: boolean;
+}>`
   padding: 4px 16px;
   display: flex;
   height: 40px;
@@ -14,6 +17,8 @@ export const StyledNavigationDrawerItem = styled.div.withConfig({
   align-items: center;
   position: relative;
   cursor: pointer;
+  justify-content: ${({ hideLabels }) =>
+    hideLabels ? 'center' : 'flex-start'};
 
   ${({ theme, selected }: { theme?: ITheme; selected?: boolean }) => css`
     &:hover {
@@ -39,13 +44,15 @@ export const StyledNavigationDrawerItem = styled.div.withConfig({
 `;
 
 export const Icon = styled.div.withConfig({
-  shouldForwardProp: (p) => !['selected'].includes(p as string),
-})`
+  shouldForwardProp: (p) => !['hideLabels'].includes(p as string),
+})<{
+  hideLabels?: boolean;
+}>`
   height: 24px;
   width: 24px;
   min-width: 24px;
   opacity: ${transparency.icons.inactive};
-  margin-right: 16px;
+  margin-right: ${({ hideLabels }) => (hideLabels ? '0px' : '16px')};
   ${centerIcon(20)};
 
   ${({ theme }: { theme?: ITheme }) => css`
