@@ -198,6 +198,22 @@ export class Store {
       this.settings = { ...this.settings, ...settings };
     };
 
+    window.addEventListener('message', (e: any) => {
+      if (
+        e.data &&
+        (e.data.type === 'update-settings' || e.data.type === 'set-settings')
+      ) {
+        try {
+          const raw = e.data.data;
+          const next: ISettings =
+            typeof raw === 'string' ? JSON.parse(raw) : raw;
+          this.settings = { ...this.settings, ...next };
+        } catch {
+          /* ignore parse errors */
+        }
+      }
+    });
+
     this._preset = (localStorage.getItem('preset') as Preset) || this._preset;
 
     [

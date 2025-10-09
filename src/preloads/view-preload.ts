@@ -269,6 +269,32 @@ if (window.location.href.startsWith(WEBUI_BASE_URL)) {
   });
 
   ipcRenderer.on('update-settings', (_e, data) => {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).settings = {
+        ...((window as any).settings || {}),
+        ...data,
+      };
+    } catch {
+      /* no-op */
+    }
+    try {
+      const fn = (window as any).updateSettings;
+      if (typeof fn === 'function') {
+        fn(data);
+      }
+    } catch {
+      /* no-op */
+    }
+    try {
+      window.postMessage(
+        { type: 'set-settings', data: JSON.stringify(data) },
+        '*',
+      );
+    } catch {
+      /* no-op */
+    }
+
     window.postMessage({ type: 'update-settings', data }, '*');
   });
 

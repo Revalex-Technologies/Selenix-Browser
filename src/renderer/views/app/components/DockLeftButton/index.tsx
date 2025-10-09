@@ -14,9 +14,19 @@ export const DockLeftButton = observer(() => {
   const toggled = !!store.settings.object.leftDockTabs;
 
   const onClick = () => {
-    store.settings.object.leftDockTabs = !toggled;
+    const newValue = !toggled;
+    store.settings.leftDockTabs = newValue;
     store.settings.save();
-    // trigger bounds recompute
+    try {
+      window.requestAnimationFrame(() => {
+        store.tabs.updateTabsBounds(true);
+      });
+    } catch (e) {
+      try {
+        store.tabs.updateTabsBounds(true);
+      } catch {}
+    }
+    // trigger bounds recompute for the Electron window height
     ipcRenderer.send('resize-height');
     // also trigger a renderer resize so tab layout updates immediately
     try {

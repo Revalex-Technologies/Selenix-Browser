@@ -30,6 +30,7 @@ export class SettingsStore {
       object: observable,
       searchEngine: computed,
       updateSettings: action,
+      leftDockTabs: computed,
     });
 
     this.store = store;
@@ -46,6 +47,14 @@ export class SettingsStore {
         firstTime = true;
       }
     });
+  }
+
+  public get leftDockTabs(): boolean {
+    return this.object.leftDockTabs;
+  }
+
+  public set leftDockTabs(value: boolean) {
+    this.object.leftDockTabs = value;
   }
 
   public get searchEngine() {
