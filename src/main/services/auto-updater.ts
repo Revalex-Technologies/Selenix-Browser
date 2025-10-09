@@ -2,10 +2,12 @@ import { app, ipcMain, dialog } from 'electron';
 
 if (process.env.NODE_ENV !== 'production') {
   if (!(global as any).$RefreshReg$) {
-    ;(global as any).$RefreshReg$ = () => { /* no-op */ };
+    (global as any).$RefreshReg$ = () => {
+      /* no-op */
+    };
   }
   if (!(global as any).$RefreshSig$) {
-    ;(global as any).$RefreshSig$ = () => (type: unknown) => type;
+    (global as any).$RefreshSig$ = () => (type: unknown) => type;
   }
 }
 import { autoUpdater } from 'electron-updater';
