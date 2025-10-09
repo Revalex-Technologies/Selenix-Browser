@@ -1,3 +1,5 @@
+import '../shims/react-refresh-shim';
+
 import { registerProtocol } from './models/protocol';
 import { ipcMain, app, webContents, session } from 'electron';
 import { setIpcMain } from '@wexond/rpc-electron';

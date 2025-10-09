@@ -23,12 +23,15 @@ const appConfig = getConfig(getBaseConfig('app'), {
     port: PORT,
     hot: true,
     allowedHosts: 'all',
+    client: {
+      overlay: false,
+    },
   },
 
   plugins: dev
     ? [
         new webpack.HotModuleReplacementPlugin(),
-        new ReactRefreshWebpackPlugin(),
+        new ReactRefreshWebpackPlugin({ overlay: false }),
       ]
     : [],
 
