@@ -11,6 +11,11 @@ const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 /* eslint-enable */
 
 const INCLUDE = resolve(__dirname, 'src');
+const REACT_REFRESH_INCLUDE = [
+  resolve(__dirname, 'src/renderer'),
+  resolve(__dirname, 'src/utils/ui-entry.ts'),
+  resolve(__dirname, 'src/utils/webui-entry.ts'),
+];
 
 const BUILD_FLAGS = {
   ENABLE_EXTENSIONS: true,
@@ -30,6 +35,11 @@ const styledComponentsTransformer = createStyledComponentsTransformer({
   minify: !dev,
   displayName: dev,
 });
+
+const reactRefreshLoader = {
+  loader: 'babel-loader',
+  options: { plugins: ['react-refresh/babel'] },
+};
 
 const tsLoader = {
   loader: 'ts-loader',
@@ -61,16 +71,15 @@ const rules = [
 
   {
     test: /\.(tsx?|ts)$/,
+    include: REACT_REFRESH_INCLUDE,
+    use: dev ? [reactRefreshLoader, tsLoader] : [tsLoader],
+  },
+
+  {
+    test: /\.(tsx?|ts)$/,
     include: INCLUDE,
-    use: dev
-      ? [
-          {
-            loader: 'babel-loader',
-            options: { plugins: ['react-refresh/babel'] },
-          },
-          tsLoader,
-        ]
-      : [tsLoader],
+    exclude: REACT_REFRESH_INCLUDE,
+    use: [tsLoader],
   },
 ];
 
