@@ -169,10 +169,56 @@ export async function setupExtensions(app: Application): Promise<void> {
     };
 
     app.extensions.on('browser-action-popup-created', (popup: any) => {
+      const isAliveWindow = (win: Electron.BrowserWindow | null | undefined) => {
+        try {
+          return !!win && !win.isDestroyed();
+        } catch {
+          return false;
+        }
+      };
+
+      const safeDestroyPopup = () => {
+        try {
+          if (!popup?.isDestroyed?.()) {
+            popup?.destroy?.();
+          }
+        } catch {}
+      };
+
+      const guardPopupMethod = (methodName: string) => {
+        const original = popup?.[methodName];
+        if (typeof original !== 'function') return;
+
+        popup[methodName] = (...args: any[]) => {
+          try {
+            if (
+              !isAliveWindow(popup?.browserWindow) ||
+              !isAliveWindow(popup?.parent)
+            ) {
+              safeDestroyPopup();
+              return;
+            }
+
+            return original.apply(popup, args);
+          } catch (err) {
+            const message =
+              err instanceof Error ? err.message : String(err ?? '');
+            if (message.includes('Object has been destroyed')) {
+              safeDestroyPopup();
+              return;
+            }
+            throw err;
+          }
+        };
+      };
+
+      guardPopupMethod('setSize');
+      guardPopupMethod('updatePosition');
+
       const reposition = async () => {
         try {
           const bw = popup?.browserWindow;
-          if (!bw || bw.isDestroyed()) return;
+          if (!isAliveWindow(bw) || !isAliveWindow(popup?.parent)) return;
 
           let parentWin: Electron.BrowserWindow | null = null;
           let anchor: {
@@ -185,13 +231,13 @@ export async function setupExtensions(app: Application): Promise<void> {
           const candidates: Electron.BrowserWindow[] = [];
           try {
             const providedParent = (popup as any)?.parent;
-            if (providedParent && !providedParent.isDestroyed()) {
+            if (isAliveWindow(providedParent)) {
               candidates.push(providedParent);
             }
           } catch {}
           for (const appWin of app.windows.list) {
             const win = appWin?.win;
-            if (!win || win.isDestroyed()) continue;
+            if (!isAliveWindow(win)) continue;
             if (!candidates.includes(win)) {
               candidates.push(win);
             }
@@ -213,7 +259,7 @@ export async function setupExtensions(app: Application): Promise<void> {
           if (!parentWin) {
             parentWin = app.windows.current?.win || null;
           }
-          if (!parentWin || parentWin.isDestroyed()) return;
+          if (!isAliveWindow(parentWin)) return;
 
           if (!anchor) {
             const rawAnchor = getAnchorRect(popup);

@@ -608,10 +608,90 @@ export class View {
     this.window.send('tab-event', event, this.id, args);
   }
 
+  private syncExtensionOwnership(
+    previousWindow: AppWindow,
+    nextWindow: AppWindow,
+  ) {
+    if (!process.env.ENABLE_EXTENSIONS) return;
+
+    try {
+      const extensions: any = Application.instance.extensions;
+      const store: any = extensions?.ctx?.store;
+      const tab = (this as any)?.webContentsView?.webContents;
+
+      if (!extensions || !store || !tab) return;
+
+      try {
+        if (!store.tabs?.has?.(tab)) {
+          extensions.addTab?.(tab, nextWindow.win);
+        } else {
+          store.addWindow?.(nextWindow.win);
+          store.tabToWindow?.set?.(tab, nextWindow.win);
+        }
+      } catch {}
+
+      const updateCachedTab = (
+        targetTab: Electron.WebContents | undefined,
+        ownerWindow: Electron.BrowserWindow,
+        active: boolean,
+      ) => {
+        if (!targetTab) return;
+
+        try {
+          const [width = 0, height = 0] =
+            typeof ownerWindow.getSize === 'function'
+              ? ownerWindow.getSize()
+              : [0, 0];
+
+          let details = store.tabDetailsCache?.get?.(targetTab.id);
+          if (!details) {
+            details = extensions.api?.tabs?.createTabDetails?.(targetTab);
+          }
+          if (!details) return;
+
+          details.windowId = ownerWindow.id;
+          details.width = width;
+          details.height = height;
+          details.active = active;
+        } catch {}
+      };
+
+      const previousActive = store.windowToActiveTab?.get?.(previousWindow.win);
+      const fallbackView = Array.from(previousWindow.viewManager.views.values())[0];
+      const fallbackTab: Electron.WebContents | undefined =
+        (fallbackView as any)?.webContentsView?.webContents;
+
+      try {
+        if (previousActive === tab) {
+          if (fallbackTab) {
+            store.windowToActiveTab?.set?.(previousWindow.win, fallbackTab);
+            updateCachedTab(fallbackTab, previousWindow.win, true);
+          } else {
+            store.windowToActiveTab?.delete?.(previousWindow.win);
+          }
+        }
+      } catch {}
+
+      try {
+        store.windowToActiveTab?.set?.(nextWindow.win, tab);
+        store.lastFocusedWindowId = nextWindow.win.id;
+      } catch {}
+
+      updateCachedTab(tab, nextWindow.win, true);
+
+      try {
+        store.windowDetailsCache?.delete?.(previousWindow.win.id);
+        store.windowDetailsCache?.delete?.(nextWindow.win.id);
+      } catch {}
+    } catch {}
+  }
+
   public reparent(newWindow: AppWindow): void {
+    const previousWindow = this.window;
+
     // Detach from old window
     try {
-      const oldWin = this.window?.win;
+      const oldWin = previousWindow?.win;
       if (oldWin && this._boundUpdateBounds) {
         oldWin.removeListener('resize', this._boundUpdateBounds);
         oldWin.removeListener('enter-full-screen', this._boundUpdateBounds);
@@ -652,6 +732,8 @@ export class View {
         this._boundUpdateBounds();
       }
     } catch {}
+
+    this.syncExtensionOwnership(previousWindow, newWindow);
 
     try {
       this.webContents.focus();
