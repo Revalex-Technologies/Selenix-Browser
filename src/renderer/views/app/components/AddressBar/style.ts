@@ -50,6 +50,27 @@ export const InputContainer = styled.div`
   overflow: hidden;
 `;
 
+export const Placeholder = styled.div.withConfig({
+  shouldForwardProp: (p) => p !== 'visible',
+})<{ visible?: boolean }>`
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(calc(-50% - 0.3px));
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: 14px;
+
+  ${({ visible, theme }: { visible: boolean; theme: ITheme }) => css`
+    display: ${visible ? 'block' : 'none'};
+    color: ${theme['searchBox.lightForeground']
+      ? 'rgba(255, 255, 255, 0.54)'
+      : 'rgba(0, 0, 0, 0.54)'};
+  `};
+`;
+
 export const Text = styled.div.withConfig({
   shouldForwardProp: (p) => p !== 'visible',
 })<{ visible?: boolean }>`
@@ -90,12 +111,6 @@ export const Input = styled.input.withConfig({
 
   ${({ visible, theme }: { visible: boolean; theme: ITheme }) => css`
     color: ${visible ? 'inherit' : 'transparent'};
-
-    &::placeholder {
-      color: ${theme['searchBox.lightForeground']
-        ? 'rgba(255, 255, 255, 0.54)'
-        : 'rgba(0, 0, 0, 0.54)'};
-    }
 
     ${theme['searchBox.lightForeground'] &&
     css`

@@ -13,6 +13,7 @@ import {
   StyledAddressBar,
   InputContainer,
   Input,
+  Placeholder,
   Text,
   SecurityButton,
 } from './style';
@@ -320,6 +321,7 @@ export const AddressBar = observer(() => {
           data-addressbar-input="true"
           onContextMenuCapture={onAddressBarContextMenu}
           ref={(r: any) => (store.inputRef = r)}
+          aria-label="Search or type in a URL"
           spellCheck={false}
           onKeyDown={onKeyDown}
           onMouseDown={onMouseDown}
@@ -328,10 +330,12 @@ export const AddressBar = observer(() => {
           onFocus={onFocus}
           onMouseUp={onMouseUp}
           onChange={onChange}
-          placeholder="Search or type in a URL"
           visible={!store.addressbarTextVisible || store.addressbarValue === ''}
           value={store.addressbarValue}
         ></Input>
+        <Placeholder visible={store.addressbarValue === ''}>
+          Search or type in a URL
+        </Placeholder>
         <Text
           visible={store.addressbarTextVisible && store.addressbarValue !== ''}
         >
