@@ -1,6 +1,6 @@
 import { ipcMain, dialog, nativeImage } from 'electron';
 import Datastore from './file-datastore';
-import { fileTypeFromBuffer } from 'file-type/core';
+import { fileTypeFromBuffer } from 'file-type';
 import { getPath } from '~/utils';
 import {
   IFindOperation,
@@ -16,7 +16,7 @@ import { countVisitedTimes } from '~/utils/history';
 import { promises } from 'fs';
 import { Application } from '../application';
 import { requestURL } from '../network/request';
-import * as parse from 'node-bookmarks-parser';
+import parse from 'node-bookmarks-parser';
 
 interface Databases {
   [key: string]: Datastore;

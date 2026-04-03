@@ -4,17 +4,17 @@ import { ITheme } from '~/interfaces';
 import { centerVertical } from '~/renderer/mixins';
 
 interface Props {
-  activated: boolean;
-  color: string;
+  activated?: boolean;
+  color?: string;
   theme: ITheme;
-  clickable: boolean;
-  dense: boolean;
+  clickable?: boolean;
+  dense?: boolean;
 }
 
 export const StyledSwitch = styled.div.withConfig({
   shouldForwardProp: (p) =>
-    !['activated', 'dense', 'clickable'].includes(p as string),
-})<{ dense: boolean; activated: boolean; clickable?: boolean }>`
+    !['activated', 'dense', 'clickable', 'color'].includes(p as string),
+})<{ dense?: boolean; activated?: boolean; clickable?: boolean; color?: string }>`
   border-radius: 32px;
   position: relative;
   overflow: hidden;
@@ -30,7 +30,7 @@ export const StyledSwitch = styled.div.withConfig({
     z-index: 2;
   }
 
-  ${({ activated, color, theme, clickable, dense }: Props) => css`
+  ${({ activated = false, color, theme, clickable = false, dense = false }: Props) => css`
     background-color: ${activated ? color : theme['switch.backgroundColor']};
     cursor: ${clickable ? 'pointer' : 'default'};
     width: ${dense ? 32 : 36}px;

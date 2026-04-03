@@ -55,7 +55,7 @@ export const PasswordIcon = styled.div.withConfig({
   transition: 0.15s background-image;
   ${centerIcon('contain')};
 
-  ${({ toggled, theme }: { toggled: boolean; theme: ITheme }) => css`
+  ${({ toggled = false, theme }) => css`
     background-image: url(${toggled ? ICON_INVISIBLE : ICON_VISIBLE});
     filter: ${theme.dark ? 'invert(100%)' : 'none'};
   `};

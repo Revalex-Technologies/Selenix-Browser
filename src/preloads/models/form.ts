@@ -149,7 +149,7 @@ export class Form {
     );
   };
 
-  public onFieldInput = (e: KeyboardEvent) => {
+  public onFieldInput = (e: Event) => {
     AutoComplete.hide();
 
     const target = e.target as HTMLInputElement;

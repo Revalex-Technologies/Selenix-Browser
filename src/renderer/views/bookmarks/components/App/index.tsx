@@ -58,7 +58,7 @@ const onRemoveClick = (item: IBookmark) => () => {
   store.menuVisible = false;
 };
 
-const onInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
+const onInput = (e: React.FormEvent<HTMLInputElement>) => {
   store.search(e.currentTarget.value);
 };
 

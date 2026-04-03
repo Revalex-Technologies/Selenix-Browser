@@ -1,5 +1,4 @@
 import styled, { css } from 'styled-components';
-import { ITheme } from '~/interfaces';
 import { BLUE_300 } from '~/renderer/constants';
 
 export const StyledAddressBar = styled.div.withConfig({
@@ -17,7 +16,7 @@ export const StyledAddressBar = styled.div.withConfig({
   font-size: 15px;
   overflow: hidden;
 
-  ${({ theme, focus }: { theme: ITheme; focus: boolean }) => css`
+  ${({ theme, focus = false }) => css`
     background-color: ${theme['addressbar.backgroundColor']};
     border: 1px solid
       ${theme.isCompact
@@ -58,12 +57,12 @@ export const Placeholder = styled.div.withConfig({
   top: 50%;
   left: 0;
   right: 0;
-  transform: translateY(calc(-50% - 0.3px));
+  transform: translateY(-50%);
   white-space: nowrap;
   overflow: hidden;
   font-size: 14px;
 
-  ${({ visible, theme }: { visible: boolean; theme: ITheme }) => css`
+  ${({ visible = false, theme }) => css`
     display: ${visible ? 'block' : 'none'};
     color: ${theme['searchBox.lightForeground']
       ? 'rgba(255, 255, 255, 0.54)'
@@ -85,7 +84,7 @@ export const Text = styled.div.withConfig({
   white-space: nowrap;
   overflow: hidden;
   font-size: 14px;
-  ${({ visible }: { visible: boolean; theme: ITheme }) => css`
+  ${({ visible = false }) => css`
     display: ${visible ? 'flex' : 'none'};
   `};
 `;
@@ -109,7 +108,7 @@ export const Input = styled.input.withConfig({
   word-spacing: inherit;
   font-size: 14px;
 
-  ${({ visible, theme }: { visible: boolean; theme: ITheme }) => css`
+  ${({ visible = false, theme }) => css`
     color: ${visible ? 'inherit' : 'transparent'};
 
     ${theme['searchBox.lightForeground'] &&
@@ -179,7 +178,7 @@ export const SecurityButton = styled.div.withConfig({
   background-clip: padding-box;
   cursor: pointer;
 
-  ${({ theme, danger }: { theme: ITheme; danger?: boolean }) => css`
+  ${({ theme, danger = false }) => css`
     background-color: transparent; /* transparent until hover */
     color: ${
       danger
