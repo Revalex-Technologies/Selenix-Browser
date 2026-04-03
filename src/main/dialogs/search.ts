@@ -13,6 +13,9 @@ import { Application } from '../application';
 
 const WIDTH = 800;
 const HEIGHT = 88;
+const COMPACT_OMNIBOX_Y_NUDGE = 2;
+const SIDE_TABS_OMNIBOX_Y_OFFSET = 5;
+
 export class SearchDialog extends PersistentDialog {
   private yAdjust: number = 0;
   private isPreviewVisible = false;
@@ -57,7 +60,8 @@ export class SearchDialog extends PersistentDialog {
     const y = compact
       ? -(TOOLBAR_HEIGHT + COMPACT_TITLEBAR_HEIGHT - DIALOG_TOP) +
         COMPACT_OMNIBOX_Y_OFFSET -
-        8
+        8 +
+        COMPACT_OMNIBOX_Y_NUDGE
       : yRaw - 8;
     super.rearrange({
       x: this.data.x - DIALOG_MARGIN,
@@ -81,21 +85,30 @@ export class SearchDialog extends PersistentDialog {
 
     // /* NORMAL-MODE ALIGNMENT */
     try {
-      const flags: any = await browserWindow.webContents
-        .executeJavaScript(`(() => {
+      const flags = (await browserWindow.webContents.executeJavaScript(`(() => {
         const hasLeftDock = !!document.getElementById('left-dock');
         const isCompact = !!document.querySelector('[data-compact="true"], .compact, .compact-mode');
         const hasAddressBar = !!document.querySelector('[data-addressbar-input="true"]');
         return { hasLeftDock, isCompact, hasAddressBar };
-      })()`);
-      const isNormal =
-        flags && flags.hasAddressBar && !flags.hasLeftDock && !flags.isCompact;
-      const isCompact = flags && flags.isCompact;
-      // Persist a y-offset so rearrange() corrects for UI chrome in compact mode
-      this.yAdjust = isCompact ? 1 : 0;
+      })()`)) as {
+        hasLeftDock?: boolean;
+        isCompact?: boolean;
+        hasAddressBar?: boolean;
+      };
+      const hasLeftDock = !!flags?.hasLeftDock;
+      const isCompact = !!flags?.isCompact;
+      // Persist a y-offset so rearrange() can align the omnibox to the address bar
+      // in compact mode and lift it slightly when side tabs are enabled.
+      this.yAdjust = isCompact
+        ? 1
+        : hasLeftDock
+          ? SIDE_TABS_OMNIBOX_Y_OFFSET
+          : 0;
       // Re-apply bounds using the latest data with the new offset so it overlays the addressbar
       this.rearrange();
-    } catch {}
+    } catch {
+      this.yAdjust = 0;
+    }
 
     browserWindow.once('resize', this.onResize);
 

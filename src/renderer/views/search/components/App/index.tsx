@@ -1,7 +1,6 @@
-import isPropValid from '@emotion/is-prop-valid';
 import * as React from 'react';
 import { observer } from 'mobx-react-lite';
-import { ThemeProvider, StyleSheetManager } from 'styled-components';
+import { ThemeProvider } from 'styled-components';
 
 import { StyledApp, Input, CurrentIcon, SearchBox } from './style';
 import store from '../../store';
@@ -10,11 +9,7 @@ import { ipcRenderer } from 'electron';
 import { Suggestions } from '../Suggestions';
 import { ICON_SEARCH, ICON_PAGE } from '~/renderer/constants';
 import { UIStyle } from '~/renderer/mixins/default-styles';
-import {
-  COMPACT_TITLEBAR_HEIGHT,
-  DEFAULT_TITLEBAR_HEIGHT,
-  TOOLBAR_HEIGHT,
-} from '~/constants/design';
+import { COMPACT_TITLEBAR_HEIGHT, TOOLBAR_HEIGHT } from '~/constants/design';
 
 const onKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
   if (e.which === 13) {
@@ -82,7 +77,7 @@ const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
   }
 };
 
-const onInput = (e: any) => {
+const onInput = (e: React.FormEvent<HTMLInputElement>) => {
   store.inputText = e.currentTarget.value;
 
   if (e.currentTarget.value.trim() === '') {
@@ -94,13 +89,13 @@ const onInput = (e: any) => {
 
 export const App = observer(() => {
   const suggestionsVisible = store.suggestions.list.length !== 0;
+  const hasSideTabs =
+    store.settings.leftDockTabs && store.settings.topBarVariant !== 'compact';
 
   let height = 0;
 
   if (suggestionsVisible) {
-    for (const s of store.suggestions.list) {
-      height += 38;
-    }
+    height = store.suggestions.list.length * 38;
   }
 
   requestAnimationFrame(() => {
@@ -137,7 +132,9 @@ export const App = observer(() => {
             : TOOLBAR_HEIGHT - 1,
       }}
     >
-      <StyledApp>
+      <StyledApp
+        style={hasSideTabs ? { transform: 'translateY(-0.1px)' } : undefined}
+      >
         <UIStyle />
         <SearchBox>
           <CurrentIcon
