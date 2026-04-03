@@ -8,6 +8,8 @@ export const StyledApp = styled(DialogStyle)`
   /* position flush with toolbar */
   margin-top: -8px !important;
   transition: none;
+  box-sizing: border-box;
+  padding-top: 8px;
   padding-bottom: 4px;
 
   ${({ theme }: { theme?: ITheme }) => css`

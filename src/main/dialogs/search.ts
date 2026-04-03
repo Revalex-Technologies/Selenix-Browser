@@ -4,7 +4,6 @@ import {
   DIALOG_MARGIN_TOP,
   DIALOG_MARGIN,
   DIALOG_TOP,
-  VIEW_Y_OFFSET,
   COMPACT_TITLEBAR_HEIGHT,
   TOOLBAR_HEIGHT,
   COMPACT_OMNIBOX_Y_OFFSET,
@@ -13,7 +12,7 @@ import { PersistentDialog } from './dialog';
 import { Application } from '../application';
 
 const WIDTH = 800;
-const HEIGHT = 80;
+const HEIGHT = 88;
 export class SearchDialog extends PersistentDialog {
   private yAdjust: number = 0;
   private isPreviewVisible = false;
@@ -55,11 +54,11 @@ export class SearchDialog extends PersistentDialog {
   public rearrange() {
     const compact = !!this.data.isCompact;
     const yRaw = this.data.y - DIALOG_MARGIN_TOP - this.yAdjust;
-    const chromeHeight = TOOLBAR_HEIGHT + COMPACT_TITLEBAR_HEIGHT;
     const y = compact
       ? -(TOOLBAR_HEIGHT + COMPACT_TITLEBAR_HEIGHT - DIALOG_TOP) +
-        COMPACT_OMNIBOX_Y_OFFSET
-      : yRaw;
+        COMPACT_OMNIBOX_Y_OFFSET -
+        8
+      : yRaw - 8;
     super.rearrange({
       x: this.data.x - DIALOG_MARGIN,
       y,
@@ -72,6 +71,14 @@ export class SearchDialog extends PersistentDialog {
 
   public async show(browserWindow: BrowserWindow) {
     super.show(browserWindow, true, false);
+    const appWindow =
+      Application.instance.windows.fromBrowserWindow(browserWindow);
+
+    if (!appWindow) {
+      this.hide();
+      return;
+    }
+
     // /* NORMAL-MODE ALIGNMENT */
     try {
       const flags: any = await browserWindow.webContents
@@ -93,7 +100,7 @@ export class SearchDialog extends PersistentDialog {
     browserWindow.once('resize', this.onResize);
 
     this.send('visible', true, {
-      id: Application.instance.windows.current.viewManager.selectedId,
+      id: appWindow.viewManager.selectedId,
       ...this.data,
     });
 

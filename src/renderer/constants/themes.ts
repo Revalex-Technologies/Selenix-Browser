@@ -37,7 +37,7 @@ export const lightTheme: ITheme = {
 
 export const darkTheme: ITheme = {
   'titlebar.backgroundColor': '#1c1c1c',
-  'addressbar.backgroundColor': '#262626',
+  'addressbar.backgroundColor': '#1f1f1f',
   'addressbar.textColor': '#ffffff',
   'toolbar.backgroundColor': '#333333',
   'toolbar.bottomLine.backgroundColor': 'rgba(255, 255, 255, 0.08)',
@@ -54,7 +54,7 @@ export const darkTheme: ITheme = {
   'dialog.separator.color': 'rgba(255, 255, 255, 0.10)',
   'dialog.textColor': '#ffffff',
   'dialog.lightForeground': true,
-  'searchBox.backgroundColor': '#333333',
+  'searchBox.backgroundColor': '#262626',
   'searchBox.lightForeground': true,
   'pages.backgroundColor': '#212121',
   'pages.lightForeground': true,
