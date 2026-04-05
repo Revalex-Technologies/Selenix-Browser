@@ -18,6 +18,7 @@ import {
   ICON_ARROW_RIGHT,
 } from '~/renderer/constants/icons';
 import { IBookmark } from '~/interfaces';
+import { resolveFaviconUrl } from '~/utils/favicon';
 
 type BookmarkProps = {
   title: string;
@@ -30,6 +31,12 @@ type BookmarkProps = {
 const Bookmark = observer(
   ({ title, url, favicon, isFolder, id }: BookmarkProps) => {
     const { buttonWidth } = store.bookmarksBar;
+    const resolvedFavicon = isFolder
+      ? ''
+      : resolveFaviconUrl(favicon, store.bookmarksBar.favicons, url);
+    const displayedFavicon =
+      resolvedFavicon || (isFolder ? ICON_FOLDER : ICON_PAGE);
+    const customFavicon = isFolder || !!resolvedFavicon;
 
     function onClick(event: any) {
       if (url) {
@@ -57,11 +64,9 @@ const Bookmark = observer(
       >
         <Favicon
           style={{
-            backgroundImage: `url(${
-              favicon || (isFolder ? ICON_FOLDER : ICON_PAGE)
-            })`,
+            backgroundImage: `url(${displayedFavicon})`,
             filter:
-              store.theme['pages.lightForeground'] && !favicon
+              store.theme['pages.lightForeground'] && !customFavicon
                 ? 'invert(100%)'
                 : 'none',
           }}

@@ -15,12 +15,26 @@ import {
 } from '~/constants/web-contents';
 import { TabEvent } from '~/interfaces/tabs';
 import { Queue } from '~/utils/queue';
+import {
+  faviconFallbackForUrl,
+  getFaviconCandidates,
+  IFaviconCandidate,
+  isDataUrl,
+  isFetchableFaviconUrl,
+} from '~/utils/favicon';
 import { Application } from './application';
+import { requestURL } from './network/request';
 import { getUserAgentForURL } from './user-agent';
 
 interface IAuthInfo {
   url: string;
 }
+
+interface IPageFaviconCollection {
+  links: IFaviconCandidate[];
+  manifests: IFaviconCandidate[];
+}
+
 export class View {
   public webContentsView: WebContentsView;
 
@@ -52,6 +66,7 @@ export class View {
   private historyQueue = new Queue();
 
   private lastUrl = '';
+  private faviconRequestId = 0;
 
   private _boundUpdateBounds?: () => void;
   private _resizeListenersAttached = false;
@@ -143,6 +158,7 @@ export class View {
       this.updateNavigationState();
       this.emitEvent('loading', false);
       this.updateURL(this.webContents.getURL());
+      void this.refreshFavicon();
     });
 
     this.webContents.addListener('did-start-loading', () => {
@@ -177,8 +193,15 @@ export class View {
     this.webContents.addListener(
       'did-start-navigation',
       async (e: any, ...args: any[]) => {
+        const [, , isMainFrame] = args;
+
         this.updateNavigationState();
 
+        if (!isMainFrame) {
+          return;
+        }
+
+        this.faviconRequestId += 1;
         this.favicon = '';
 
         this.emitEvent('load-commit', ...args);
@@ -244,42 +267,11 @@ export class View {
     this.webContents.addListener(
       'page-favicon-updated',
       async (e: any, favicons: any) => {
-        let iconUrl =
-          Array.isArray(favicons) && favicons.length > 0 ? favicons[0] : '';
-
-        if (!iconUrl && this.url) {
-          try {
-            const origin = new URL(this.url).origin;
-            iconUrl = origin + '/favicon.ico';
-          } catch {}
-        }
-
-        if (!iconUrl) {
-          this.favicon = '';
-          return;
-        }
-
-        this.favicon = iconUrl;
-        this.updateData();
-
-        try {
-          let fav = this.favicon;
-          if (fav.startsWith('http')) {
-            fav = await Application.instance.storage.addFavicon(fav);
-          }
-          this.emitEvent('favicon-updated', fav);
-        } catch (e) {
-          try {
-            const origin = new URL(this.url).origin;
-            const fallback = origin + '/favicon.ico';
-            if (fallback !== this.favicon) {
-              const fav =
-                await Application.instance.storage.addFavicon(fallback);
-              this.emitEvent('favicon-updated', fav);
-            }
-          } catch {}
-          this.favicon = '';
-        }
+        void this.refreshFavicon(
+          Array.isArray(favicons)
+            ? favicons.map((url) => ({ url, rel: 'icon', source: 'electron' }))
+            : [],
+        );
       },
     );
 
@@ -606,6 +598,239 @@ export class View {
 
   public emitEvent(event: TabEvent, ...args: any[]) {
     this.window.send('tab-event', event, this.id, args);
+  }
+
+  private async refreshFavicon(extraCandidates: IFaviconCandidate[] = []) {
+    const pageUrl = this.url;
+
+    if (
+      !pageUrl ||
+      pageUrl.startsWith(WEBUI_BASE_URL) ||
+      pageUrl.startsWith(`${ERROR_PROTOCOL}://`)
+    ) {
+      return;
+    }
+
+    const requestId = ++this.faviconRequestId;
+    const pageCandidates = await this.collectPageFaviconCandidates(pageUrl);
+
+    if (requestId !== this.faviconRequestId) {
+      return;
+    }
+
+    const manifestCandidates = (
+      await Promise.all(
+        pageCandidates.manifests.map((manifest) =>
+          this.collectManifestFaviconCandidates(manifest.url),
+        ),
+      )
+    ).flat();
+
+    if (requestId !== this.faviconRequestId) {
+      return;
+    }
+
+    const candidates = getFaviconCandidates(pageUrl, [
+      ...extraCandidates,
+      ...pageCandidates.links,
+      ...manifestCandidates,
+    ]);
+
+    for (const candidate of candidates) {
+      if (requestId !== this.faviconRequestId) {
+        return;
+      }
+
+      const candidateUrl = candidate.url || '';
+
+      try {
+        const displayFavicon =
+          isDataUrl(candidateUrl) || !isFetchableFaviconUrl(candidateUrl)
+            ? candidateUrl
+            : await Application.instance.storage.addFavicon(candidateUrl);
+
+        if (requestId !== this.faviconRequestId) {
+          return;
+        }
+
+        this.favicon = candidateUrl;
+        await this.updateData();
+
+        if (requestId !== this.faviconRequestId) {
+          return;
+        }
+
+        this.emitEvent('favicon-updated', displayFavicon);
+        return;
+      } catch {}
+    }
+
+    if (requestId !== this.faviconRequestId) {
+      return;
+    }
+
+    const fallbackFavicon = faviconFallbackForUrl(pageUrl);
+
+    if (fallbackFavicon) {
+      this.favicon = fallbackFavicon;
+      await this.updateData();
+
+      if (requestId !== this.faviconRequestId) {
+        return;
+      }
+
+      this.emitEvent('favicon-updated', fallbackFavicon);
+      return;
+    }
+
+    this.favicon = '';
+    await this.updateData();
+  }
+
+  private async collectPageFaviconCandidates(
+    pageUrl: string,
+  ): Promise<IPageFaviconCollection> {
+    if (!/^https?:/i.test(pageUrl)) {
+      return { links: [], manifests: [] };
+    }
+
+    try {
+      const data = (await this.webContents.executeJavaScript(
+        `
+          (async () => {
+            const normalizeHref = (value) => {
+              if (!value) return '';
+              try {
+                return new URL(value, document.baseURI).toString();
+              } catch {
+                return '';
+              }
+            };
+
+            const blobToDataUrl = async (value) => {
+              if (!value || !value.startsWith('blob:')) return value || '';
+
+              try {
+                const response = await fetch(value);
+                const blob = await response.blob();
+
+                return await new Promise((resolve) => {
+                  const reader = new FileReader();
+                  reader.onload = () =>
+                    resolve(typeof reader.result === 'string' ? reader.result : '');
+                  reader.onerror = () => resolve('');
+                  reader.readAsDataURL(blob);
+                });
+              } catch {
+                return '';
+              }
+            };
+
+            const links = [];
+            const manifests = [];
+
+            for (const element of Array.from(document.querySelectorAll('link[rel][href]'))) {
+              const rel = (element.getAttribute('rel') || '').toLowerCase();
+              const href = await blobToDataUrl(normalizeHref(element.getAttribute('href') || element.href));
+
+              if (!href) continue;
+
+              const payload = {
+                url: href,
+                rel,
+                type: (element.getAttribute('type') || '').toLowerCase(),
+                sizes: (element.getAttribute('sizes') || '').toLowerCase(),
+                purpose: (element.getAttribute('purpose') || '').toLowerCase(),
+                source: rel.includes('manifest') ? 'manifest' : 'link',
+              };
+
+              if (rel.includes('manifest')) manifests.push(payload);
+              else if (
+                rel.includes('icon') ||
+                rel.includes('apple-touch-icon') ||
+                rel.includes('mask-icon') ||
+                rel.includes('fluid-icon')
+              ) {
+                links.push(payload);
+              }
+            }
+
+            for (const element of Array.from(document.querySelectorAll(
+              'meta[name="msapplication-TileImage"], meta[name="msapplication-square70x70logo"], meta[name="msapplication-square150x150logo"], meta[name="msapplication-square310x310logo"], meta[name="msapplication-wide310x150logo"]',
+            ))) {
+              const href = await blobToDataUrl(normalizeHref(element.getAttribute('content') || ''));
+
+              if (!href) continue;
+
+              links.push({
+                url: href,
+                rel: (element.getAttribute('name') || '').toLowerCase(),
+                source: 'meta',
+              });
+            }
+
+            return { links, manifests };
+          })()
+        `,
+        true,
+      )) as IPageFaviconCollection;
+
+      return {
+        links: Array.isArray(data?.links) ? data.links : [],
+        manifests: Array.isArray(data?.manifests) ? data.manifests : [],
+      };
+    } catch {
+      return { links: [], manifests: [] };
+    }
+  }
+
+  private async collectManifestFaviconCandidates(
+    manifestUrl?: string | null,
+  ): Promise<IFaviconCandidate[]> {
+    if (!manifestUrl || !/^https?:/i.test(manifestUrl)) {
+      return [];
+    }
+
+    try {
+      const res = await requestURL(manifestUrl);
+
+      if (res.statusCode >= 400) {
+        return [];
+      }
+
+      const text = Buffer.from(res.data, 'binary')
+        .toString('utf8')
+        .replace(/^\uFEFF/, '');
+      const manifest = JSON.parse(text);
+
+      if (!Array.isArray(manifest?.icons)) {
+        return [];
+      }
+
+      return manifest.icons
+        .filter((icon: any) => typeof icon?.src === 'string' && icon.src.trim())
+        .map((icon: any) => {
+          try {
+            return {
+              url: new URL(icon.src, manifestUrl).toString(),
+              rel: 'manifest icon',
+              type: typeof icon.type === 'string' ? icon.type.toLowerCase() : '',
+              sizes:
+                typeof icon.sizes === 'string' ? icon.sizes.toLowerCase() : '',
+              purpose:
+                typeof icon.purpose === 'string'
+                  ? icon.purpose.toLowerCase()
+                  : '',
+              source: 'manifest' as const,
+            };
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean);
+    } catch {
+      return [];
+    }
   }
 
   private syncExtensionOwnership(

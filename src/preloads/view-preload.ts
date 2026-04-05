@@ -309,6 +309,10 @@ if (window.location.href.startsWith(WEBUI_BASE_URL)) {
   ipcRenderer.on('credentials-remove', (_e, data) => {
     window.postMessage({ type: 'credentials-remove', data }, '*');
   });
+
+  ipcRenderer.on('favicon-added', (_e, data) => {
+    window.postMessage({ type: 'favicon-added', data }, '*');
+  });
 }
 
 contextBridge.exposeInMainWorld('api', {

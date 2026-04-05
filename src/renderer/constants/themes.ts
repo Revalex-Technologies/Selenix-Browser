@@ -20,7 +20,7 @@ export const lightTheme: ITheme = {
   'dialog.separator.color': 'rgba(0, 0, 0, 0.08)',
   'dialog.textColor': '#000000',
   'dialog.lightForeground': false,
-  'searchBox.backgroundColor': '#f6f7f9',
+  'searchBox.backgroundColor': '#ffffff',
   'searchBox.lightForeground': false,
   'pages.backgroundColor': '#ffffff',
   'pages.lightForeground': false,

@@ -9,6 +9,7 @@ import { ListItem } from '~/renderer/components/ListItem';
 import { formatTime } from '../../utils';
 import store from '../../store';
 import { ICON_PAGE } from '~/renderer/constants/icons';
+import { resolveFaviconUrl } from '~/utils/favicon';
 
 const onClick = (item: IHistoryItem) => () => {
   const index = store.selectedItems.indexOf(item._id);
@@ -33,14 +34,11 @@ const onTitleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
 export default observer(({ data }: { data: IHistoryItem }) => {
   const selected = store.selectedItems.includes(data._id);
 
-  let { favicon } = data;
-  let customFavicon = false;
+  let favicon = resolveFaviconUrl(data.favicon, store.favicons, data.url);
+  let customFavicon = favicon !== '';
 
-  if (favicon == null || favicon.trim() === '') {
+  if (!favicon) {
     favicon = ICON_PAGE;
-  } else {
-    favicon = store.favicons.get(data.favicon);
-    customFavicon = true;
   }
 
   return (

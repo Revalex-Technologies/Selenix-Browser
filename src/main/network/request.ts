@@ -1,12 +1,11 @@
 import * as http from 'http';
 import * as https from 'https';
-import { parse as parseUrl, resolve as resolveUrl } from 'url';
 import { ResponseDetails } from '~/common/rpc/network';
 
 const DEFAULT_HEADERS: http.OutgoingHttpHeaders = {
   'User-Agent':
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-  Accept: 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+  Accept: '*/*',
   'Accept-Language': 'en-US,en;q=0.8',
   'Cache-Control': 'no-cache',
   Pragma: 'no-cache',
@@ -17,11 +16,28 @@ export const requestURL = (
   redirects = 0,
 ): Promise<ResponseDetails> =>
   new Promise((resolve, reject) => {
-    const opts = { ...parseUrl(url), headers: DEFAULT_HEADERS };
+    let requestUrl: URL;
 
-    const requester = opts.protocol === 'https:' ? https : http;
+    try {
+      requestUrl = new URL(url);
+    } catch {
+      reject(new Error(`Invalid URL: ${url}`));
+      return;
+    }
 
-    const req = requester.request(opts, (res) => {
+    if (!['http:', 'https:'].includes(requestUrl.protocol)) {
+      reject(
+        new Error(`Unsupported protocol for requestURL: ${requestUrl.protocol}`),
+      );
+      return;
+    }
+
+    const requester = requestUrl.protocol === 'https:' ? https : http;
+
+    const req = requester.request(
+      requestUrl,
+      { headers: DEFAULT_HEADERS },
+      (res) => {
       // Handle redirects manually
       const status = res.statusCode || 0;
       if (
@@ -31,7 +47,10 @@ export const requestURL = (
       ) {
         // Consume and ignore body before following redirect
         res.resume();
-        const next = resolveUrl(url, String(res.headers.location));
+        const next = new URL(
+          String(res.headers.location),
+          requestUrl,
+        ).toString();
         requestURL(next, redirects + 1)
           .then(resolve)
           .catch(reject);
@@ -52,7 +71,8 @@ export const requestURL = (
         });
       });
       res.on('error', reject);
-    });
+      },
+    );
 
     req.on('error', reject);
     req.end();

@@ -7,6 +7,7 @@ import { Item, Icon, Title } from './style';
 import { IHistoryItem } from '~/interfaces';
 import store from '../../store';
 import { ICON_PAGE } from '~/renderer/constants';
+import { resolveFaviconUrl } from '~/utils/favicon';
 
 const onClick = (url: string) => () => {
   if (url !== '' && url != null) {
@@ -16,12 +17,13 @@ const onClick = (url: string) => () => {
 
 export const TopSite = observer(({ item }: { item?: IHistoryItem }) => {
   const { title, favicon, url } = item || {};
-  const custom = favicon === '' || favicon == null;
+  const resolvedFavicon = resolveFaviconUrl(favicon, undefined, url) || favicon;
+  const custom = resolvedFavicon === '' || resolvedFavicon == null;
 
   let fav = ICON_PAGE;
 
   if (!custom) {
-    fav = favicon;
+    fav = resolvedFavicon;
   }
 
   return (

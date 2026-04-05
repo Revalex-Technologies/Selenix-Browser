@@ -1,6 +1,7 @@
 import { Menu, ipcRenderer } from 'electron';
 import { makeObservable, observable, toJS } from 'mobx';
-import { IBookmark } from '~/interfaces';
+import { IBookmark, IFavicon } from '~/interfaces';
+import { PreloadDatabase } from '~/preloads/models/database';
 import { Store } from '../store';
 
 export class BookmarkBarStore {
@@ -8,6 +9,7 @@ export class BookmarkBarStore {
   public overflowMenu: Menu;
   private staticMainID: string;
   private store: Store;
+  public faviconsDb = new PreloadDatabase<IFavicon>('favicons');
 
   public list: IBookmark[] = [];
 
@@ -15,19 +17,28 @@ export class BookmarkBarStore {
 
   public overflowItems: IBookmark[] = [];
 
+  public favicons: Map<string, string> = new Map();
+
   public constructor(store: Store) {
     makeObservable(this, {
       list: observable,
       bookmarkBarItems: observable,
       overflowItems: observable,
+      favicons: observable,
     });
 
     this.store = store;
     this.load();
+    this.loadFavicons();
 
     this.handleWindowResize();
     ipcRenderer.on('reload-bookmarks', () => {
       this.load();
+    });
+    ipcRenderer.on('favicon-added', (_e, favicon: IFavicon) => {
+      if (favicon?.url && favicon?.data) {
+        this.favicons.set(favicon.url, favicon.data);
+      }
     });
   }
 
@@ -36,6 +47,14 @@ export class BookmarkBarStore {
     this.staticMainID = items.find((x) => x.static === 'main')._id;
     this.list = items;
     this.setBookmarkBarItems();
+  }
+
+  public async loadFavicons() {
+    (await this.faviconsDb.get({})).forEach((favicon) => {
+      if (favicon?.url && favicon?.data && this.favicons.get(favicon.url) == null) {
+        this.favicons.set(favicon.url, favicon.data);
+      }
+    });
   }
 
   public setBookmarkBarItems(): void {

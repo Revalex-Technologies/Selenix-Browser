@@ -16,6 +16,7 @@ import { ISuggestion } from '~/interfaces';
 import store from '../../store';
 import { ipcRenderer } from 'electron';
 import { callViewMethod } from '~/utils/view';
+import { resolveFaviconUrl } from '~/utils/favicon';
 
 interface Props {
   suggestion: ISuggestion;
@@ -50,6 +51,8 @@ export const Suggestion = observer(({ suggestion }: Props) => {
   const selected = store.suggestions.selected === suggestion.id;
 
   let { favicon } = suggestion;
+
+  favicon = resolveFaviconUrl(favicon, undefined, url) || favicon;
 
   if (favicon == null || favicon.trim() === '') {
     favicon = ICON_PAGE;

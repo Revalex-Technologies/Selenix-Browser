@@ -13,6 +13,11 @@ import {
   IBookmark,
 } from '~/interfaces';
 import { countVisitedTimes } from '~/utils/history';
+import {
+  isDataUrl,
+  isFetchableFaviconUrl,
+  resolveFaviconUrl,
+} from '~/utils/favicon';
 import { promises } from 'fs';
 import { Application } from '../application';
 import { requestURL } from '../network/request';
@@ -61,6 +66,7 @@ export class StorageService {
   public historyVisited: IVisitedItem[] = [];
 
   public favicons: Map<string, string> = new Map();
+  public faviconRequests: Map<string, Promise<string>> = new Map();
 
   public constructor() {
     ipcMain.handle('storage-get', async (e, data: IFindOperation) => {
@@ -256,7 +262,7 @@ export class StorageService {
 
     this.historyVisited = this.historyVisited.map((x) => ({
       ...x,
-      favicon: this.favicons.get(x.favicon),
+      favicon: resolveFaviconUrl(x.favicon, this.favicons),
     }));
   }
 
@@ -339,6 +345,10 @@ export class StorageService {
       value: change,
     });
 
+    if (change.favicon && isFetchableFaviconUrl(change.favicon)) {
+      void this.addFavicon(change.favicon).catch((): void => undefined);
+    }
+
     if (change.parent) {
       const parent = this.bookmarks.find((x) => x._id === change.parent);
       if (!parent.children.includes(change._id))
@@ -370,6 +380,10 @@ export class StorageService {
 
     const doc = await this.insert<IBookmark>({ item, scope: 'bookmarks' });
 
+    if (item.favicon && isFetchableFaviconUrl(item.favicon)) {
+      void this.addFavicon(item.favicon).catch((): void => undefined);
+    }
+
     if (item.parent) {
       const parent = this.bookmarks.find((x) => x._id === item.parent);
       await this.updateBookmark(parent._id, {
@@ -392,38 +406,92 @@ export class StorageService {
   };
 
   public addFavicon = async (url: string): Promise<string> => {
-    if (!this.favicons.get(url)) {
+    if (!url) {
+      return '';
+    }
+
+    if (isDataUrl(url)) {
+      return url;
+    }
+
+    const cached = this.favicons.get(url);
+
+    if (cached) {
+      return cached;
+    }
+
+    const pending = this.faviconRequests.get(url);
+
+    if (pending) {
+      return pending;
+    }
+
+    if (!isFetchableFaviconUrl(url)) {
+      return url;
+    }
+
+    const request = (async () => {
       const res = await requestURL(url);
 
       if (res.statusCode >= 400) {
         throw new Error(res.statusCode + ' favicon fetch failed');
       }
 
-      const dataBuf = Buffer.from(res.data, 'binary');
+      const originalBuf = Buffer.from(res.data, 'binary');
 
-      const detected = await fileTypeFromBuffer(dataBuf);
+      const detected = await fileTypeFromBuffer(originalBuf);
       let mime = detected?.mime;
 
       if (!mime) {
         const headCT =
           (res.headers && (res.headers['content-type'] as string)) || '';
         if (headCT) {
-          mime = headCT.split(';')[0].trim();
+          mime = headCT.split(';')[0].trim().toLowerCase();
         }
       }
       if (!mime) {
-        const textHead = dataBuf.slice(0, 256).toString('utf8');
-        if (/^\s*<svg[\s>]/i.test(textHead)) {
+        const textHead = originalBuf.slice(0, 512).toString('utf8').trimStart();
+        if (/^(<\?xml[^>]*>\s*)?<svg[\s>]/i.test(textHead)) {
           mime = 'image/svg+xml';
         }
+      }
+      if (!mime) {
+        const pathname = new URL(url).pathname.toLowerCase();
+        if (pathname.endsWith('.svg')) mime = 'image/svg+xml';
+        else if (pathname.endsWith('.png')) mime = 'image/png';
+        else if (pathname.endsWith('.webp')) mime = 'image/webp';
+        else if (pathname.endsWith('.avif')) mime = 'image/avif';
+        else if (pathname.endsWith('.gif')) mime = 'image/gif';
+        else if (pathname.endsWith('.jpg') || pathname.endsWith('.jpeg'))
+          mime = 'image/jpeg';
       }
       if (!mime) {
         mime = 'image/x-icon';
       }
 
-      const dataUrl = `data:${mime};base64,${dataBuf.toString('base64')}`;
+      if (!mime.startsWith('image/')) {
+        throw new Error(`Unexpected favicon content-type: ${mime}`);
+      }
 
-      this.insert({
+      let normalizedMime = mime;
+      let normalizedBuf: Buffer = originalBuf;
+
+      if (mime !== 'image/svg+xml') {
+        try {
+          const image = nativeImage.createFromBuffer(originalBuf);
+          if (!image.isEmpty()) {
+            const pngBuffer = image.toPNG();
+            if (pngBuffer.byteLength > 0) {
+              normalizedMime = 'image/png';
+              normalizedBuf = pngBuffer;
+            }
+          }
+        } catch {}
+      }
+
+      const dataUrl = `data:${normalizedMime};base64,${normalizedBuf.toString('base64')}`;
+
+      await this.insert({
         scope: 'favicons',
         item: {
           url,
@@ -433,9 +501,32 @@ export class StorageService {
 
       this.favicons.set(url, dataUrl);
 
+      const faviconPayload = {
+        url,
+        data: dataUrl,
+      };
+
+      for (const appWindow of Application.instance.windows.list) {
+        try {
+          appWindow.send('favicon-added', faviconPayload);
+        } catch {}
+
+        try {
+          for (const view of appWindow.viewManager.views.values()) {
+            view.send('favicon-added', faviconPayload);
+          }
+        } catch {}
+      }
+
       return dataUrl;
-    } else {
-      return this.favicons.get(url);
+    })();
+
+    this.faviconRequests.set(url, request);
+
+    try {
+      return await request;
+    } finally {
+      this.faviconRequests.delete(url);
     }
   };
 
@@ -458,14 +549,10 @@ export class StorageService {
       if (!bookmark.isFolder && bookmark.url) {
         title = encodeTitle(bookmark.title);
         const href = encodeHref(bookmark.url);
-        let icon = bookmark.favicon;
-
-        if (!icon.startsWith('data:')) {
-          icon = this.favicons.get(icon);
-        }
+        const icon = resolveFaviconUrl(bookmark.favicon, this.favicons);
 
         payload.push(
-          `${indentNext}<DT><A HREF="${href}" ICON="${icon}">${title}</A>`,
+          `${indentNext}<DT><A HREF="${href}"${icon && icon.startsWith('data:') ? ` ICON="${icon}"` : ''}>${title}</A>`,
         );
       } else if (bookmark.isFolder) {
         title = encodeTitle(bookmark.title);

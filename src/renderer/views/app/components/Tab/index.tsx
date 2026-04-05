@@ -22,6 +22,7 @@ import store from '../../store';
 import { ipcRenderer } from 'electron';
 import * as remote from '@electron/remote';
 import { COMPACT_TAB_MARGIN_TOP } from '~/constants/design';
+import { resolveFaviconUrl } from '~/utils/favicon';
 
 const removeTab = (tab: ITab) => (e: React.MouseEvent<HTMLDivElement>) => {
   e.stopPropagation();
@@ -221,12 +222,15 @@ const onContextMenu = (tab: ITab) => () => {
 };
 
 const Content = observer(({ tab }: { tab: ITab }) => {
+  const favicon = resolveFaviconUrl(tab.favicon, undefined, tab.url);
+  const isIconSet = favicon !== '' || tab.loading;
+
   return (
     <StyledContent>
-      {!tab.loading && tab.favicon !== '' && (
+      {!tab.loading && favicon !== '' && (
         <StyledIcon
-          isIconSet={tab.favicon !== ''}
-          style={{ backgroundImage: `url(${tab.favicon})` }}
+          isIconSet={favicon !== ''}
+          style={{ backgroundImage: `url(${favicon})` }}
         >
           <PinnedVolume tab={tab} />
         </StyledIcon>
@@ -242,7 +246,7 @@ const Content = observer(({ tab }: { tab: ITab }) => {
         />
       )}
       {!tab.isPinned && (
-        <StyledTitle isIcon={tab.isIconSet} selected={tab.isSelected}>
+        <StyledTitle isIcon={isIconSet} selected={tab.isSelected}>
           {tab.title}
         </StyledTitle>
       )}

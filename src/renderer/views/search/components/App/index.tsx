@@ -10,6 +10,7 @@ import { Suggestions } from '../Suggestions';
 import { ICON_SEARCH, ICON_PAGE } from '~/renderer/constants';
 import { UIStyle } from '~/renderer/mixins/default-styles';
 import { COMPACT_TITLEBAR_HEIGHT, TOOLBAR_HEIGHT } from '~/constants/design';
+import { resolveFaviconUrl } from '~/utils/favicon';
 
 const onKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
   if (e.which === 13) {
@@ -109,16 +110,23 @@ export const App = observer(() => {
   if (suggestion && suggestionsVisible) {
     favicon = suggestion.favicon;
     customIcon = false;
+    const resolvedSuggestionFavicon = resolveFaviconUrl(
+      favicon,
+      undefined,
+      suggestion.url,
+    );
 
     if (suggestion.isSearch) {
       favicon = store.searchEngine.icon;
     } else if (
-      favicon == null ||
-      favicon.trim() === '' ||
+      (resolvedSuggestionFavicon || favicon) == null ||
+      (resolvedSuggestionFavicon || favicon).trim() === '' ||
       favicon === ICON_PAGE
     ) {
       favicon = ICON_PAGE;
       customIcon = true;
+    } else {
+      favicon = resolvedSuggestionFavicon || favicon;
     }
   }
 

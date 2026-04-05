@@ -9,6 +9,7 @@ import store from '../../store';
 import { ListItem } from '~/renderer/components/ListItem';
 import { getBookmarkTitle } from '../../utils';
 import { ICON_PAGE, ICON_FOLDER } from '~/renderer/constants/icons';
+import { resolveFaviconUrl } from '~/utils/favicon';
 
 const onClick = (item: IBookmark) => (e: React.MouseEvent<HTMLDivElement>) => {
   const index = store.selectedItems.indexOf(item._id);
@@ -60,23 +61,18 @@ const onContextMenu = (data: IBookmark) => (e: any) => {
 export const Bookmark = observer(({ data }: { data: IBookmark }) => {
   const selected = store.selectedItems.includes(data._id);
 
-  let favicon = data.favicon;
-  let customFavicon = false;
+  let favicon = '';
+  let customFavicon = !!data.isFolder;
 
   if (data.isFolder) {
     favicon = ICON_FOLDER;
-    customFavicon = true;
   } else {
-    if (favicon) {
-      if (favicon.startsWith('data:')) {
-        favicon = data.favicon;
-      } else {
-        favicon = store.favicons.get(data.favicon);
-      }
-    } else {
-      favicon = ICON_PAGE;
-      customFavicon = true;
-    }
+    favicon = resolveFaviconUrl(data.favicon, store.favicons, data.url);
+    customFavicon = favicon !== '';
+  }
+
+  if (!favicon) {
+    favicon = ICON_PAGE;
   }
 
   return (

@@ -143,7 +143,6 @@ export class TabsStore {
         if (event === 'blocked-ad') tab.blockedAds++;
         if (event === 'title-updated') tab.title = args[0];
         if (event === 'favicon-updated') tab.favicon = args[0];
-        if (event === 'did-navigate') tab.favicon = '';
         if (event === 'media-playing') tab.isPlaying = true;
         if (event === 'media-paused') tab.isPlaying = false;
         if (event === 'loading') tab.loading = args[0];
@@ -163,6 +162,7 @@ export class TabsStore {
           const [, , isMainFrame] = args;
           if (isMainFrame) {
             tab.blockedAds = 0;
+            tab.favicon = '';
           }
         }
       }

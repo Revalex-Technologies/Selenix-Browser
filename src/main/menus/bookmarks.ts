@@ -10,6 +10,7 @@ import { IBookmark } from '~/interfaces';
 import { Application } from '../application';
 import { AppWindow } from '../windows/app';
 import { showAddBookmarkDialog } from '../dialogs/add-bookmark';
+import { resolveFaviconUrl } from '~/utils/favicon';
 
 function getPath(file: string) {
   if (process.env.NODE_ENV === 'development') {
@@ -32,8 +33,11 @@ function getIcon(
   isFolder: boolean,
 ): NativeImage | string {
   if (favicon) {
-    let dataURL = Application.instance.storage.favicons.get(favicon);
-    if (dataURL) {
+    let dataURL = resolveFaviconUrl(
+      favicon,
+      Application.instance.storage.favicons,
+    );
+    if (dataURL && dataURL.startsWith('data:')) {
       if (!dataURL.split(',')[0].includes('image')) {
         const split = dataURL.split(':');
         dataURL = split.join(':image/');

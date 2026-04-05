@@ -159,6 +159,12 @@ export class Store {
         } catch {
           /* no-op */
         }
+      } else if (e.data?.type === 'favicon-added') {
+        const favicon = e.data.data as IFavicon;
+
+        if (favicon?.url && favicon?.data) {
+          this.favicons.set(favicon.url, favicon.data);
+        }
       }
     });
 

@@ -1,5 +1,3 @@
-import { parse } from 'url';
-
 import { IFormFillData } from '~/interfaces';
 import { getFormFillValue, getFormFillSubValue } from '~/utils/form-fill';
 import { Application } from '../application';
@@ -13,7 +11,13 @@ const getType = (name: string) => {
 export const getFormFillMenuItems = async (name: string, value: string) => {
   const dataType = getType(name);
   const { url } = Application.instance.windows.current.viewManager.selected;
-  const { hostname } = parse(url);
+  let hostname = '';
+
+  try {
+    hostname = new URL(url).hostname;
+  } catch {
+    hostname = '';
+  }
 
   const items = await Application.instance.storage.find<IFormFillData>({
     scope: 'formfill',
