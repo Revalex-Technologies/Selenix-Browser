@@ -141,9 +141,21 @@ export class StorageService {
       return this.history;
     });
 
-    ipcMain.on('history-remove', (e, ids: string[]) => {
-      this.history = this.history.filter((x) => ids.indexOf(x._id) === -1);
-      ids.forEach((x) => this.remove({ scope: 'history', query: { _id: x } }));
+    ipcMain.on('history-remove', (_e, ids: string[] | string) => {
+      const historyIds = Array.isArray(ids) ? ids : [ids];
+
+      if (historyIds.length === 0) {
+        return;
+      }
+
+      this.history = this.history.filter((x) => historyIds.indexOf(x._id) === -1);
+      this.syncVisitedHistory();
+
+      historyIds.forEach((id) =>
+        this.remove({ scope: 'history', query: { _id: id } }),
+      );
+
+      this.broadcastHistoryChanged();
     });
 
     ipcMain.handle('topsites-get', (e, count) => {
@@ -244,26 +256,43 @@ export class StorageService {
       query: {},
     });
 
-    items.sort((a, b) => {
-      let aDate = a.date;
-      let bDate = b.date;
-
-      if (typeof aDate === 'string') {
-        aDate = new Date(a.date).getTime();
-        bDate = new Date(b.date).getTime();
-      }
-
-      return aDate - bDate;
-    });
+    this.sortHistoryItems(items);
 
     this.history = items;
+    this.syncVisitedHistory();
+  }
 
-    this.historyVisited = countVisitedTimes(items);
+  private getHistoryTimestamp(item: IHistoryItem): number {
+    if (typeof item.date === 'string') {
+      return new Date(item.date).getTime();
+    }
 
-    this.historyVisited = this.historyVisited.map((x) => ({
-      ...x,
-      favicon: resolveFaviconUrl(x.favicon, this.favicons),
+    return Number(item.date || 0);
+  }
+
+  private sortHistoryItems(items: IHistoryItem[]) {
+    items.sort(
+      (a, b) => this.getHistoryTimestamp(a) - this.getHistoryTimestamp(b),
+    );
+  }
+
+  private syncVisitedHistory() {
+    this.historyVisited = countVisitedTimes(this.history).map((item) => ({
+      ...item,
+      favicon: resolveFaviconUrl(item.favicon, this.favicons),
     }));
+  }
+
+  private broadcastHistoryChanged() {
+    Application.instance.windows.broadcast('history-changed');
+
+    for (const appWindow of Application.instance.windows.list) {
+      try {
+        for (const view of appWindow.viewManager.views.values()) {
+          view.send('history-changed');
+        }
+      } catch {}
+    }
   }
 
   private async loadBookmarks() {

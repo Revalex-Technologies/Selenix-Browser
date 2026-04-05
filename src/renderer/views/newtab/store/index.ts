@@ -211,6 +211,8 @@ export class Store {
         } catch {
           /* ignore parse errors */
         }
+      } else if (e.data?.type === 'history-changed') {
+        void this.loadTopSites();
       }
     });
 

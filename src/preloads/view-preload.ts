@@ -313,6 +313,10 @@ if (window.location.href.startsWith(WEBUI_BASE_URL)) {
   ipcRenderer.on('favicon-added', (_e, data) => {
     window.postMessage({ type: 'favicon-added', data }, '*');
   });
+
+  ipcRenderer.on('history-changed', () => {
+    window.postMessage({ type: 'history-changed' }, '*');
+  });
 }
 
 contextBridge.exposeInMainWorld('api', {

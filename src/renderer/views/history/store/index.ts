@@ -165,6 +165,10 @@ export class Store {
         if (favicon?.url && favicon?.data) {
           this.favicons.set(favicon.url, favicon.data);
         }
+      } else if (e.data?.type === 'history-changed') {
+        this.selectedItems = [];
+        this.resetLoadedItems();
+        void this.load();
       }
     });
 

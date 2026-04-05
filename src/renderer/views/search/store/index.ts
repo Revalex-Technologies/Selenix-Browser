@@ -84,14 +84,29 @@ export class Store extends DialogStore {
         this.inputRef.current.focus();
 
         this.inputRef.current.setSelectionRange(data.cursorPos, data.cursorPos);
+        void this.loadHistory().then(() => {
+          const input = this.inputRef.current;
 
-        const event = new Event('input', { bubbles: true });
-        this.inputRef.current.dispatchEvent(event);
+          if (!this.visible || !input) {
+            return;
+          }
+
+          const event = new Event('input', { bubbles: true });
+          input.dispatchEvent(event);
+        });
       }
     });
 
     ipcRenderer.on('search-tabs', (e, tabs) => {
       this.tabs = tabs;
+    });
+
+    ipcRenderer.on('history-changed', () => {
+      void this.loadHistory().then(() => {
+        if (this.visible) {
+          this.suggest();
+        }
+      });
     });
 
     this.loadHistory();
