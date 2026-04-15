@@ -125,18 +125,7 @@ export const Input = styled.input.withConfig({
 export const SecurityButton = styled.div.withConfig({
   shouldForwardProp: (p) => !['expanded', 'danger'].includes(p as string),
 })<{ expanded?: boolean; danger?: boolean }>`
-  /* ensure the icon is perfectly centered within the button */
-  display: inline-grid;
-  place-items: center;
-  /* keep content from shifting on hover/expand */
   box-sizing: border-box;
-
-  /* nudge the svg slightly left for optical centering */
-  & .icon,
-  & .icon svg {
-    position: relative;
-    left: -1px;
-  }
 
   /* clamp any icon elements inside the security button */
   & .icon,
@@ -160,6 +149,7 @@ export const SecurityButton = styled.div.withConfig({
 
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   padding: 0 8px;
   height: 26px;
@@ -200,7 +190,6 @@ export const SecurityButton = styled.div.withConfig({
     flex: 0 0 16px;
     display: inline-block;
     vertical-align: middle;
-    transform: translateX(-1px);
     background-repeat: no-repeat;
     background-position: center;
     background-size: 16px 16px;

@@ -308,7 +308,6 @@ export const AddressBar = observer(() => {
                   !isTrusted
                     ? 'brightness(0) invert(1)'
                     : 'none',
-                marginLeft: isSecure && !isInternal ? '1.5px' : '-1px',
               }}
             />
             {expanded && <div className="label">{label}</div>}
