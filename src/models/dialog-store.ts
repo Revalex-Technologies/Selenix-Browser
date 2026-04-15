@@ -1,6 +1,4 @@
 import { ipcRenderer } from 'electron';
-
-import * as remote from '@electron/remote';
 import { observable, computed, makeObservable } from 'mobx';
 import { getTheme } from '~/utils/themes';
 import { ISettings } from '~/interfaces';
@@ -91,13 +89,13 @@ export class DialogStore {
   }
 
   public get id() {
-    return remote.getCurrentWebContents().id;
+    return ipcRenderer.sendSync('get-webcontents-id');
   }
 
   public get windowId() {
     if (this._windowId === -1) {
-      const win = remote.getCurrentWindow();
-      if (win) this._windowId = win.id;
+      const windowId = ipcRenderer.sendSync('get-window-id');
+      if (typeof windowId === 'number') this._windowId = windowId;
     }
 
     return this._windowId;

@@ -14,7 +14,12 @@ interface Props {
 export const StyledSwitch = styled.div.withConfig({
   shouldForwardProp: (p) =>
     !['activated', 'dense', 'clickable', 'color'].includes(p as string),
-})<{ dense?: boolean; activated?: boolean; clickable?: boolean; color?: string }>`
+})<{
+  dense?: boolean;
+  activated?: boolean;
+  clickable?: boolean;
+  color?: string;
+}>`
   border-radius: 32px;
   position: relative;
   overflow: hidden;
@@ -30,7 +35,13 @@ export const StyledSwitch = styled.div.withConfig({
     z-index: 2;
   }
 
-  ${({ activated = false, color, theme, clickable = false, dense = false }: Props) => css`
+  ${({
+    activated = false,
+    color,
+    theme,
+    clickable = false,
+    dense = false,
+  }: Props) => css`
     background-color: ${activated ? color : theme['switch.backgroundColor']};
     cursor: ${clickable ? 'pointer' : 'default'};
     width: ${dense ? 32 : 36}px;

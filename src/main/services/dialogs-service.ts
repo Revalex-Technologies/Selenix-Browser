@@ -1,5 +1,4 @@
 import { WebContentsView, app, ipcMain } from 'electron';
-import { enable } from '@electron/remote/main';
 import { join } from 'path';
 import { SearchDialog } from '../dialogs/search';
 import { PreviewDialog } from '../dialogs/preview';
@@ -69,8 +68,6 @@ export class DialogsService {
       },
     });
 
-    enable(view.webContents);
-
     (view as any).setBackgroundColor?.('#00000000');
     (view.webContents as any).setBackgroundColor?.('#00000000');
 
@@ -129,6 +126,7 @@ export class DialogsService {
     }
 
     browserWindow.webContents.send('dialog-visibility-change', name, true);
+    (webContentsView.webContents as any).windowId = browserWindow.id;
 
     this.contentViewDetails.set(webContentsView.webContents.id, true);
 

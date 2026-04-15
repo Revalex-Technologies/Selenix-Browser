@@ -100,6 +100,6 @@ export class ExtensionsStore {
       (x) => x.extensionId !== id,
     );
 
-    getExtensionMainChannel().getInvoker().uninstall(id);
+    void getExtensionMainChannel().getInvoker().uninstall(id);
   }
 }

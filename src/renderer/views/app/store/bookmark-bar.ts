@@ -51,7 +51,11 @@ export class BookmarkBarStore {
 
   public async loadFavicons() {
     (await this.faviconsDb.get({})).forEach((favicon) => {
-      if (favicon?.url && favicon?.data && this.favicons.get(favicon.url) == null) {
+      if (
+        favicon?.url &&
+        favicon?.data &&
+        this.favicons.get(favicon.url) == null
+      ) {
         this.favicons.set(favicon.url, favicon.data);
       }
     });

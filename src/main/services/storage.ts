@@ -148,7 +148,9 @@ export class StorageService {
         return;
       }
 
-      this.history = this.history.filter((x) => historyIds.indexOf(x._id) === -1);
+      this.history = this.history.filter(
+        (x) => historyIds.indexOf(x._id) === -1,
+      );
       this.syncVisitedHistory();
 
       historyIds.forEach((id) =>

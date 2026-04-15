@@ -1,6 +1,6 @@
 import { ISettings } from '~/interfaces';
 
-import { app } from 'electron';
+import { app, ipcRenderer } from 'electron';
 
 export const DEFAULT_SEARCH_ENGINES = [
   {
@@ -69,8 +69,7 @@ export const DEFAULT_SETTINGS: ISettings = {
   downloadsPath: (() => {
     try {
       if (typeof process !== 'undefined' && process.type === 'renderer') {
-        const remote = require('@electron/remote');
-        return remote.app.getPath('downloads');
+        return ipcRenderer.sendSync('get-app-path-sync', 'downloads');
       }
     } catch (e) {}
 

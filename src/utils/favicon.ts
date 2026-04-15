@@ -58,7 +58,8 @@ const getLargestSize = (sizes?: string): number => {
 
 const inferTypeFromUrl = (value?: string): string => {
   const parsed = value ? tryCreateUrl(value) : null;
-  const pathname = parsed?.pathname?.toLowerCase() || value?.toLowerCase() || '';
+  const pathname =
+    parsed?.pathname?.toLowerCase() || value?.toLowerCase() || '';
 
   if (pathname.endsWith('.svg')) return 'image/svg+xml';
   if (pathname.endsWith('.png')) return 'image/png';
@@ -75,7 +76,9 @@ const inferTypeFromUrl = (value?: string): string => {
 const scoreFaviconCandidate = (candidate: IFaviconCandidate): number => {
   const rel = candidate.rel?.toLowerCase() || '';
   const purpose = candidate.purpose?.toLowerCase() || '';
-  const type = (candidate.type || inferTypeFromUrl(candidate.url)).toLowerCase();
+  const type = (
+    candidate.type || inferTypeFromUrl(candidate.url)
+  ).toLowerCase();
   const size = getLargestSize(candidate.sizes);
 
   let score = 0;
@@ -128,10 +131,7 @@ export const isRenderableFaviconUrl = (value?: string): boolean => {
   return !!parsed && !BLOCKED_PROTOCOLS.has(parsed.protocol);
 };
 
-export const faviconFallbackForUrl = (
-  pageUrl?: string,
-  size = 64,
-): string => {
+export const faviconFallbackForUrl = (pageUrl?: string, size = 64): string => {
   const parsed = pageUrl ? tryCreateUrl(pageUrl) : null;
 
   if (!parsed || !['http:', 'https:'].includes(parsed.protocol)) {

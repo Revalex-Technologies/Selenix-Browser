@@ -7,7 +7,6 @@ import store from '../../store';
 import { isURL } from '~/utils';
 import { callViewMethod } from '~/utils/view';
 import { ipcRenderer } from 'electron';
-import { Menu, getCurrentWindow } from '@electron/remote';
 import { ToolbarButton } from '../ToolbarButton';
 import {
   StyledAddressBar,
@@ -28,7 +27,6 @@ import { NEWTAB_URL } from '~/constants/tabs';
 import { WEBUI_BASE_URL } from '~/constants/files';
 
 const onAddressBarContextMenu = (e: React.MouseEvent<HTMLElement>) => {
-  const PADDING = '\\u2003'.repeat(16);
   try {
     e.preventDefault();
     const inputEl =
@@ -40,44 +38,9 @@ const onAddressBarContextMenu = (e: React.MouseEvent<HTMLElement>) => {
 
     if (inputEl) inputEl.focus();
 
-    const pad = '\u2003\u2003\u2003\u2003'; // em-spaces
-    const template = [
-      {
-        label: 'Undo' + pad,
-        role: 'undo',
-        accelerator: process.platform === 'darwin' ? 'Cmd+Z' : 'Ctrl+Z',
-      },
-      { type: 'separator' },
-      {
-        label: 'Copy' + pad,
-        role: 'copy',
-        accelerator: process.platform === 'darwin' ? 'Cmd+C' : 'Ctrl+C',
-      },
-      {
-        label: 'Paste' + pad,
-        role: 'paste',
-        accelerator: process.platform === 'darwin' ? 'Cmd+V' : 'Ctrl+V',
-      },
-      { type: 'separator' },
-      {
-        label: 'Delete' + pad,
-        role: 'delete',
-        accelerator: process.platform === 'darwin' ? 'Fn+Delete' : 'Delete',
-      },
-      { type: 'separator' },
-      {
-        label: 'Select All' + pad,
-        role: 'selectAll',
-        accelerator: process.platform === 'darwin' ? 'Cmd+A' : 'Ctrl+A',
-      },
-      { type: 'separator' },
-    ] as any;
-    const menu = Menu.buildFromTemplate(template);
-    if (typeof getCurrentWindow === 'function') {
-      menu.popup({ window: getCurrentWindow() });
-    } else {
-      menu.popup();
-    }
+    void ipcRenderer
+      .invoke('show-addressbar-context-menu')
+      .catch((_error: unknown): void => {});
   } catch (err) {
     console.error('AddressBar context menu error:', err);
   }

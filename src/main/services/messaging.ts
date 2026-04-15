@@ -85,6 +85,10 @@ import { showZoomDialog } from '../dialogs/zoom';
 import { showTabGroupDialog } from '../dialogs/tabgroup';
 
 export const runMessagingService = (appWindow: AppWindow) => {
+  try {
+    ipcMain.removeHandler('get-app-icon-path');
+  } catch {}
+
   ipcMain.handle('get-app-icon-path', async () => {
     try {
       // Try to get the current process's icon (native app executable)

@@ -15,8 +15,6 @@ import {
 } from './style';
 import store from '../../store';
 import { ipcRenderer } from 'electron';
-
-import * as remote from '@electron/remote';
 import { WEBUI_BASE_URL, WEBUI_URL_SUFFIX } from '~/constants/files';
 import { Switch } from '~/renderer/components/Switch';
 import {
@@ -121,14 +119,13 @@ const onFindInPageClick = () => {
   store.hide();
 };
 
-const onAlwaysClick = () => {
-  store.alwaysOnTop = !store.alwaysOnTop;
-  const current = remote.getCurrentWindow();
-  const parent = (current as any).getParentWindow
-    ? (current as any).getParentWindow()
-    : null;
-  const target = parent || current;
-  target.setAlwaysOnTop(store.alwaysOnTop);
+const onAlwaysClick = async () => {
+  try {
+    store.alwaysOnTop = await ipcRenderer.invoke(
+      'window-set-always-on-top',
+      !store.alwaysOnTop,
+    );
+  } catch {}
 };
 
 const onNewWindowClick = () => {
@@ -190,7 +187,7 @@ export const QuickMenu = observer(() => {
             <>
               <MenuItem onClick={onUpdateClick}>
                 <Icon icon={ICON_FIRE}></Icon>
-                <MenuItemTitle>{`Update ${remote.app.name}`}</MenuItemTitle>
+                <MenuItemTitle>{`Update ${store.appName}`}</MenuItemTitle>
               </MenuItem>
               <Line />
             </>

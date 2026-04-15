@@ -20,7 +20,6 @@ import { ITab } from '../../models';
 import store from '../../store';
 
 import { ipcRenderer } from 'electron';
-import * as remote from '@electron/remote';
 import { COMPACT_TAB_MARGIN_TOP } from '~/constants/design';
 import { resolveFaviconUrl } from '~/utils/favicon';
 
@@ -110,115 +109,80 @@ const onMouseUp = (tab: ITab) => (e: React.MouseEvent<HTMLDivElement>) => {
   }
 };
 
-const onContextMenu = (tab: ITab) => () => {
-  const menu = remote.Menu.buildFromTemplate([
-    {
-      label: 'New tab to the right',
-      click: () => {
-        store.tabs.addTab(
-          {
-            index: store.tabs.list.indexOf(store.tabs.selectedTab) + 1,
-          },
-          tab.tabGroupId,
-        );
-      },
-    },
-    {
-      label: 'Add to a new group',
-      click: () => {
-        const tabGroup = store.tabGroups.addGroup();
-        tab.tabGroupId = tabGroup.id;
-        store.tabs.updateTabsBounds(true);
-      },
-    },
-    {
-      label: 'Remove from group',
-      visible: !!tab.tabGroup,
-      click: () => {
-        tab.removeFromGroup();
-      },
-    },
-    {
-      type: 'separator',
-    },
-    {
-      label: 'Reload',
-      accelerator: 'CmdOrCtrl+R',
-      click: () => {
-        tab.callViewMethod('webContents.reload');
-      },
-    },
-    {
-      label: 'Duplicate',
-      click: () => {
-        store.tabs.addTab({ active: true, url: tab.url });
-      },
-    },
-    {
-      label: tab.isPinned ? 'Unpin tab' : 'Pin tab',
-      click: () => {
-        tab.isPinned ? store.tabs.unpinTab(tab) : store.tabs.pinTab(tab);
-      },
-    },
-    {
-      label: tab.isMuted ? 'Unmute tab' : 'Mute tab',
-      click: () => {
-        tab.isMuted ? store.tabs.unmuteTab(tab) : store.tabs.muteTab(tab);
-      },
-    },
-    {
-      type: 'separator',
-    },
-    {
-      label: 'Close tab',
-      accelerator: 'CmdOrCtrl+W',
-      click: () => {
-        tab.close();
-      },
-    },
-    {
-      label: 'Close other tabs',
-      click: () => {
-        for (const t of store.tabs.list) {
-          if (t !== tab) {
-            t.close();
-          }
-        }
-      },
-    },
-    {
-      label: 'Close tabs to the left',
-      click: () => {
-        for (let i = store.tabs.list.indexOf(tab) - 1; i >= 0; i--) {
-          store.tabs.list[i].close();
-        }
-      },
-    },
-    {
-      label: 'Close tabs to the right',
-      click: () => {
-        for (
-          let i = store.tabs.list.length - 1;
-          i > store.tabs.list.indexOf(tab);
-          i--
-        ) {
-          store.tabs.list[i].close();
-        }
-      },
-    },
-    {
-      type: 'separator',
-    },
-    {
-      label: 'Revert closed tab',
-      enabled: store.tabs.closedUrl !== '',
-      click: () => {
-        store.tabs.revertClosed();
-      },
-    },
-  ]);
+const onContextMenu = (tab: ITab) => async () => {
+  let action: string | null = null;
 
-  menu.popup();
+  try {
+    action = await ipcRenderer.invoke('show-tab-context-menu', {
+      hasTabGroup: !!tab.tabGroup,
+      isPinned: tab.isPinned,
+      isMuted: tab.isMuted,
+      canRevertClosed: store.tabs.closedUrl !== '',
+    });
+  } catch {
+    return;
+  }
+
+  switch (action) {
+    case 'new-tab-to-the-right':
+      store.tabs.addTab(
+        {
+          index: store.tabs.list.indexOf(store.tabs.selectedTab) + 1,
+        },
+        tab.tabGroupId,
+      );
+      break;
+    case 'add-to-a-new-group': {
+      const tabGroup = store.tabGroups.addGroup();
+      tab.tabGroupId = tabGroup.id;
+      store.tabs.updateTabsBounds(true);
+      break;
+    }
+    case 'remove-from-group':
+      tab.removeFromGroup();
+      break;
+    case 'reload':
+      tab.callViewMethod('webContents.reload');
+      break;
+    case 'duplicate':
+      store.tabs.addTab({ active: true, url: tab.url });
+      break;
+    case 'toggle-pin':
+      tab.isPinned ? store.tabs.unpinTab(tab) : store.tabs.pinTab(tab);
+      break;
+    case 'toggle-mute':
+      tab.isMuted ? store.tabs.unmuteTab(tab) : store.tabs.muteTab(tab);
+      break;
+    case 'close-tab':
+      tab.close();
+      break;
+    case 'close-other-tabs':
+      for (const t of store.tabs.list) {
+        if (t !== tab) {
+          t.close();
+        }
+      }
+      break;
+    case 'close-tabs-to-the-left':
+      for (let i = store.tabs.list.indexOf(tab) - 1; i >= 0; i--) {
+        store.tabs.list[i].close();
+      }
+      break;
+    case 'close-tabs-to-the-right':
+      for (
+        let i = store.tabs.list.length - 1;
+        i > store.tabs.list.indexOf(tab);
+        i--
+      ) {
+        store.tabs.list[i].close();
+      }
+      break;
+    case 'revert-closed-tab':
+      store.tabs.revertClosed();
+      break;
+    default:
+      break;
+  }
 };
 
 const Content = observer(({ tab }: { tab: ITab }) => {

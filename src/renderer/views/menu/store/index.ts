@@ -1,9 +1,10 @@
 import { ipcRenderer } from 'electron';
-import * as remote from '@electron/remote';
 import { makeObservable, observable } from 'mobx';
 import { DialogStore } from '~/models/dialog-store';
 
 export class Store extends DialogStore {
+  public appName = ipcRenderer.sendSync('get-app-name-sync') || 'Selenix';
+
   @observable
   public alwaysOnTop = false;
 
@@ -18,7 +19,7 @@ export class Store extends DialogStore {
     makeObservable(this);
 
     try {
-      this.alwaysOnTop = remote.getCurrentWindow().isAlwaysOnTop();
+      this.alwaysOnTop = !!ipcRenderer.sendSync('window-is-always-on-top-sync');
     } catch (e) {}
     this.registerIpcHandlers();
   }

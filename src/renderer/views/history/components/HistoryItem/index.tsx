@@ -35,7 +35,7 @@ export default observer(({ data }: { data: IHistoryItem }) => {
   const selected = store.selectedItems.includes(data._id);
 
   let favicon = resolveFaviconUrl(data.favicon, store.favicons, data.url);
-  let customFavicon = favicon !== '';
+  const customFavicon = favicon !== '';
 
   if (!favicon) {
     favicon = ICON_PAGE;

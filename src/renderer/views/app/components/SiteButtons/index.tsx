@@ -13,7 +13,6 @@ import {
 } from '~/renderer/constants/icons';
 
 import { ipcRenderer } from 'electron';
-import * as remote from '@electron/remote';
 
 import store from '../../store';
 import { ToolbarButton } from '../ToolbarButton';
@@ -76,40 +75,39 @@ ipcRenderer.on('zoom-factor-updated', (e, zoomFactor, showDialog) => {
 const onShieldMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
   if (e.button === 0) {
     e.preventDefault();
-    return onShieldContextMenu(e);
+    void onShieldContextMenu(e);
   }
 };
 
-const onShieldContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+const onShieldContextMenu = async (e: React.MouseEvent<HTMLDivElement>) => {
   e.preventDefault();
-  const menu = remote.Menu.buildFromTemplate([
-    {
-      label: 'Enable',
-      type: 'checkbox',
-      checked: !!store.settings.object.shield,
-      click: () => {
-        const next = !store.settings.object.shield;
-        store.settings.object.shield = next;
-        store.settings.save();
-        try {
-          ipcRenderer.send('shield:set-enabled', next);
-        } catch {}
-        try {
-          window.dispatchEvent(
-            new CustomEvent('shield:enabled-updated', { detail: next }),
-          );
-        } catch {}
+  let action: string | null = null;
 
-        try {
-          window.dispatchEvent(
-            new CustomEvent('shield:enabled-updated', { detail: next }),
-          );
-        } catch {}
-      },
-    },
-  ]);
   try {
-    menu.popup({ window: remote.getCurrentWindow() });
+    action = await ipcRenderer.invoke(
+      'show-shield-context-menu',
+      !!store.settings.object.shield,
+    );
+  } catch {
+    return;
+  }
+
+  if (action !== 'enable' && action !== 'disable') {
+    return;
+  }
+
+  const next = action === 'enable';
+  store.settings.object.shield = next;
+  store.settings.save();
+
+  try {
+    ipcRenderer.send('shield:set-enabled', next);
+  } catch {}
+
+  try {
+    window.dispatchEvent(
+      new CustomEvent('shield:enabled-updated', { detail: next }),
+    );
   } catch {}
 };
 

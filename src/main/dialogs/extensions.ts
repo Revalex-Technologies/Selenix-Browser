@@ -169,7 +169,9 @@ export async function setupExtensions(app: Application): Promise<void> {
     };
 
     app.extensions.on('browser-action-popup-created', (popup: any) => {
-      const isAliveWindow = (win: Electron.BrowserWindow | null | undefined) => {
+      const isAliveWindow = (
+        win: Electron.BrowserWindow | null | undefined,
+      ) => {
         try {
           return !!win && !win.isDestroyed();
         } catch {

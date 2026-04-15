@@ -1,8 +1,7 @@
 import { makeObservable, observable } from 'mobx';
+import { ipcRenderer } from 'electron';
 
 import { Store } from '.';
-
-import * as remote from '@electron/remote';
 import { prefixHttp, isURL } from '~/utils';
 import { Database } from '~/models/database';
 import { IStartupTab } from '~/interfaces/startup-tab';
@@ -50,7 +49,7 @@ export class StartupTabsStore {
       this.clearStartupTabs(false, false);
     }
 
-    const args = remote.process.argv;
+    const args = ipcRenderer.sendSync('get-process-argv-sync') as string[];
     let needsNewTabPage = false;
 
     if (tabsToLoad && tabsToLoad.length > 0) {
@@ -84,7 +83,7 @@ export class StartupTabsStore {
     }
 
     if (args.length > 1 && this.store.windowId === 1) {
-      const path = remote.process.argv[1];
+      const path = args[1];
       const ext = extname(path);
 
       if (existsSync(path) && ext === '.html') {

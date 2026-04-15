@@ -27,7 +27,9 @@ export const requestURL = (
 
     if (!['http:', 'https:'].includes(requestUrl.protocol)) {
       reject(
-        new Error(`Unsupported protocol for requestURL: ${requestUrl.protocol}`),
+        new Error(
+          `Unsupported protocol for requestURL: ${requestUrl.protocol}`,
+        ),
       );
       return;
     }
@@ -38,39 +40,39 @@ export const requestURL = (
       requestUrl,
       { headers: DEFAULT_HEADERS },
       (res) => {
-      // Handle redirects manually
-      const status = res.statusCode || 0;
-      if (
-        [301, 302, 303, 307, 308].includes(status) &&
-        res.headers.location &&
-        redirects < 5
-      ) {
-        // Consume and ignore body before following redirect
-        res.resume();
-        const next = new URL(
-          String(res.headers.location),
-          requestUrl,
-        ).toString();
-        requestURL(next, redirects + 1)
-          .then(resolve)
-          .catch(reject);
-        return;
-      }
+        // Handle redirects manually
+        const status = res.statusCode || 0;
+        if (
+          [301, 302, 303, 307, 308].includes(status) &&
+          res.headers.location &&
+          redirects < 5
+        ) {
+          // Consume and ignore body before following redirect
+          res.resume();
+          const next = new URL(
+            String(res.headers.location),
+            requestUrl,
+          ).toString();
+          requestURL(next, redirects + 1)
+            .then(resolve)
+            .catch(reject);
+          return;
+        }
 
-      const chunks: Buffer[] = [];
+        const chunks: Buffer[] = [];
 
-      res.on('data', (chunk) =>
-        chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)),
-      );
-      res.on('end', () => {
-        const buf = Buffer.concat(chunks);
-        resolve({
-          statusCode: status,
-          data: buf.toString('binary'),
-          headers: res.headers,
+        res.on('data', (chunk) =>
+          chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)),
+        );
+        res.on('end', () => {
+          const buf = Buffer.concat(chunks);
+          resolve({
+            statusCode: status,
+            data: buf.toString('binary'),
+            headers: res.headers,
+          });
         });
-      });
-      res.on('error', reject);
+        res.on('error', reject);
       },
     );
 

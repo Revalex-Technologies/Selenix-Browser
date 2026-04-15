@@ -7,8 +7,6 @@ import {
   ipcMain,
   screen,
 } from 'electron';
-
-import { enable } from '@electron/remote/main';
 import { writeFileSync, promises } from 'fs';
 import { resolve, join } from 'path';
 
@@ -59,8 +57,7 @@ export class AppWindow {
       this.win.setMenu(null);
       Menu.setApplicationMenu(null);
     } catch {}
-
-    enable(this.win.webContents);
+    (this.win.webContents as any).windowId = this.win.id;
 
     this.incognito = incognito;
 

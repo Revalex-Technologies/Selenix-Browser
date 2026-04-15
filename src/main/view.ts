@@ -85,13 +85,6 @@ export class View {
       },
     });
 
-    try {
-      const { enable } = require('@electron/remote/main');
-      enable(this.webContentsView.webContents);
-    } catch (err) {
-      console.warn('Failed to enable remote for browser view:', err);
-    }
-
     this.incognito = incognito;
 
     this.webContents.userAgent = getUserAgentForURL(
@@ -814,7 +807,8 @@ export class View {
             return {
               url: new URL(icon.src, manifestUrl).toString(),
               rel: 'manifest icon',
-              type: typeof icon.type === 'string' ? icon.type.toLowerCase() : '',
+              type:
+                typeof icon.type === 'string' ? icon.type.toLowerCase() : '',
               sizes:
                 typeof icon.sizes === 'string' ? icon.sizes.toLowerCase() : '',
               purpose:
@@ -882,9 +876,12 @@ export class View {
       };
 
       const previousActive = store.windowToActiveTab?.get?.(previousWindow.win);
-      const fallbackView = Array.from(previousWindow.viewManager.views.values())[0];
-      const fallbackTab: Electron.WebContents | undefined =
-        (fallbackView as any)?.webContentsView?.webContents;
+      const fallbackView = Array.from(
+        previousWindow.viewManager.views.values(),
+      )[0];
+      const fallbackTab: Electron.WebContents | undefined = (
+        fallbackView as any
+      )?.webContentsView?.webContents;
 
       try {
         if (previousActive === tab) {

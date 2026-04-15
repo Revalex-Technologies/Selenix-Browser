@@ -204,9 +204,13 @@ export class SessionsService {
       ];
 
       const menu = Menu.buildFromTemplate(template);
-      const win = BrowserWindow.fromWebContents(e.sender);
+      const senderWindowId = (e.sender as any).windowId;
+      const win =
+        (typeof senderWindowId === 'number'
+          ? BrowserWindow.fromId(senderWindowId)
+          : null) ?? BrowserWindow.fromWebContents(e.sender);
       try {
-        menu.popup({ window: win });
+        menu.popup({ window: win ?? undefined });
       } catch {
         menu.popup();
       }

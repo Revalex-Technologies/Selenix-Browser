@@ -2,6 +2,8 @@
 
 ## electron remote package
 
+> This @electron/remote package is no longer used (we switched to ipc for everything) but this peice of doc is still gonna hang around for a minute.
+
 We install `@electron/remote` because the built in remote was removed from electron a long time ago, then we hook it like this
 
 ```ts

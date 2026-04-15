@@ -3,7 +3,6 @@ import { StyleSheetManager } from 'styled-components';
 import { observer } from 'mobx-react-lite';
 import * as React from 'react';
 import { ipcRenderer } from 'electron';
-import * as remote from '@electron/remote';
 
 import store from '../../store';
 import { Tabbar } from '../Tabbar';
@@ -30,8 +29,10 @@ const onMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
   }
 };
 
-const onFullscreenExit = (e: React.MouseEvent<HTMLDivElement>) => {
-  remote.getCurrentWindow().setFullScreen(false);
+const onFullscreenExit = () => {
+  void ipcRenderer
+    .invoke('window-set-full-screen', false)
+    .catch((_error: unknown): void => {});
 };
 
 export const Titlebar = observer(() => {

@@ -14,6 +14,7 @@ import {
   SecondaryText,
 } from './style';
 import { IDownloadItem } from '~/interfaces';
+import { shell, ipcRenderer } from 'electron';
 
 const showDownloadContextMenu = (
   item: IDownloadItem,
@@ -23,40 +24,12 @@ const showDownloadContextMenu = (
     ev.preventDefault();
     ev.stopPropagation();
   }
-  const menu = Menu.buildFromTemplate([
-    {
-      label: 'Pause',
-      enabled: !item.completed,
-      click: () => ipcRenderer.invoke('pause-download', item.id),
-    },
-    {
-      label: 'Resume',
-      enabled: !item.completed,
-      click: () => ipcRenderer.invoke('resume-download', item.id),
-    },
-    { type: 'separator' },
-    {
-      label: 'Cancel',
-      enabled: !item.completed,
-      click: () => ipcRenderer.invoke('cancel-download', item.id),
-    },
-    { type: 'separator' },
-    {
-      label: 'Open file',
-      enabled: !!item.savePath && !!item.completed,
-      click: () => item.savePath && shell.openPath(item.savePath),
-    },
-    {
-      label: 'View in file manager',
-      enabled: !!item.savePath,
-      click: () => item.savePath && shell.showItemInFolder(item.savePath),
-    },
-  ]);
-  menu.popup({ window: getCurrentWindow() });
+  try {
+    void ipcRenderer
+      .invoke('show-download-context-menu', item.id)
+      .catch((_error: unknown): void => {});
+  } catch {}
 };
-
-import { shell, ipcRenderer } from 'electron';
-import { Menu, getCurrentWindow } from '@electron/remote';
 
 const prettyBytes = (input: number): string => {
   if (typeof input !== 'number' || !isFinite(input)) return '0 B';

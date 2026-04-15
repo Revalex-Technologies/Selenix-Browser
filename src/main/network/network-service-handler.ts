@@ -1,8 +1,11 @@
-import { RpcMainEvent, RpcMainHandler } from '@wexond/rpc-electron';
-import { getNetworkMainChannel, NetworkService } from '~/common/rpc/network';
+import { ipcMain } from 'electron';
+import {
+  NETWORK_SERVICE_REQUEST_CHANNEL,
+  NetworkService,
+} from '~/common/rpc/network';
 import { requestURL } from './request';
 
-export class NetworkServiceHandler implements RpcMainHandler<NetworkService> {
+export class NetworkServiceHandler {
   private static instance?: NetworkServiceHandler;
 
   public static get() {
@@ -11,10 +14,16 @@ export class NetworkServiceHandler implements RpcMainHandler<NetworkService> {
   }
 
   constructor() {
-    getNetworkMainChannel().getReceiver().handler = this;
+    try {
+      ipcMain.removeHandler(NETWORK_SERVICE_REQUEST_CHANNEL);
+    } catch {}
+
+    ipcMain.handle(NETWORK_SERVICE_REQUEST_CHANNEL, (_e, url: string) =>
+      this.request(url),
+    );
   }
 
-  request(e: RpcMainEvent, url: string) {
+  request(url: string): ReturnType<NetworkService['request']> {
     return requestURL(url);
   }
 }

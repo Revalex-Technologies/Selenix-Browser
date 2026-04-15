@@ -1,11 +1,12 @@
 import { registerProtocol } from './models/protocol';
-import { ipcMain, app, webContents, session } from 'electron';
-import { setIpcMain } from '@wexond/rpc-electron';
-setIpcMain(ipcMain);
-
-import { initialize } from '@electron/remote/main';
-
-initialize();
+import {
+  ipcMain,
+  app,
+  webContents,
+  session,
+  BrowserWindow,
+  Menu,
+} from 'electron';
 
 require('source-map-support').install();
 
@@ -54,6 +55,210 @@ ipcMain.on('get-webcontents-id', (e: any) => {
 ipcMain.on('get-window-id', (e: any) => {
   e.returnValue = (e.sender as any).windowId;
 });
+
+ipcMain.on('get-app-name-sync', (e: any) => {
+  e.returnValue = app.name;
+});
+
+ipcMain.on('get-process-argv-sync', (e: any) => {
+  e.returnValue = process.argv;
+});
+
+ipcMain.on('get-app-path-sync', (e: any, pathName: string) => {
+  const allowedPaths = new Set(['downloads', 'userData']);
+
+  if (!allowedPaths.has(pathName)) {
+    e.returnValue = '';
+    return;
+  }
+
+  e.returnValue = app.getPath(pathName as 'downloads' | 'userData');
+});
+
+const resolveBrowserWindow = (
+  sender: Electron.WebContents,
+): BrowserWindow | null => {
+  const windowId = (sender as any).windowId;
+
+  if (typeof windowId === 'number') {
+    const owner = BrowserWindow.fromId(windowId);
+    if (owner && !owner.isDestroyed()) {
+      return owner;
+    }
+  }
+
+  const directOwner = BrowserWindow.fromWebContents(sender);
+  if (directOwner && !directOwner.isDestroyed()) {
+    return directOwner;
+  }
+
+  return null;
+};
+
+ipcMain.on('window-is-always-on-top-sync', (e: any) => {
+  e.returnValue = resolveBrowserWindow(e.sender)?.isAlwaysOnTop() ?? false;
+});
+
+ipcMain.handle('window-set-always-on-top', (e, value: boolean) => {
+  const browserWindow = resolveBrowserWindow(e.sender);
+
+  if (!browserWindow) {
+    return false;
+  }
+
+  browserWindow.setAlwaysOnTop(!!value);
+  return browserWindow.isAlwaysOnTop();
+});
+
+ipcMain.handle('window-set-full-screen', (e, value: boolean) => {
+  const browserWindow = resolveBrowserWindow(e.sender);
+
+  if (!browserWindow) {
+    return false;
+  }
+
+  browserWindow.setFullScreen(!!value);
+  return browserWindow.isFullScreen();
+});
+
+ipcMain.handle('show-addressbar-context-menu', (e) => {
+  const browserWindow = resolveBrowserWindow(e.sender);
+  const menu = Menu.buildFromTemplate([
+    { role: 'undo', accelerator: 'CmdOrCtrl+Z' },
+    { type: 'separator' },
+    { role: 'copy', accelerator: 'CmdOrCtrl+C' },
+    { role: 'paste', accelerator: 'CmdOrCtrl+V' },
+    { type: 'separator' },
+    {
+      role: 'delete',
+      accelerator: process.platform === 'darwin' ? 'Fn+Delete' : 'Delete',
+    },
+    { type: 'separator' },
+    { role: 'selectAll', accelerator: 'CmdOrCtrl+A' },
+  ]);
+
+  menu.popup({
+    window: browserWindow ?? undefined,
+  });
+});
+
+const showActionMenu = (
+  browserWindow: BrowserWindow | null,
+  items: (
+    finish: (action: string | null) => void,
+  ) => Electron.MenuItemConstructorOptions[],
+) =>
+  new Promise<string | null>((resolve) => {
+    let settled = false;
+
+    const finish = (action: string | null) => {
+      if (settled) {
+        return;
+      }
+
+      settled = true;
+      resolve(action);
+    };
+
+    const menu = Menu.buildFromTemplate(items(finish));
+
+    menu.popup({
+      window: browserWindow ?? undefined,
+      callback: () => finish(null),
+    });
+  });
+
+ipcMain.handle(
+  'show-tab-context-menu',
+  async (
+    e,
+    {
+      hasTabGroup,
+      isPinned,
+      isMuted,
+      canRevertClosed,
+    }: {
+      hasTabGroup: boolean;
+      isPinned: boolean;
+      isMuted: boolean;
+      canRevertClosed: boolean;
+    },
+  ) =>
+    showActionMenu(resolveBrowserWindow(e.sender), (finish) => [
+      {
+        label: 'New tab to the right',
+        click: () => finish('new-tab-to-the-right'),
+      },
+      {
+        label: 'Add to a new group',
+        click: () => finish('add-to-a-new-group'),
+      },
+      {
+        label: 'Remove from group',
+        visible: !!hasTabGroup,
+        click: () => finish('remove-from-group'),
+      },
+      {
+        type: 'separator',
+      },
+      {
+        label: 'Reload',
+        accelerator: 'CmdOrCtrl+R',
+        click: () => finish('reload'),
+      },
+      {
+        label: 'Duplicate',
+        click: () => finish('duplicate'),
+      },
+      {
+        label: isPinned ? 'Unpin tab' : 'Pin tab',
+        click: () => finish('toggle-pin'),
+      },
+      {
+        label: isMuted ? 'Unmute tab' : 'Mute tab',
+        click: () => finish('toggle-mute'),
+      },
+      {
+        type: 'separator',
+      },
+      {
+        label: 'Close tab',
+        accelerator: 'CmdOrCtrl+W',
+        click: () => finish('close-tab'),
+      },
+      {
+        label: 'Close other tabs',
+        click: () => finish('close-other-tabs'),
+      },
+      {
+        label: 'Close tabs to the left',
+        click: () => finish('close-tabs-to-the-left'),
+      },
+      {
+        label: 'Close tabs to the right',
+        click: () => finish('close-tabs-to-the-right'),
+      },
+      {
+        type: 'separator',
+      },
+      {
+        label: 'Revert closed tab',
+        enabled: !!canRevertClosed,
+        click: () => finish('revert-closed-tab'),
+      },
+    ]),
+);
+
+ipcMain.handle('show-shield-context-menu', async (e, enabled: boolean) =>
+  showActionMenu(resolveBrowserWindow(e.sender), (finish) => [
+    {
+      label: 'Enable',
+      type: 'checkbox',
+      checked: !!enabled,
+      click: () => finish(enabled ? 'disable' : 'enable'),
+    },
+  ]),
+);
 
 ipcMain.handle(
   `web-contents-call`,

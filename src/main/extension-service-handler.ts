@@ -1,18 +1,22 @@
-import { RpcMainEvent, RpcMainHandler } from '@wexond/rpc-electron';
+import { ipcMain } from 'electron';
 import {
-  getExtensionMainChannel,
   ExtensionMainService,
+  EXTENSION_SERVICE_UNINSTALL_CHANNEL,
 } from '~/common/rpc/extensions';
 import { Application } from './application';
 
-export class ExtensionServiceHandler
-  implements RpcMainHandler<ExtensionMainService>
-{
+export class ExtensionServiceHandler {
   constructor() {
-    getExtensionMainChannel().getReceiver().handler = this;
+    try {
+      ipcMain.removeHandler(EXTENSION_SERVICE_UNINSTALL_CHANNEL);
+    } catch {}
+
+    ipcMain.handle(EXTENSION_SERVICE_UNINSTALL_CHANNEL, (_e, id: string) =>
+      this.uninstall(id),
+    );
   }
 
-  uninstall(e: RpcMainEvent, id: string): void {
-    Application.instance.sessions.uninstallExtension(id);
+  uninstall(id: string): ReturnType<ExtensionMainService['uninstall']> {
+    return Application.instance.sessions.uninstallExtension(id);
   }
 }

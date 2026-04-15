@@ -1,5 +1,4 @@
 import { WebContentsView, app, ipcMain, BrowserWindow } from 'electron';
-import { enable } from '@electron/remote/main';
 import { join } from 'path';
 import { roundifyRectangle } from '../services/dialogs-service';
 
@@ -55,8 +54,6 @@ export class PersistentDialog {
         ...webPreferences,
       },
     });
-
-    enable(this.webContentsView.webContents);
 
     (this.webContentsView as any).setBackgroundColor?.('#00000000');
 
@@ -133,6 +130,7 @@ export class PersistentDialog {
   public show(browserWindow: BrowserWindow, focus = true, waitForLoad = true) {
     return new Promise<void>((resolve) => {
       this.browserWindow = browserWindow;
+      (this.webContents as any).windowId = browserWindow.id;
 
       clearTimeout(this.timeout);
 
